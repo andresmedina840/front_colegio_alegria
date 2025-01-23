@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Grid,
+  Link,
   MenuItem,
   TextField,
   Typography,
@@ -12,7 +13,6 @@ import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
 import api from "../services/api";
-import { formatDate } from "../utils/formatDate";
 
 const CreateUserForm = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -138,29 +138,25 @@ const CreateUserForm = () => {
               .join("/")
           : "",
       };
-  
+
       const response = await api.post("/auth/crearUsuario", formattedData);
-  
+
       // Mostrar notificación de éxito
       enqueueSnackbar(response.data.message || "Usuario creado exitosamente", {
         variant: "success",
       });
-  
-      // Retrasar la redirección al login para dar tiempo a la notificación
-      setTimeout(() => {
-        router.push("/login");
-      }, 4000);
+
+      router.push("/login");
     } catch (error: any) {
       // Manejar errores
       const errorMessage =
         error.response?.data?.message || "Error al crear usuario";
       console.error("Error al crear usuario:", errorMessage);
-  
+
       // Mostrar notificación de error
       enqueueSnackbar(errorMessage, { variant: "error" });
     }
   };
-  
 
   return (
     <Box
@@ -412,6 +408,12 @@ const CreateUserForm = () => {
       >
         Crear Usuario
       </Button>
+      <Typography variant="body2" sx={{ mt: 2 }}>
+        ¿Ya tienes una cuenta?{" "}
+        <Link href="/login" color="primary" underline="hover">
+          Inicia sesión
+        </Link>
+      </Typography>
     </Box>
   );
 };
