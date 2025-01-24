@@ -181,6 +181,12 @@ const CreateUserForm = () => {
             name="username"
             value={formData.username}
             onChange={handleChange}
+            helperText={`${formData.username.length} / 30 caracteres`} 
+            slotProps={{
+              htmlInput: {
+                maxLength: 30, 
+              },
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={4}>
@@ -191,6 +197,12 @@ const CreateUserForm = () => {
             name="primerNombre"
             value={formData.primerNombre}
             onChange={handleChange}
+            helperText={`${formData.username.length} / 30 caracteres`} 
+            slotProps={{
+              htmlInput: {
+                maxLength: 30, 
+              },
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={4}>
@@ -201,6 +213,12 @@ const CreateUserForm = () => {
             name="segundoNombre"
             value={formData.segundoNombre}
             onChange={handleChange}
+            helperText={`${formData.username.length} / 30 caracteres`} 
+            slotProps={{
+              htmlInput: {
+                maxLength: 30, 
+              },
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={4}>
@@ -211,6 +229,12 @@ const CreateUserForm = () => {
             name="primerApellido"
             value={formData.primerApellido}
             onChange={handleChange}
+            helperText={`${formData.username.length} / 30 caracteres`} 
+            slotProps={{
+              htmlInput: {
+                maxLength: 30, 
+              },
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={4}>
