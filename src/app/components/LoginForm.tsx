@@ -8,6 +8,7 @@ import {
   Link,
   IconButton,
   InputAdornment,
+  CircularProgress,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { useState } from "react";
@@ -24,6 +25,7 @@ const LoginForm = () => {
     password: "",
   });
 
+  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,6 +34,7 @@ const LoginForm = () => {
   };
 
   const handleLogin = async () => {
+    setIsLoading(true); // Activa el spinner y desactiva el botón
     try {
       const response = await api.post("/auth/login", formData);
       console.log("Usuario autenticado:", response.data);
@@ -45,6 +48,8 @@ const LoginForm = () => {
       const errorMessage =
         error.response?.data?.message || "Credenciales incorrectas";
       enqueueSnackbar(errorMessage, { variant: "error" });
+    } finally {
+      setIsLoading(false); // Desactiva el spinner y habilita el botón
     }
   };
 
@@ -139,8 +144,12 @@ const LoginForm = () => {
           fullWidth
           sx={{ mt: 3 }}
           onClick={handleLogin}
+          disabled={isLoading} 
+          startIcon={
+            isLoading ? <CircularProgress size={20} color="inherit" /> : null
+          } 
         >
-          Iniciar Sesión
+          {isLoading ? "Cargando..." : "Iniciar Sesión"}
         </Button>
         <Typography variant="body2" sx={{ mt: 2 }}>
           ¿No tienes una cuenta?{" "}
