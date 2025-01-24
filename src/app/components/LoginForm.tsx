@@ -40,13 +40,9 @@ const LoginForm = () => {
       console.log("Usuario autenticado:", response.data);
 
       enqueueSnackbar("Inicio de sesión exitoso", { variant: "success" });
-
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 2000);
+      router.push("/dashboard");
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || "Credenciales incorrectas";
+      const errorMessage = error.response?.data?.message;
       enqueueSnackbar(errorMessage, { variant: "error" });
     } finally {
       setIsLoading(false); // Desactiva el spinner y habilita el botón
@@ -144,10 +140,10 @@ const LoginForm = () => {
           fullWidth
           sx={{ mt: 3 }}
           onClick={handleLogin}
-          disabled={isLoading} 
+          disabled={isLoading}
           startIcon={
             isLoading ? <CircularProgress size={20} color="inherit" /> : null
-          } 
+          }
         >
           {isLoading ? "Cargando..." : "Iniciar Sesión"}
         </Button>
