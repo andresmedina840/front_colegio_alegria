@@ -37,17 +37,14 @@ const CreateStudentForm = () => {
     segundoNombre: "",
     primerApellido: "",
     segundoApellido: "",
-    tipoIdentificacion: "",
     numeroIdentificacion: "",
     fechaNacimiento: "",
     fechaMatricula: "",
     genero: "",
     grado: "",
     jornada: "",
-    direccion: "",
     departamentoNacimiento: "",
     municipioNacimiento: "",
-    telefono: "",
     sedeMatricula: "",
     institucionEducativaAnterior: "",
     ultimoGradoCursado: "",
@@ -81,17 +78,14 @@ const CreateStudentForm = () => {
         segundoNombre: "",
         primerApellido: "",
         segundoApellido: "",
-        tipoIdentificacion: "",
         numeroIdentificacion: "",
         fechaNacimiento: "",
         fechaMatricula: "",
         genero: "",
         grado: "",
         jornada: "",
-        direccion: "",
         departamentoNacimiento: "",
         municipioNacimiento: "",
-        telefono: "",
         sedeMatricula: "",
         institucionEducativaAnterior: "",
         ultimoGradoCursado: "",
@@ -176,6 +170,13 @@ const CreateStudentForm = () => {
 
       <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
         <CardContent>
+          <Typography
+            variant="h6"
+            align="left"
+            sx={{ fontWeight: "bold", mb: 3 }}
+          >
+            Información del estudiante
+          </Typography>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={3}>
               <TextField
@@ -253,13 +254,6 @@ const CreateStudentForm = () => {
                 }}
               />
             </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-
-      <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
-        <CardContent>
-          <Grid container spacing={2}>
             <Grid item xs={12} sm={12}>
               <TextField
                 fullWidth
@@ -380,12 +374,6 @@ const CreateStudentForm = () => {
                 }}
               />
             </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-      <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
-        <CardContent>
-          <Grid container spacing={2}>
             <Grid item xs={12} sm={4}>
               <TextField
                 select
@@ -483,6 +471,7 @@ const CreateStudentForm = () => {
           </Grid>
         </CardContent>
       </Card>
+
       <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
         <CardContent>
           <Typography
