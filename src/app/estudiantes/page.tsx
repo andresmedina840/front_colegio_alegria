@@ -2,16 +2,17 @@
 
 import React from "react";
 import Layout from "../components/Layout";
-import { Typography, Box } from "@mui/material";
+import { Typography, Box, Container } from "@mui/material";
+import CreateStudentForm from "../components/CreateStudentForm";
 
 const Estudiante = () => {
   return (
     <Layout>
-      <Box>
-        <Typography variant="h4" gutterBottom>
-          Bienvenido Estudiantes
-        </Typography>
-      </Box>
+      <Container maxWidth="md">
+        <Box sx={{ mt: 4 }}>
+          <CreateStudentForm />
+        </Box>
+      </Container>
     </Layout>
   );
 };

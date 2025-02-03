@@ -197,10 +197,13 @@ const CreateUserForm = () => {
             name="primerNombre"
             value={formData.primerNombre}
             onChange={handleChange}
-            helperText={`${formData.username.length} / 30 caracteres`} 
+            helperText={`${formData.primerNombre.length} / 30 caracteres`} 
             slotProps={{
               htmlInput: {
                 maxLength: 30, 
+              },
+              inputLabel: {
+                shrink: true,
               },
             }}
           />
@@ -213,10 +216,13 @@ const CreateUserForm = () => {
             name="segundoNombre"
             value={formData.segundoNombre}
             onChange={handleChange}
-            helperText={`${formData.username.length} / 30 caracteres`} 
+            helperText={`${formData.segundoNombre.length} / 30 caracteres`} 
             slotProps={{
               htmlInput: {
                 maxLength: 30, 
+              },
+              inputLabel: {
+                shrink: true,
               },
             }}
           />
@@ -229,10 +235,13 @@ const CreateUserForm = () => {
             name="primerApellido"
             value={formData.primerApellido}
             onChange={handleChange}
-            helperText={`${formData.username.length} / 30 caracteres`} 
+            helperText={`${formData.primerApellido.length} / 30 caracteres`} 
             slotProps={{
               htmlInput: {
                 maxLength: 30, 
+              },
+              inputLabel: {
+                shrink: true,
               },
             }}
           />
@@ -245,6 +254,15 @@ const CreateUserForm = () => {
             name="segundoApellido"
             value={formData.segundoApellido}
             onChange={handleChange}
+            helperText={`${formData.segundoApellido.length} / 30 caracteres`} 
+            slotProps={{
+              htmlInput: {
+                maxLength: 30, 
+              },
+              inputLabel: {
+                shrink: true,
+              },
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={4}>

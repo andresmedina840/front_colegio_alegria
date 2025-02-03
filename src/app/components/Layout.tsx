@@ -52,6 +52,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     setDrawerOpen(false);
   };
 
+  const handleLogout = () => {
+    // Simular eliminación de sesión
+    console.log("Cerrando sesión...");
+    // Elimina el token o información del usuario almacenada
+    localStorage.removeItem("authToken"); // O cualquier clave que uses
+    // Redirige al usuario al login
+    router.push("/login");
+  };
+
   // Menú con acceso al Dashboard y otras secciones
   const menuItems: MenuItem[] = [
     { text: "Dashboard", route: "/dashboard", roles: ["ADMIN", "PROFESOR", "PADRE"] },
@@ -110,11 +119,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap>
-            Sistema Educativo
+            Colegio Alegría del Norte
           </Typography>
           <Box display="flex" alignItems="center">
             <Avatar alt="Usuario" src="/user-avatar.png" sx={{ mr: 2 }} />
-            <IconButton color="inherit">
+            <IconButton color="inherit" onClick={handleLogout}>
               <LogoutIcon />
             </IconButton>
           </Box>
