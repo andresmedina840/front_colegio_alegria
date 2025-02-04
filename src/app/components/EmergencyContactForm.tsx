@@ -1,15 +1,13 @@
 import { Grid, MenuItem, TextField, Typography } from "@mui/material";
 import React from "react";
 
-type ParentFormProps = {
-  title: string;
+type EmergencyContactFormProps = {
   formData: any;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   tiposIdentificacion: string[];
 };
 
-const ParentForm: React.FC<ParentFormProps> = ({
-  title,
+const EmergencyContactForm: React.FC<EmergencyContactFormProps> = ({
   formData,
   handleChange,
   tiposIdentificacion,
@@ -17,19 +15,19 @@ const ParentForm: React.FC<ParentFormProps> = ({
   return (
     <>
       <Typography variant="h5" align="left" sx={{ fontWeight: "bold", mb: 3 }}>
-        {title}
+        Contacto de Emergencia
       </Typography>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={3}>
           <TextField
             fullWidth
-            label={`Primer Nombre ${title}`}
-            name={`primerNombre${title}`}
+            label="Primer Nombre Contacto Emergencia"
+            name="primerNombreEmergencia"
             variant="outlined"
-            value={formData[`primerNombre${title}`]}
+            value={formData.primerNombreEmergencia || ""}
             onChange={handleChange}
             helperText={`${
-              formData[`primerNombre${title}`].length
+              (formData.primerNombreEmergencia || "").length
             } / 26 caracteres`}
             slotProps={{
               htmlInput: {
@@ -44,13 +42,13 @@ const ParentForm: React.FC<ParentFormProps> = ({
         <Grid item xs={12} sm={3}>
           <TextField
             fullWidth
-            label={`Segundo Nombre ${title}`}
-            name={`segundoNombre${title}`}
+            label="Segundo Nombre Contacto Emergencia"
+            name="segundoNombreEmergencia"
             variant="outlined"
-            value={formData[`segundoNombre${title}`]}
+            value={formData.segundoNombreEmergencia || ""}
             onChange={handleChange}
             helperText={`${
-              formData[`segundoNombre${title}`].length
+              (formData.segundoNombreEmergencia || "").length
             } / 26 caracteres`}
             slotProps={{
               htmlInput: {
@@ -65,13 +63,13 @@ const ParentForm: React.FC<ParentFormProps> = ({
         <Grid item xs={12} sm={3}>
           <TextField
             fullWidth
-            label={`Primer Apellido ${title}`}
-            name={`primerApellido${title}`}
+            label="Primer Apellido Contacto Emergencia"
+            name="primerApellidoEmergencia"
             variant="outlined"
-            value={formData[`primerApellido${title}`]}
+            value={formData.primerApellidoEmergencia || ""}
             onChange={handleChange}
             helperText={`${
-              formData[`primerApellido${title}`].length
+              (formData.primerApellidoEmergencia || "").length
             } / 26 caracteres`}
             slotProps={{
               htmlInput: {
@@ -86,13 +84,13 @@ const ParentForm: React.FC<ParentFormProps> = ({
         <Grid item xs={12} sm={3}>
           <TextField
             fullWidth
-            label={`Segundo Apellido ${title}`}
-            name={`segundoApellido${title}`}
+            label="Segundo Apellido Contacto Emergencia"
+            name="segundoApellidoEmergencia"
             variant="outlined"
-            value={formData[`segundoApellido${title}`]}
+            value={formData.segundoApellidoEmergencia || ""}
             onChange={handleChange}
             helperText={`${
-              formData[`segundoApellido${title}`].length
+              (formData.segundoApellidoEmergencia || "").length
             } / 26 caracteres`}
             slotProps={{
               htmlInput: {
@@ -104,19 +102,20 @@ const ParentForm: React.FC<ParentFormProps> = ({
             }}
           />
         </Grid>
+
         <Grid item xs={12} sm={5}>
           <TextField
             select
             fullWidth
-            label={`Tipo Identificación ${title}`}
-            name={`tipoIdentificacion${title}`}
-            value={formData[`tipoIdentificacion${title}`]}
+            label="Tipo Identificación Contacto Emergencia"
+            name="tipoIdentificacionEmergencia"
+            value={formData.tipoIdentificacionEmergencia || ""}
             onChange={handleChange}
             slotProps={{
-              inputLabel: {
-                shrink: true,
-              },
-            }}
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
           >
             {tiposIdentificacion.map((tipo) => (
               <MenuItem key={tipo} value={tipo}>
@@ -125,15 +124,16 @@ const ParentForm: React.FC<ParentFormProps> = ({
             ))}
           </TextField>
         </Grid>
+
         <Grid item xs={12} sm={4}>
           <TextField
             fullWidth
-            label={`Número Identificación ${title}`}
-            name={`numeroIdentificacion${title}`}
-            value={formData[`numeroIdentificacion${title}`]}
+            label="Número Identificación Contacto Emergencia"
+            name="numeroIdentificacionEmergencia"
+            value={formData.numeroIdentificacionEmergencia || ""}
             onChange={handleChange}
             helperText={`${
-              (formData[`numeroIdentificacion${title}`] || "").length
+              (formData.numeroIdentificacionEmergencia || "").length
             } / 50 caracteres`}
             slotProps={{
               htmlInput: {
@@ -149,12 +149,12 @@ const ParentForm: React.FC<ParentFormProps> = ({
         <Grid item xs={12} sm={3}>
           <TextField
             fullWidth
-            label={`Numero Celular ${title}`}
-            name={`numeroCelular${title}`}
-            value={formData[`numeroCelular${title}`]}
+            label="Número Celular Contacto Emergencia"
+            name="numeroCelularEmergencia"
+            value={formData.numeroCelularEmergencia || ""}
             onChange={handleChange}
             helperText={`${
-              (formData[`numeroCelular${title}`] || "").length
+              (formData.numeroCelularEmergencia || "").length
             } / 10 caracteres`}
             slotProps={{
               htmlInput: {
@@ -170,12 +170,12 @@ const ParentForm: React.FC<ParentFormProps> = ({
         <Grid item xs={12} sm={8}>
           <TextField
             fullWidth
-            label={`Direccion ${title}`}
-            name={`direccion${title}`}
-            value={formData[`direccion${title}`]}
+            label="Dirección Contacto Emergencia"
+            name="direccionEmergencia"
+            value={formData.direccionEmergencia || ""}
             onChange={handleChange}
             helperText={`${
-              (formData[`direccion${title}`] || "").length
+              (formData.direccionEmergencia || "").length
             } / 60 caracteres`}
             slotProps={{
               htmlInput: {
@@ -187,64 +187,25 @@ const ParentForm: React.FC<ParentFormProps> = ({
             }}
           />
         </Grid>
+
         <Grid item xs={12} sm={4}>
           <TextField
             fullWidth
-            label={`Barrio ${title}`}
-            name={`barrio${title}`}
-            value={formData[`barrio${title}`]}
+            label="Parentesco Contacto Emergencia"
+            name="parentescoEmergencia"
+            value={formData.parentescoEmergencia || ""}
             onChange={handleChange}
             helperText={`${
-              (formData[`barrio${title}`] || "").length
-            } / 45 caracteres`}
+              (formData.parentescoEmergencia || "").length
+            } / 30 caracteres`}
             slotProps={{
-              htmlInput: {
-                maxLength: 45,
-              },
-              inputLabel: {
-                shrink: true,
-              },
-            }}
-          />
-        </Grid>
-        <Grid item xs={12} sm={5}>
-          <TextField
-            fullWidth
-            label={`Ocupación ${title}`}
-            name={`ocupacion${title}`}
-            value={formData[`ocupacion${title}`]}
-            onChange={handleChange}
-            helperText={`${
-              (formData[`ocupacion${title}`] || "").length
-            } / 60 caracteres`}
-            slotProps={{
-              htmlInput: {
-                maxLength: 60,
-              },
-              inputLabel: {
-                shrink: true,
-              },
-            }}
-          />
-        </Grid>
-        <Grid item xs={12} sm={7}>
-          <TextField
-            fullWidth
-            label={`Correo Electrónico ${title}`}
-            name={`correoElectronico${title}`}
-            value={formData[`correoElectronico${title}`]}
-            onChange={handleChange}
-            helperText={`${
-              (formData[`correoElectronico${title}`] || "").length
-            } / 60 caracteres`}
-            slotProps={{
-              htmlInput: {
-                maxLength: 60,
-              },
-              inputLabel: {
-                shrink: true,
-              },
-            }}
+                htmlInput: {
+                  maxLength: 30,
+                },
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
           />
         </Grid>
       </Grid>
@@ -252,4 +213,4 @@ const ParentForm: React.FC<ParentFormProps> = ({
   );
 };
 
-export default ParentForm;
+export default EmergencyContactForm;

@@ -17,6 +17,7 @@ import ParentForm from "./ParentForm";
 import HealthAffiliationForm from "./HealthAffiliationForm";
 import StudentInfoForm from "./StudentInfoForm";
 import EnrollmentInfoForm from "./EnrollmentInfoForm";
+import EmergencyContactForm from "./EmergencyContactForm";
 
 const generos = ["Masculino", "Femenino", "Otro"];
 const tiposIdentificacion = ["TI", "CC", "RC", "CE"];
@@ -76,6 +77,7 @@ const initialFormData = {
   correoElectronicoPadre: "",
   autorizacionImagen: "",
   veracidadInformacion: "",
+  autorizacionCoctactoEmergencia: "",
 };
 
 const CreateStudentForm = () => {
@@ -177,6 +179,38 @@ const CreateStudentForm = () => {
             />
           </Box>
           <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid item xs={12} sm={12}>
+              <TextField
+                select
+                fullWidth
+                label="Autorización para contacto de emergencia"
+                name="autorizacionCoctactoEmergencia"
+                value={formData.autorizacionCoctactoEmergencia || ""}
+                onChange={handleChange}
+                slotProps={{
+                  inputLabel: {
+                    shrink: true,
+                  },
+                }}
+              >
+                {siNo.map((respuestas) => (
+                  <MenuItem key={respuestas} value={respuestas}>
+                    {respuestas}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            {formData.autorizacionCoctactoEmergencia === "SI" && (
+              <Box sx={{ mt: 2, ml: 2 }}>
+                <EmergencyContactForm
+                  formData={formData}
+                  handleChange={handleChange}
+                  tiposIdentificacion={tiposIdentificacion}
+                />
+              </Box>
+            )}
+
             <Grid item xs={12} sm={6}>
               <TextField
                 select
@@ -218,6 +252,18 @@ const CreateStudentForm = () => {
                   </MenuItem>
                 ))}
               </TextField>
+            </Grid>
+
+            <Grid item xs={12} sm={12}>
+              <Typography
+                variant="h5"
+                align="justify"
+                sx={{ fontWeight: "bold", mb: 3 }}
+              >
+                Con mi firma y con la de mi padre, madre o acudiente, nos
+                comprometemos a cumplir con lo establecido en el Manual de
+                Convivencia del Colegio Alegria del Norte.
+              </Typography>
             </Grid>
           </Grid>
         </CardContent>
