@@ -1,0 +1,31 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Acceder a la instancia EC2 y desplegar Frontend
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ubuntu
+          key: ${{ secrets.AWS_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/colegio_alegria_norte
+            if [ ! -d "front_colegio_alegria" ]; then
+              git clone https://github.com/andresmedina840/front_colegio_alegria.git
+            fi
+            cd front_colegio_alegria
+            git pull origin main
+            docker-compose down
+            docker-compose up --build -d
