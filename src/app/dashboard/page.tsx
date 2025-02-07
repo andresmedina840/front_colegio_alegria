@@ -10,7 +10,7 @@ import {
   Grid,
   CircularProgress,
 } from "@mui/material";
-import api from "../services/api"; // Asegúrate de tener configurado tu archivo de servicio API.
+import api from "../axios/axiosClient"; // Asegúrate de tener configurado tu archivo de servicio API.
 
 // Simulación del rol del usuario actual
 const currentUserRole = "ADMIN"; // Cambia este valor según la lógica de autenticación

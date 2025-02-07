@@ -15,7 +15,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import api from "../services/api";
+import api from "../axios/axiosClient";
 
 const LoginForm = () => {
   const router = useRouter();

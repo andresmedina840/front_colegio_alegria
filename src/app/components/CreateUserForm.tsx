@@ -12,7 +12,7 @@ import {
 import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
-import api from "../services/api";
+import api from "../axios/axiosClient";
 
 const CreateUserForm = () => {
   const { enqueueSnackbar } = useSnackbar();

@@ -12,7 +12,7 @@ import {
   Card,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
-import api from "../services/api";
+import api from "../axios/axiosClient";
 import ParentForm from "./ParentForm";
 import HealthAffiliationForm from "./HealthAffiliationForm";
 import StudentInfoForm from "./StudentInfoForm";
