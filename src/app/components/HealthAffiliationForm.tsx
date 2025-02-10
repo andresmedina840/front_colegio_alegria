@@ -2,8 +2,10 @@ import { Card, CardContent, Grid, TextField, Typography } from "@mui/material";
 import React from "react";
 
 type HealthAffiliationFormProps = {
-  formData: any;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  formData: Record<string, string>;
+  handleChange: (
+    e: React.ChangeEvent<{ name?: string; value: unknown }>
+  ) => void;
 };
 
 const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
@@ -13,7 +15,11 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
   return (
     <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
       <CardContent>
-        <Typography variant="h5" align="left" sx={{ fontWeight: "bold", mb: 3 }}>
+        <Typography
+          variant="h5"
+          align="left"
+          sx={{ fontWeight: "bold", mb: 3 }}
+        >
           Afiliación al sistema de salud
         </Typography>
         <Grid container spacing={2}>
@@ -24,7 +30,9 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="tipoSangre"
               value={formData.tipoSangre || ""}
               onChange={handleChange}
-              helperText={`${(formData.tipoSangre || "").length} / 5 caracteres`}
+              helperText={`${
+                (formData.tipoSangre || "").length
+              } / 5 caracteres`}
               inputProps={{ maxLength: 5 }}
             />
           </Grid>
@@ -35,7 +43,9 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="epsAfiliado"
               value={formData.epsAfiliado || ""}
               onChange={handleChange}
-              helperText={`${(formData.epsAfiliado || "").length} / 45 caracteres`}
+              helperText={`${
+                (formData.epsAfiliado || "").length
+              } / 45 caracteres`}
               inputProps={{ maxLength: 45 }}
             />
           </Grid>
@@ -46,7 +56,9 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="ipsAsignada"
               value={formData.ipsAsignada || ""}
               onChange={handleChange}
-              helperText={`${(formData.ipsAsignada || "").length} / 55 caracteres`}
+              helperText={`${
+                (formData.ipsAsignada || "").length
+              } / 55 caracteres`}
               inputProps={{ maxLength: 55 }}
             />
           </Grid>
@@ -57,7 +69,9 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="arsAfiliado"
               value={formData.arsAfiliado || ""}
               onChange={handleChange}
-              helperText={`${(formData.arsAfiliado || "").length} / 45 caracteres`}
+              helperText={`${
+                (formData.arsAfiliado || "").length
+              } / 45 caracteres`}
               inputProps={{ maxLength: 45 }}
             />
           </Grid>
@@ -68,7 +82,9 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="nroCarnetSisben"
               value={formData.nroCarnetSisben || ""}
               onChange={handleChange}
-              helperText={`${(formData.nroCarnetSisben || "").length} / 20 caracteres`}
+              helperText={`${
+                (formData.nroCarnetSisben || "").length
+              } / 20 caracteres`}
               inputProps={{ maxLength: 20 }}
             />
           </Grid>
@@ -79,7 +95,9 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="nivelSisben"
               value={formData.nivelSisben || ""}
               onChange={handleChange}
-              helperText={`${(formData.nivelSisben || "").length} / 45 caracteres`}
+              helperText={`${
+                (formData.nivelSisben || "").length
+              } / 45 caracteres`}
               inputProps={{ maxLength: 45 }}
             />
           </Grid>

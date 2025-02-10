@@ -2,8 +2,10 @@ import { Card, CardContent, Grid, TextField } from "@mui/material";
 import React from "react";
 
 type EnrollmentInfoFormProps = {
-  formData: any;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  formData: Record<string, string>;
+  handleChange: (
+    e: React.ChangeEvent<{ name?: string; value: unknown }>
+  ) => void;
 };
 
 const EnrollmentInfoForm: React.FC<EnrollmentInfoFormProps> = ({
@@ -22,7 +24,9 @@ const EnrollmentInfoForm: React.FC<EnrollmentInfoFormProps> = ({
               variant="outlined"
               value={formData.numeroMatricula || ""}
               onChange={handleChange}
-              helperText={`${(formData.numeroMatricula || "").length} / 26 caracteres`}
+              helperText={`${
+                (formData.numeroMatricula || "").length
+              } / 26 caracteres`}
               inputProps={{ maxLength: 26 }}
             />
           </Grid>

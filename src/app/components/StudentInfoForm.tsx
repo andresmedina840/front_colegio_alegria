@@ -9,8 +9,10 @@ import {
 import React from "react";
 
 type StudentInfoFormProps = {
-  formData: any;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  formData: Record<string, string>;
+  handleChange: (
+    e: React.ChangeEvent<{ name?: string; value: unknown }>
+  ) => void;
   grados: string[];
   jornadaEscolar: string[];
   generos: string[];

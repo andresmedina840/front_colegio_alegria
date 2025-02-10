@@ -3,8 +3,10 @@ import React from "react";
 
 type ParentFormProps = {
   title: string;
-  formData: any;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  formData: Record<string, string>;
+  handleChange: (
+    e: React.ChangeEvent<{ name?: string; value: unknown }>
+  ) => void;
   tiposIdentificacion: string[];
 };
 

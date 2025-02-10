@@ -14,7 +14,7 @@ axiosClient.interceptors.request.use(
 			if (token) {
 				request.headers['Authorization'] = `Bearer ${token}`;
 			}
-		} catch (e) {}
+		} catch {}
 
 		return request;
 	},

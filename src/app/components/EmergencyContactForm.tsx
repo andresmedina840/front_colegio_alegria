@@ -2,8 +2,10 @@ import { Grid, MenuItem, TextField, Typography } from "@mui/material";
 import React from "react";
 
 type EmergencyContactFormProps = {
-  formData: any;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  formData: Record<string, string>;
+  handleChange: (
+    e: React.ChangeEvent<{ name?: string; value: unknown }>
+  ) => void;
   tiposIdentificacion: string[];
 };
 
@@ -112,10 +114,10 @@ const EmergencyContactForm: React.FC<EmergencyContactFormProps> = ({
             value={formData.tipoIdentificacionEmergencia || ""}
             onChange={handleChange}
             slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
+              inputLabel: {
+                shrink: true,
+              },
+            }}
           >
             {tiposIdentificacion.map((tipo) => (
               <MenuItem key={tipo} value={tipo}>
@@ -199,13 +201,13 @@ const EmergencyContactForm: React.FC<EmergencyContactFormProps> = ({
               (formData.parentescoEmergencia || "").length
             } / 30 caracteres`}
             slotProps={{
-                htmlInput: {
-                  maxLength: 30,
-                },
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
+              htmlInput: {
+                maxLength: 30,
+              },
+              inputLabel: {
+                shrink: true,
+              },
+            }}
           />
         </Grid>
       </Grid>

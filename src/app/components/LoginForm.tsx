@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import api from "../axios/axiosClient";
+import Image from "next/image";
 
 const LoginForm = () => {
   const router = useRouter();
@@ -34,20 +35,39 @@ const LoginForm = () => {
   };
 
   const handleLogin = async () => {
-    setIsLoading(true); // Activa el spinner y desactiva el botón
+    setIsLoading(true);
     try {
       const response = await api.post("/auth/login", formData);
       console.log("Usuario autenticado:", response.data);
-
+  
       enqueueSnackbar("Inicio de sesión exitoso", { variant: "success" });
       router.push("/dashboard");
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message;
+    } catch (error: unknown) {
+      let errorMessage = "Error al iniciar sesión";
+  
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error &&
+        typeof error.response === "object" &&
+        error.response !== null &&
+        "data" in error.response &&
+        typeof error.response.data === "object" &&
+        error.response.data !== null &&
+        "message" in error.response.data &&
+        typeof error.response.data.message === "string"
+      ) {
+        errorMessage = error.response.data.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+  
       enqueueSnackbar(errorMessage, { variant: "error" });
     } finally {
-      setIsLoading(false); // Desactiva el spinner y habilita el botón
+      setIsLoading(false);
     }
   };
+  
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -84,10 +104,13 @@ const LoginForm = () => {
           Colegio Alegría del Norte
         </Typography>
 
-        <img
-          src="/logo-colegio.png" // Ruta del logo
+        <Image
+          src="/logo-colegio.png"
           alt="Logo del Colegio"
-          style={{ width: 100, marginBottom: 20 }}
+          width={100}
+          height={100}
+          priority // Carga la imagen más rápido
+          style={{ marginBottom: 20 }}
         />
 
         <Grid container spacing={2}>

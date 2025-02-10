@@ -2,7 +2,7 @@
 
 import React from "react";
 import Layout from "../components/Layout";
-import { Typography, Box, Container } from "@mui/material";
+import { Box, Container } from "@mui/material";
 import CreateStudentForm from "../components/CreateStudentForm";
 
 const Estudiante = () => {

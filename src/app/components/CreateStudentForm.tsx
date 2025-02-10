@@ -1,125 +1,138 @@
 "use client";
 
-import { useState } from "react";
 import {
   Box,
   Button,
   Grid,
+  Link,
+  MenuItem,
   TextField,
   Typography,
-  MenuItem,
-  CardContent,
-  Card,
 } from "@mui/material";
+import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
+import { useRouter } from "next/navigation";
 import api from "../axios/axiosClient";
-import ParentForm from "./ParentForm";
-import HealthAffiliationForm from "./HealthAffiliationForm";
-import StudentInfoForm from "./StudentInfoForm";
-import EnrollmentInfoForm from "./EnrollmentInfoForm";
-import EmergencyContactForm from "./EmergencyContactForm";
 
-const generos = ["Masculino", "Femenino", "Otro"];
-const tiposIdentificacion = ["TI", "CC", "RC", "CE"];
-const grados = [
-  "Pre-Jardín",
-  "Jardín",
-  "Transición",
-  "Primero",
-  "Segundo",
-  "Tercero",
-  "Cuarto",
-  "Quinto",
-];
-const jornadaEscolar = ["Mañana", "Tarde", "Completa"];
-const siNo = ["SI", "NO"];
-
-const initialFormData = {
-  primerNombre: "",
-  segundoNombre: "",
-  primerApellido: "",
-  segundoApellido: "",
-  numeroIdentificacion: "",
-  fechaNacimiento: "",
-  fechaMatricula: "",
-  genero: "",
-  grado: "",
-  jornada: "",
-  departamentoNacimiento: "",
-  municipioNacimiento: "",
-  sedeMatricula: "",
-  institucionEducativaAnterior: "",
-  ultimoGradoCursado: "",
-  ultimoAnioCursado: "",
-  edad: "",
-  tipoSangre: "",
-  epsAfiliado: "",
-  ipsAsignada: "",
-  arsAfiliado: "",
-  nroCarnetSisben: "",
-  nivelSisben: "",
-  estrato: "",
-  numeroMatricula: "",
-  primerNombrePadre: "",
-  segundoNombrePadre: "",
-  primerApellidoPadre: "",
-  segundoApellidoPadre: "",
-  direccionPadre: "",
-  barrioPadre: "",
-  primerNombreMadre: "",
-  segundoNombreMadre: "",
-  primerApellidoMadre: "",
-  segundoApellidoMadre: "",
-  tipoIdentificacionPadre: "",
-  numeroIdentificacionPadre: "",
-  numeroCelularPadre: "",
-  ocupacionPadre: "",
-  correoElectronicoPadre: "",
-  autorizacionImagen: "",
-  veracidadInformacion: "",
-  autorizacionCoctactoEmergencia: "",
+// Definir un tipo para las opciones de selección
+type OpcionSelect = {
+  id: string;
+  nombre: string;
 };
 
-const CreateStudentForm = () => {
+const CreateUserForm = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const router = useRouter();
 
-  const [formData, setFormData] = useState(initialFormData);
+  const [formData, setFormData] = useState({
+    username: "",
+    primerNombre: "",
+    segundoNombre: "",
+    primerApellido: "",
+    segundoApellido: "",
+    email: "",
+    password: "",
+    rol: "",
+    fechaNacimiento: "",
+    tipoIdentificacionId: "",
+    numeroIdentificacion: "",
+    numeroCelular1: "",
+    numeroCelular2: "",
+    usuarioTelegram: "",
+    direccionCompleta: "",
+    ciudad: "",
+    departamento: "",
+    pais: "",
+  });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const [paises, setPaises] = useState<OpcionSelect[]>([]);
+  const [departamentos, setDepartamentos] = useState<OpcionSelect[]>([]);
+  const [ciudades, setCiudades] = useState<OpcionSelect[]>([]);
+
+  // Cargar países al iniciar
+  useEffect(() => {
+    const fetchPaises = async () => {
+      try {
+        const response = await api.get<OpcionSelect[]>("/ubicacion/paises");
+        setPaises(response.data);
+      } catch (error) {
+        console.error("Error al cargar países:", error);
+      }
+    };
+    fetchPaises();
+  }, []);
+
+  // Cargar departamentos cuando se selecciona un país
+  useEffect(() => {
+    if (formData.pais) {
+      const fetchDepartamentos = async () => {
+        try {
+          const response = await api.get<OpcionSelect[]>(`/ubicacion/departamentos/${formData.pais}`);
+          setDepartamentos(response.data);
+        } catch (error) {
+          console.error("Error al cargar departamentos:", error);
+        }
+      };
+      fetchDepartamentos();
+    } else {
+      setDepartamentos([]);
+      setCiudades([]);
+    }
+  }, [formData.pais]);
+
+  // Cargar ciudades cuando se selecciona un departamento
+  useEffect(() => {
+    if (formData.departamento) {
+      const fetchCiudades = async () => {
+        try {
+          const response = await api.get<OpcionSelect[]>(`/ubicacion/ciudades/${formData.departamento}`);
+          setCiudades(response.data);
+        } catch (error) {
+          console.error("Error al cargar ciudades:", error);
+        }
+      };
+      fetchCiudades();
+    } else {
+      setCiudades([]);
+    }
+  }, [formData.departamento]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
 
-    if (name === "fechaNacimiento") {
-      const hoy = new Date();
-      const fechaNac = new Date(value);
-      let edadCalculada = hoy.getFullYear() - fechaNac.getFullYear();
-
-      // Ajustar si aún no ha cumplido años este año
-      const mes = hoy.getMonth() - fechaNac.getMonth();
-      if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
-        edadCalculada--;
-      }
-
-      setFormData((prevData) => ({
-        ...prevData,
-        edad: edadCalculada.toString() + " años",
-      }));
-    }
-
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+      ...(name === "pais" ? { departamento: "", ciudad: "" } : {}),
+      ...(name === "departamento" ? { ciudad: "" } : {}),
+    }));
   };
 
-  const handleSubmit = async () => {
+  const handleCreateUser = async () => {
     try {
-      await api.post("/alumnos", formData);
-      enqueueSnackbar("Estudiante registrado con éxito", {
-        variant: "success",
-      });
-      setFormData(initialFormData);
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || "Error al registrar el estudiante";
+      const response = await api.post("/auth/crearUsuario", formData);
+      enqueueSnackbar(response.data.message || "Usuario creado exitosamente", { variant: "success" });
+      router.push("/login");
+    } catch (error: unknown) {
+      let errorMessage = "Error al crear usuario";
+
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error &&
+        typeof error.response === "object" &&
+        error.response !== null &&
+        "data" in error.response &&
+        typeof error.response.data === "object" &&
+        error.response.data !== null &&
+        "message" in error.response.data &&
+        typeof error.response.data.message === "string"
+      ) {
+        errorMessage = error.response.data.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
       enqueueSnackbar(errorMessage, { variant: "error" });
     }
   };
@@ -127,160 +140,88 @@ const CreateStudentForm = () => {
   return (
     <Box
       sx={{
-        maxWidth: "100%",
-        margin: "auto",
-        mt: 4,
+        width: 600,
+        padding: 3,
         backgroundColor: "white",
         borderRadius: 2,
         boxShadow: 3,
       }}
     >
-      <Typography
-        variant="h4"
-        align="center"
-        sx={{ fontWeight: "bold", mb: 3 }}
-      >
-        Registro de Estudiante
+      <Typography variant="h5" sx={{ mb: 3 }}>
+        Crear Usuario
       </Typography>
-
-      <EnrollmentInfoForm formData={formData} handleChange={handleChange} />
-
-      <StudentInfoForm
-        formData={formData}
-        handleChange={handleChange}
-        grados={grados}
-        jornadaEscolar={jornadaEscolar}
-        generos={generos}
-      />
-
-      <HealthAffiliationForm formData={formData} handleChange={handleChange} />
-
-      <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
-        <CardContent>
-          <Typography
-            variant="h5"
-            align="left"
-            sx={{ fontWeight: "bold", mb: 3 }}
+      <Grid container spacing={2}>
+        {/* Campo País */}
+        <Grid item xs={12} sm={4}>
+          <TextField
+            label="País"
+            select
+            fullWidth
+            variant="outlined"
+            name="pais"
+            value={formData.pais}
+            onChange={handleChange}
           >
-            Información Familiar
-          </Typography>
-          <ParentForm
-            title="Padre"
-            formData={formData}
-            handleChange={handleChange}
-            tiposIdentificacion={tiposIdentificacion}
-          />
-          <Box sx={{ mt: 2 }}>
-            <ParentForm
-              title="Madre"
-              formData={formData}
-              handleChange={handleChange}
-              tiposIdentificacion={tiposIdentificacion}
-            />
-          </Box>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12} sm={12}>
-              <TextField
-                select
-                fullWidth
-                label="Autorización para contacto de emergencia"
-                name="autorizacionCoctactoEmergencia"
-                value={formData.autorizacionCoctactoEmergencia || ""}
-                onChange={handleChange}
-                slotProps={{
-                  inputLabel: {
-                    shrink: true,
-                  },
-                }}
-              >
-                {siNo.map((respuestas) => (
-                  <MenuItem key={respuestas} value={respuestas}>
-                    {respuestas}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
+            {paises.map((pais) => (
+              <MenuItem key={pais.id} value={pais.id}>
+                {pais.nombre}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
 
-            {formData.autorizacionCoctactoEmergencia === "SI" && (
-              <Box sx={{ mt: 2, ml: 2 }}>
-                <EmergencyContactForm
-                  formData={formData}
-                  handleChange={handleChange}
-                  tiposIdentificacion={tiposIdentificacion}
-                />
-              </Box>
-            )}
+        {/* Campo Departamento */}
+        <Grid item xs={12} sm={4}>
+          <TextField
+            label="Departamento"
+            select
+            fullWidth
+            variant="outlined"
+            name="departamento"
+            value={formData.departamento}
+            onChange={handleChange}
+            disabled={!formData.pais}
+          >
+            {departamentos.map((departamento) => (
+              <MenuItem key={departamento.id} value={departamento.id}>
+                {departamento.nombre}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
 
-            <Grid item xs={12} sm={6}>
-              <TextField
-                select
-                fullWidth
-                label="Autorizo para uso de imagen (Fotografía/videos)"
-                name="autorizacionImagen"
-                value={formData.autorizacionImagen || ""}
-                onChange={handleChange}
-                slotProps={{
-                  inputLabel: {
-                    shrink: true,
-                  },
-                }}
-              >
-                {siNo.map((respuestas) => (
-                  <MenuItem key={respuestas} value={respuestas}>
-                    {respuestas}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                select
-                fullWidth
-                label="Declaración de veracidad de la información"
-                name="veracidadInformacion"
-                value={formData.veracidadInformacion || ""}
-                onChange={handleChange}
-                slotProps={{
-                  inputLabel: {
-                    shrink: true,
-                  },
-                }}
-              >
-                {siNo.map((respuestas) => (
-                  <MenuItem key={respuestas} value={respuestas}>
-                    {respuestas}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-
-            <Grid item xs={12} sm={12}>
-              <Typography
-                variant="h5"
-                align="justify"
-                sx={{ fontWeight: "bold", mb: 3 }}
-              >
-                Con mi firma y con la de mi padre, madre o acudiente, nos
-                comprometemos a cumplir con lo establecido en el Manual de
-                Convivencia del Colegio Alegria del Norte.
-              </Typography>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-
-      <Grid item xs={12}>
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          onClick={handleSubmit}
-        >
-          Registrar Estudiante
-        </Button>
+        {/* Campo Ciudad */}
+        <Grid item xs={12} sm={4}>
+          <TextField
+            label="Ciudad"
+            select
+            fullWidth
+            variant="outlined"
+            name="ciudad"
+            value={formData.ciudad}
+            onChange={handleChange}
+            disabled={!formData.departamento}
+          >
+            {ciudades.map((ciudad) => (
+              <MenuItem key={ciudad.id} value={ciudad.id}>
+                {ciudad.nombre}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
       </Grid>
+
+      <Button variant="contained" color="primary" fullWidth sx={{ mt: 3 }} onClick={handleCreateUser}>
+        Crear Usuario
+      </Button>
+      <Typography variant="body2" sx={{ mt: 2 }}>
+        ¿Ya tienes una cuenta?{" "}
+        <Link href="/login" color="primary" underline="hover">
+          Inicia sesión
+        </Link>
+      </Typography>
     </Box>
   );
 };
 
-export default CreateStudentForm;
+export default CreateUserForm;
