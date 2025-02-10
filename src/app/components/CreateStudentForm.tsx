@@ -20,6 +20,9 @@ import EnrollmentInfoForm from "./EnrollmentInfoForm";
 import EmergencyContactForm from "./EmergencyContactForm";
 import DocumentacionRecibida from "./DocumentacionRecibida";
 import Discapacidades from "./Discapacidades";
+import CapacidadesExcepcionales from "./CapacidadesExcepcionales";
+import SituacionAcademica from "./SituacionAcademica";
+import CondicionesEspeciales from "./CondicionesEspeciales";
 
 const generos = ["Masculino", "Femenino", "Otro"];
 const tiposIdentificacion = ["TI", "CC", "RC", "CE"];
@@ -35,6 +38,7 @@ const grados = [
 ];
 const jornadaEscolar = ["Mañana", "Tarde", "Completa"];
 const siNo = [" ", "SI", "NO"];
+const estratoEconomico = ["Estrato 1 ", "Estrato 2", "Estrato 3", "Estrato 4 ", "Estrato 5", "Estrato 6", "Otro"];
 
 const initialFormData = {
   primerNombre: "",
@@ -87,28 +91,32 @@ const CreateStudentForm = () => {
 
   const [formData, setFormData] = useState(initialFormData);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | React.ChangeEvent<{ name?: string; value: unknown }>) => {
+  const handleChange = (
+    e:
+      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+      | React.ChangeEvent<{ name?: string; value: unknown }>
+  ) => {
     const { name, value } = e.target as { name: string; value: string }; // Cast para evitar errores
-  
+
     if (name === "fechaNacimiento") {
       const hoy = new Date();
       const fechaNac = new Date(value);
       let edadCalculada = hoy.getFullYear() - fechaNac.getFullYear();
-  
+
       // Ajustar si aún no ha cumplido años este año
       const mes = hoy.getMonth() - fechaNac.getMonth();
       if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
         edadCalculada--;
       }
-  
+
       setFormData((prevData) => ({
         ...prevData,
         edad: edadCalculada.toString() + " años",
       }));
     }
-  
+
     setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };  
+  };
 
   const handleSubmit = async () => {
     try {
@@ -145,18 +153,6 @@ const CreateStudentForm = () => {
 
       <EnrollmentInfoForm formData={formData} handleChange={handleChange} />
 
-      <Discapacidades
-        formData={formData}
-        handleChange={handleChange}
-        siNo={siNo} // <- Agregar esta prop
-      />
-
-      <DocumentacionRecibida
-        formData={formData}
-        handleChange={handleChange}
-        siNo={siNo} // <- Agregar esta prop
-      />
-
       <StudentInfoForm
         formData={formData}
         handleChange={handleChange}
@@ -165,7 +161,17 @@ const CreateStudentForm = () => {
         generos={generos}
       />
 
-      <HealthAffiliationForm formData={formData} handleChange={handleChange} />
+      <HealthAffiliationForm formData={formData} handleChange={handleChange} estratoEconomico={estratoEconomico}/>
+
+      <CondicionesEspeciales formData={formData} handleChange={handleChange} siNo={siNo} />
+
+      <SituacionAcademica formData={formData} handleChange={handleChange} siNo={siNo} />
+
+      <DocumentacionRecibida
+        formData={formData}
+        handleChange={handleChange}
+        siNo={siNo} // <- Agregar esta prop
+      />
 
       <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
         <CardContent>
