@@ -19,7 +19,7 @@ type StudentInfoFormProps = {
   handleChange: (
     e: React.ChangeEvent<{ name?: string; value: unknown }>
   ) => void;
-  grados: string[];
+  grados: OpcionSelect[];
   jornadaEscolar: string[];
   generos: string[];
   paises: OpcionSelect[];
@@ -217,10 +217,13 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               }}
             >
               {grados.map((grado) => (
-                <MenuItem key={grado} value={grado}>
-                  {grado}
+                <MenuItem key={grado.id} value={grado.id}>
+                  {grado.nombre}
                 </MenuItem>
               ))}
+
+
+              
             </TextField>
           </Grid>
 
@@ -282,9 +285,9 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               }}
             >
               {grados.map((grado) => (
-                <MenuItem key={grado} value={grado}>
-                  {grado}
-                </MenuItem>
+                <MenuItem key={grado.id} value={grado.id}>
+                {grado.nombre}
+              </MenuItem>
               ))}
             </TextField>
           </Grid>

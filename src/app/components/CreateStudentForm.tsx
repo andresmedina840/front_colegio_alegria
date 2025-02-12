@@ -23,16 +23,7 @@ import SituacionAcademica from "./SituacionAcademica";
 import CondicionesEspeciales from "./CondicionesEspeciales";
 
 const generos = ["Masculino", "Femenino", "Otro"];
-const grados = [
-  "Pre-Jardín",
-  "Jardín",
-  "Transición",
-  "Primero",
-  "Segundo",
-  "Tercero",
-  "Cuarto",
-  "Quinto",
-];
+
 const jornadaEscolar = ["Mañana", "Tarde", "Completa"];
 const siNo = [" ", "SI", "NO"];
 const estratoEconomico = [
@@ -53,6 +44,8 @@ type OpcionSelect = {
 const initialFormData = {
   numeroMatricula: "",
   fechaMatricula: "",
+  tipoIdentificacionEstudiante: "",
+  numeroIdentificacionEstudiante: "",
   primerNombre: "",
   segundoNombre: "",
   primerApellido: "",
@@ -70,7 +63,6 @@ const initialFormData = {
   departamentoNacimiento: "",
   municipioNacimiento: "",
 
-  numeroIdentificacion: "",
   tipoSangre: "",
   epsAfiliado: "",
   ipsAsignada: "",
@@ -78,18 +70,21 @@ const initialFormData = {
   nroCarnetSisben: "",
   nivelSisben: "",
   estrato: "",
+
   primerNombrePadre: "",
   segundoNombrePadre: "",
   primerApellidoPadre: "",
   segundoApellidoPadre: "",
+  tipoIdentificacionPadre: "",
+  numeroIdentificacionPadre: "",
   direccionPadre: "",
   barrioPadre: "",
   primerNombreMadre: "",
   segundoNombreMadre: "",
   primerApellidoMadre: "",
   segundoApellidoMadre: "",
-  tipoIdentificacionPadre: "",
-  numeroIdentificacionPadre: "",
+  tipoIdentificacionMadre: "",
+  numeroIdentificacionMadre: "",
   numeroCelularPadre: "",
   ocupacionPadre: "",
   correoElectronicoPadre: "",
@@ -106,9 +101,22 @@ const CreateStudentForm = () => {
   const [tiposIdentificacion, setTiposIdentificacion] = useState<
     OpcionSelect[]
   >([]);
+  const [grados, setGrados] = useState<OpcionSelect[]>([]);
   const [paises, setPaises] = useState<OpcionSelect[]>([]);
   const [departamentos, setDepartamentos] = useState<OpcionSelect[]>([]);
   const [ciudades, setCiudades] = useState<OpcionSelect[]>([]);
+
+  useEffect(() => {
+    const fetchGrados = async () => {
+      try {
+        const response = await api.get<OpcionSelect[]>("/grados/listaGrados");
+        setGrados(response.data);
+      } catch (error) {
+        console.error("Error al cargar la lista de Grados: ", error);
+      }
+    };
+    fetchGrados();
+  }, []);
 
   useEffect(() => {
     const fetchTiposIdentificacion = async () => {
@@ -137,10 +145,10 @@ const CreateStudentForm = () => {
   }, []);
 
   useEffect(() => {
-    if (!formData.paisNacimiento) {
-      setDepartamentos([]); // Limpia los departamentos si no hay país seleccionado
-      setCiudades([]); // Limpia las ciudades también
-      return; // 🚀 No ejecuta la API si no hay un país seleccionado
+    if (!formData.paisNacimiento || formData.paisNacimiento === "") {
+      setDepartamentos([]);
+      setCiudades([]);
+      return;
     }
 
     const fetchDepartamentos = async () => {
@@ -155,44 +163,55 @@ const CreateStudentForm = () => {
     };
 
     fetchDepartamentos();
-  }, [formData.paisNacimiento]); // ✅ Solo ejecuta la API si paisNacimiento tiene un valor válido
+  }, [formData.paisNacimiento]);
 
   useEffect(() => {
-    if (formData.departamentoNacimiento) {
-      const fetchCiudades = async () => {
-        try {
-          const response = await api.get<OpcionSelect[]>(
-            `/ubicacion/ciudades/${formData.departamentoNacimiento}`
-          );
-          setCiudades(response.data);
-        } catch (error) {
-          console.error("Error al cargar ciudades:", error);
-        }
-      };
-      fetchCiudades();
-    } else {
+    if (
+      !formData.departamentoNacimiento ||
+      formData.departamentoNacimiento === ""
+    ) {
       setCiudades([]);
+      return;
     }
+
+    const fetchCiudades = async () => {
+      try {
+        const response = await api.get<OpcionSelect[]>(
+          `/ubicacion/ciudades/${formData.departamentoNacimiento}`
+        );
+        setCiudades(response.data);
+      } catch (error) {
+        console.error("Error al cargar ciudades:", error);
+      }
+    };
+
+    fetchCiudades();
   }, [formData.departamentoNacimiento]);
 
   const cargarDepartamentos = async (paisId: string) => {
+    if (!paisId || paisId === "") {
+      setDepartamentos([]);
+      setCiudades([]);
+      return;
+    }
+  
     setFormData((prevData) => ({
       ...prevData,
       paisNacimiento: paisId,
       departamentoNacimiento: "",
       municipioNacimiento: "",
     }));
-
+  
     try {
       const response = await api.get<OpcionSelect[]>(
         `/ubicacion/departamentos/${paisId}`
       );
       setDepartamentos(response.data);
-      setCiudades([]); // Vaciar municipios
+      setCiudades([]);
     } catch (error) {
       console.error("Error al cargar departamentos:", error);
     }
-  };
+  };  
 
   const cargarCiudades = async (departamentoId: string) => {
     setFormData((prevData) => ({
@@ -217,26 +236,26 @@ const CreateStudentForm = () => {
     >
   ): void => {
     const { name, value } = e.target as { name: string; value: string }; // Cast para evitar errores
-  
+
     if (name === "fechaNacimiento") {
       const hoy = new Date();
       const fechaNac = new Date(value);
       let edadCalculada = hoy.getFullYear() - fechaNac.getFullYear();
-  
+
       // Ajustar si aún no ha cumplido años este año
       const mes = hoy.getMonth() - fechaNac.getMonth();
       if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
         edadCalculada--;
       }
-  
+
       setFormData((prevData) => ({
         ...prevData,
         edad: edadCalculada.toString() + " años",
       }));
     }
-  
+
     setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };  
+  };
 
   const handleSubmit = async () => {
     try {

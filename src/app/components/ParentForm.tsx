@@ -28,7 +28,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             label={`Primer Nombre ${title}`}
             name={`primerNombre${title}`}
             variant="outlined"
-            value={formData[`primerNombre${title}`]}
+            value={formData[`primerNombre${title}` || ""]}
             onChange={handleChange}
             helperText={`${
               formData[`primerNombre${title}`].length
@@ -49,7 +49,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             label={`Segundo Nombre ${title}`}
             name={`segundoNombre${title}`}
             variant="outlined"
-            value={formData[`segundoNombre${title}`]}
+            value={formData[`segundoNombre${title}` || ""]}
             onChange={handleChange}
             helperText={`${
               formData[`segundoNombre${title}`].length
@@ -70,7 +70,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             label={`Primer Apellido ${title}`}
             name={`primerApellido${title}`}
             variant="outlined"
-            value={formData[`primerApellido${title}`]}
+            value={formData[`primerApellido${title}`]  || ""}
             onChange={handleChange}
             helperText={`${
               formData[`primerApellido${title}`].length
@@ -91,7 +91,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             label={`Segundo Apellido ${title}`}
             name={`segundoApellido${title}`}
             variant="outlined"
-            value={formData[`segundoApellido${title}`]}
+            value={formData[`segundoApellido${title}`]  || ""}
             onChange={handleChange}
             helperText={`${
               formData[`segundoApellido${title}`].length
@@ -112,7 +112,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             fullWidth
             label={`Tipo Identificación ${title}`}
             name={`tipoIdentificacion${title}`}
-            value={formData[`tipoIdentificacion${title}`]}
+            value={formData[`tipoIdentificacion${title}`]  || ""}
             onChange={handleChange}
             slotProps={{
               inputLabel: {
@@ -132,7 +132,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             fullWidth
             label={`Número Identificación ${title}`}
             name={`numeroIdentificacion${title}`}
-            value={formData[`numeroIdentificacion${title}`]}
+            value={formData[`numeroIdentificacion${title}`]  || ""}
             onChange={handleChange}
             helperText={`${
               (formData[`numeroIdentificacion${title}`] || "").length
@@ -153,7 +153,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             fullWidth
             label={`Numero Celular ${title}`}
             name={`numeroCelular${title}`}
-            value={formData[`numeroCelular${title}`]}
+            value={formData[`numeroCelular${title}`]  || ""}
             onChange={handleChange}
             helperText={`${
               (formData[`numeroCelular${title}`] || "").length
@@ -174,7 +174,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             fullWidth
             label={`Direccion ${title}`}
             name={`direccion${title}`}
-            value={formData[`direccion${title}`]}
+            value={formData[`direccion${title}`]  || ""}
             onChange={handleChange}
             helperText={`${
               (formData[`direccion${title}`] || "").length
@@ -194,7 +194,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             fullWidth
             label={`Barrio ${title}`}
             name={`barrio${title}`}
-            value={formData[`barrio${title}`]}
+            value={formData[`barrio${title}`]  || ""}
             onChange={handleChange}
             helperText={`${
               (formData[`barrio${title}`] || "").length
@@ -214,7 +214,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             fullWidth
             label={`Ocupación ${title}`}
             name={`ocupacion${title}`}
-            value={formData[`ocupacion${title}`]}
+            value={formData[`ocupacion${title}`]  || ""}
             onChange={handleChange}
             helperText={`${
               (formData[`ocupacion${title}`] || "").length
@@ -234,7 +234,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             fullWidth
             label={`Correo Electrónico ${title}`}
             name={`correoElectronico${title}`}
-            value={formData[`correoElectronico${title}`]}
+            value={formData[`correoElectronico${title}`]  || ""}
             onChange={handleChange}
             helperText={`${
               (formData[`correoElectronico${title}`] || "").length
