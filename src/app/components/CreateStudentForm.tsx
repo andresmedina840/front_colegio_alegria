@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -19,13 +19,10 @@ import StudentInfoForm from "./StudentInfoForm";
 import EnrollmentInfoForm from "./EnrollmentInfoForm";
 import EmergencyContactForm from "./EmergencyContactForm";
 import DocumentacionRecibida from "./DocumentacionRecibida";
-import Discapacidades from "./Discapacidades";
-import CapacidadesExcepcionales from "./CapacidadesExcepcionales";
 import SituacionAcademica from "./SituacionAcademica";
 import CondicionesEspeciales from "./CondicionesEspeciales";
 
 const generos = ["Masculino", "Femenino", "Otro"];
-const tiposIdentificacion = ["TI", "CC", "RC", "CE"];
 const grados = [
   "Pre-Jardín",
   "Jardín",
@@ -38,26 +35,42 @@ const grados = [
 ];
 const jornadaEscolar = ["Mañana", "Tarde", "Completa"];
 const siNo = [" ", "SI", "NO"];
-const estratoEconomico = ["Estrato 1 ", "Estrato 2", "Estrato 3", "Estrato 4 ", "Estrato 5", "Estrato 6", "Otro"];
+const estratoEconomico = [
+  "Estrato 1 ",
+  "Estrato 2",
+  "Estrato 3",
+  "Estrato 4 ",
+  "Estrato 5",
+  "Estrato 6",
+  "Otro",
+];
+
+type OpcionSelect = {
+  id: string;
+  nombre: string;
+};
 
 const initialFormData = {
+  numeroMatricula: "",
+  fechaMatricula: "",
   primerNombre: "",
   segundoNombre: "",
   primerApellido: "",
   segundoApellido: "",
-  numeroIdentificacion: "",
-  fechaNacimiento: "",
-  fechaMatricula: "",
-  genero: "",
+  sedeMatricula: "",
   grado: "",
   jornada: "",
-  departamentoNacimiento: "",
-  municipioNacimiento: "",
-  sedeMatricula: "",
   institucionEducativaAnterior: "",
   ultimoGradoCursado: "",
   ultimoAnioCursado: "",
+  genero: "",
+  fechaNacimiento: "",
   edad: "",
+  paisNacimiento: "",
+  departamentoNacimiento: "",
+  municipioNacimiento: "",
+
+  numeroIdentificacion: "",
   tipoSangre: "",
   epsAfiliado: "",
   ipsAsignada: "",
@@ -65,7 +78,6 @@ const initialFormData = {
   nroCarnetSisben: "",
   nivelSisben: "",
   estrato: "",
-  numeroMatricula: "",
   primerNombrePadre: "",
   segundoNombrePadre: "",
   primerApellidoPadre: "",
@@ -91,32 +103,140 @@ const CreateStudentForm = () => {
 
   const [formData, setFormData] = useState(initialFormData);
 
-  const handleChange = (
-    e:
-      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-      | React.ChangeEvent<{ name?: string; value: unknown }>
-  ) => {
-    const { name, value } = e.target as { name: string; value: string }; // Cast para evitar errores
+  const [tiposIdentificacion, setTiposIdentificacion] = useState<
+    OpcionSelect[]
+  >([]);
+  const [paises, setPaises] = useState<OpcionSelect[]>([]);
+  const [departamentos, setDepartamentos] = useState<OpcionSelect[]>([]);
+  const [ciudades, setCiudades] = useState<OpcionSelect[]>([]);
 
+  useEffect(() => {
+    const fetchTiposIdentificacion = async () => {
+      try {
+        const response = await api.get<OpcionSelect[]>(
+          "/tipo-identificacion/tiposDeIdentificacion"
+        );
+        setTiposIdentificacion(response.data);
+      } catch (error) {
+        console.error("Error al cargar tipos de Identificación: ", error);
+      }
+    };
+    fetchTiposIdentificacion();
+  }, []);
+
+  useEffect(() => {
+    const fetchPaises = async () => {
+      try {
+        const response = await api.get<OpcionSelect[]>("/ubicacion/paises");
+        setPaises(response.data);
+      } catch (error) {
+        console.error("Error al cargar países:", error);
+      }
+    };
+    fetchPaises();
+  }, []);
+
+  useEffect(() => {
+    if (!formData.paisNacimiento) {
+      setDepartamentos([]); // Limpia los departamentos si no hay país seleccionado
+      setCiudades([]); // Limpia las ciudades también
+      return; // 🚀 No ejecuta la API si no hay un país seleccionado
+    }
+
+    const fetchDepartamentos = async () => {
+      try {
+        const response = await api.get<OpcionSelect[]>(
+          `/ubicacion/departamentos/${formData.paisNacimiento}`
+        );
+        setDepartamentos(response.data);
+      } catch (error) {
+        console.error("Error al cargar departamentos:", error);
+      }
+    };
+
+    fetchDepartamentos();
+  }, [formData.paisNacimiento]); // ✅ Solo ejecuta la API si paisNacimiento tiene un valor válido
+
+  useEffect(() => {
+    if (formData.departamentoNacimiento) {
+      const fetchCiudades = async () => {
+        try {
+          const response = await api.get<OpcionSelect[]>(
+            `/ubicacion/ciudades/${formData.departamentoNacimiento}`
+          );
+          setCiudades(response.data);
+        } catch (error) {
+          console.error("Error al cargar ciudades:", error);
+        }
+      };
+      fetchCiudades();
+    } else {
+      setCiudades([]);
+    }
+  }, [formData.departamentoNacimiento]);
+
+  const cargarDepartamentos = async (paisId: string) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      paisNacimiento: paisId,
+      departamentoNacimiento: "",
+      municipioNacimiento: "",
+    }));
+
+    try {
+      const response = await api.get<OpcionSelect[]>(
+        `/ubicacion/departamentos/${paisId}`
+      );
+      setDepartamentos(response.data);
+      setCiudades([]); // Vaciar municipios
+    } catch (error) {
+      console.error("Error al cargar departamentos:", error);
+    }
+  };
+
+  const cargarCiudades = async (departamentoId: string) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      departamentoNacimiento: departamentoId,
+      municipioNacimiento: "",
+    }));
+
+    try {
+      const response = await api.get<OpcionSelect[]>(
+        `/ubicacion/ciudades/${departamentoId}`
+      );
+      setCiudades(response.data);
+    } catch (error) {
+      console.error("Error al cargar ciudades:", error);
+    }
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown }
+    >
+  ): void => {
+    const { name, value } = e.target as { name: string; value: string }; // Cast para evitar errores
+  
     if (name === "fechaNacimiento") {
       const hoy = new Date();
       const fechaNac = new Date(value);
       let edadCalculada = hoy.getFullYear() - fechaNac.getFullYear();
-
+  
       // Ajustar si aún no ha cumplido años este año
       const mes = hoy.getMonth() - fechaNac.getMonth();
       if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
         edadCalculada--;
       }
-
+  
       setFormData((prevData) => ({
         ...prevData,
         edad: edadCalculada.toString() + " años",
       }));
     }
-
+  
     setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };
+  };  
 
   const handleSubmit = async () => {
     try {
@@ -159,13 +279,31 @@ const CreateStudentForm = () => {
         grados={grados}
         jornadaEscolar={jornadaEscolar}
         generos={generos}
+        paises={paises}
+        departamentos={departamentos}
+        ciudades={ciudades}
+        cargarDepartamentos={cargarDepartamentos}
+        cargarCiudades={cargarCiudades}
+        tiposIdentificacion={tiposIdentificacion.map((tipo) => tipo.nombre)}
       />
 
-      <HealthAffiliationForm formData={formData} handleChange={handleChange} estratoEconomico={estratoEconomico}/>
+      <HealthAffiliationForm
+        formData={formData}
+        handleChange={handleChange}
+        estratoEconomico={estratoEconomico}
+      />
 
-      <CondicionesEspeciales formData={formData} handleChange={handleChange} siNo={siNo} />
+      <CondicionesEspeciales
+        formData={formData}
+        handleChange={handleChange}
+        siNo={siNo}
+      />
 
-      <SituacionAcademica formData={formData} handleChange={handleChange} siNo={siNo} />
+      <SituacionAcademica
+        formData={formData}
+        handleChange={handleChange}
+        siNo={siNo}
+      />
 
       <DocumentacionRecibida
         formData={formData}
@@ -186,14 +324,17 @@ const CreateStudentForm = () => {
             title="Padre"
             formData={formData}
             handleChange={handleChange}
-            tiposIdentificacion={tiposIdentificacion}
+            tiposIdentificacion={tiposIdentificacion.map((tipo) => tipo.nombre)}
           />
+
           <Box sx={{ mt: 2 }}>
             <ParentForm
               title="Madre"
               formData={formData}
               handleChange={handleChange}
-              tiposIdentificacion={tiposIdentificacion}
+              tiposIdentificacion={tiposIdentificacion.map(
+                (tipo) => tipo.nombre
+              )}
             />
           </Box>
           <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -224,7 +365,9 @@ const CreateStudentForm = () => {
                 <EmergencyContactForm
                   formData={formData}
                   handleChange={handleChange}
-                  tiposIdentificacion={tiposIdentificacion}
+                  tiposIdentificacion={tiposIdentificacion.map(
+                    (tipo) => tipo.nombre
+                  )}
                 />
               </Box>
             )}

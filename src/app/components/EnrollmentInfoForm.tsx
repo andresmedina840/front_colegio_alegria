@@ -25,9 +25,16 @@ const EnrollmentInfoForm: React.FC<EnrollmentInfoFormProps> = ({
               value={formData.numeroMatricula || ""}
               onChange={handleChange}
               helperText={`${
-                (formData.numeroMatricula || "").length
+                (formData.primerNombre || "").length
               } / 26 caracteres`}
-              inputProps={{ maxLength: 26 }}
+              slotProps={{
+                htmlInput: {
+                  maxLength: 26,
+                },
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -38,8 +45,10 @@ const EnrollmentInfoForm: React.FC<EnrollmentInfoFormProps> = ({
               name="fechaMatricula"
               value={formData.fechaMatricula || ""}
               onChange={handleChange}
-              InputLabelProps={{ shrink: true }}
-              inputProps={{ max: new Date().toISOString().split("T")[0] }}
+              slotProps={{
+                inputLabel: { shrink: true },
+                htmlInput: { max: new Date().toISOString().split("T")[0] }, // Evitar fechas futuras
+              }}
             />
           </Grid>
         </Grid>

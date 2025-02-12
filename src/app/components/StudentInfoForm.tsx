@@ -8,6 +8,12 @@ import {
 } from "@mui/material";
 import React from "react";
 
+// Agrega estos tipos
+type OpcionSelect = {
+  id: string;
+  nombre: string;
+};
+
 type StudentInfoFormProps = {
   formData: Record<string, string>;
   handleChange: (
@@ -16,6 +22,12 @@ type StudentInfoFormProps = {
   grados: string[];
   jornadaEscolar: string[];
   generos: string[];
+  paises: OpcionSelect[];
+  departamentos: OpcionSelect[];
+  ciudades: OpcionSelect[];
+  cargarDepartamentos: (paisId: string) => void;
+  cargarCiudades: (departamentoId: string) => void;
+  tiposIdentificacion: string[];
 };
 
 const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
@@ -24,6 +36,12 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
   grados,
   jornadaEscolar,
   generos,
+  paises,
+  departamentos,
+  ciudades,
+  cargarDepartamentos,
+  cargarCiudades,
+  tiposIdentificacion,
 }) => {
   return (
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
@@ -36,6 +54,47 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           Información del estudiante
         </Typography>
         <Grid container spacing={2}>
+          <Grid item xs={12} sm={5}>
+            <TextField
+              select
+              fullWidth
+              label={`Tipo Identificación Estudiante`}
+              name={`tipoIdentificacionEstudiante`}
+              value={formData[`tipoIdentificacionEstudiante`]}
+              onChange={handleChange}
+              slotProps={{
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
+            >
+              {tiposIdentificacion.map((tipo) => (
+                <MenuItem key={tipo} value={tipo}>
+                  {tipo}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              fullWidth
+              label={`Número Identificación Estudiante`}
+              name={`numeroIdentificacionEstudiante`}
+              value={formData[`numeroIdentificacionEstudiante`]}
+              onChange={handleChange}
+              helperText={`${
+                (formData[`numeroIdentificacionEstudiante`] || "").length
+              } / 50 caracteres`}
+              slotProps={{
+                htmlInput: {
+                  maxLength: 50,
+                },
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
+            />
+          </Grid>
           <Grid item xs={12} sm={3}>
             <TextField
               fullWidth
@@ -57,7 +116,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={4}>
             <TextField
               fullWidth
               label="Segundo Nombre"
@@ -78,7 +137,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={4}>
             <TextField
               fullWidth
               label="Primer Apellido"
@@ -99,7 +158,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={4}>
             <TextField
               fullWidth
               label="Segundo Apellido"
@@ -293,50 +352,85 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               variant="outlined"
               value={formData.edad}
               slotProps={{
-                input: { readOnly: true }, // Bloquear edición manual con nueva sintaxis
+                input: { readOnly: true },
                 inputLabel: { shrink: true },
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={5}>
+          <Grid item xs={12} sm={4}>
             <TextField
+              label="País de Nacimiento"
+              select
               fullWidth
-              label="Departamento de nacimiento"
-              name="departamentoNacimiento"
-              value={formData.departamentoNacimiento}
-              onChange={handleChange}
-              helperText={`${
-                (formData.departamentoNacimiento || "").length
-              } / 60 caracteres`}
+              variant="outlined"
+              name="paisNacimiento"
+              value={formData.paisNacimiento || ""}
+              onChange={(e) => {
+                handleChange(e);
+                cargarDepartamentos(e.target.value as string);
+              }}
               slotProps={{
-                htmlInput: {
-                  maxLength: 60,
-                },
                 inputLabel: {
                   shrink: true,
                 },
               }}
-            />
+            >
+              <MenuItem value="">Seleccionar país</MenuItem>
+              {paises.map((pais) => (
+                <MenuItem key={pais.id} value={pais.id}>
+                  {pais.nombre}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              select
+              fullWidth
+              label="Departamento de Nacimiento"
+              name="departamentoNacimiento"
+              value={formData.departamentoNacimiento || ""}
+              onChange={(e) => {
+                handleChange(e);
+                cargarCiudades(e.target.value as string);
+              }}
+              slotProps={{
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
+              disabled={!formData.paisNacimiento}
+            >
+              <MenuItem value="">Seleccionar departamento</MenuItem>
+              {departamentos.map((departamento) => (
+                <MenuItem key={departamento.id} value={departamento.id}>
+                  {departamento.nombre}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
           <Grid item xs={12} sm={5}>
             <TextField
+              select
               fullWidth
-              label="Municipio de nacimiento"
+              label="Municipio de Nacimiento"
               name="municipioNacimiento"
-              value={formData.municipioNacimiento}
+              value={formData.municipioNacimiento || ""}
               onChange={handleChange}
-              helperText={`${
-                (formData.municipioNacimiento || "").length
-              } / 60 caracteres`}
               slotProps={{
-                htmlInput: {
-                  maxLength: 60,
-                },
                 inputLabel: {
                   shrink: true,
                 },
               }}
-            />
+              disabled={!formData.departamentoNacimiento}
+            >
+              <MenuItem value="">Seleccionar municipio</MenuItem>
+              {ciudades.map((ciudad) => (
+                <MenuItem key={ciudad.id} value={ciudad.id}>
+                  {ciudad.nombre}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
         </Grid>
       </CardContent>
