@@ -3,9 +3,7 @@ import React from "react";
 
 type HealthAffiliationFormProps = {
   formData: Record<string, string>;
-  handleChange: (
-    e: React.ChangeEvent<{ name?: string; value: unknown }>
-  ) => void;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   estratoEconomico: string[];
 };
 
@@ -17,11 +15,7 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
   return (
     <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
       <CardContent>
-        <Typography
-          variant="h5"
-          align="left"
-          sx={{ fontWeight: "bold", mb: 3 }}
-        >
+        <Typography variant="h5" align="left" sx={{ fontWeight: "bold", mb: 3 }}>
           Afiliación al sistema de salud
         </Typography>
         <Grid container spacing={2}>
@@ -32,17 +26,8 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="tipoSangre"
               value={formData.tipoSangre || ""}
               onChange={handleChange}
-              helperText={`${
-                (formData.tipoSangre || "").length
-              } / 5 caracteres`}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 5,
-                },
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
+              helperText={`${(formData.tipoSangre || "").length} / 5 caracteres`}
+              inputProps={{ maxLength: 5 }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -52,17 +37,8 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="epsAfiliado"
               value={formData.epsAfiliado || ""}
               onChange={handleChange}
-              helperText={`${
-                (formData.epsAfiliado || "").length
-              } / 45 caracteres`}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 45,
-                },
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
+              helperText={`${(formData.epsAfiliado || "").length} / 45 caracteres`}
+              inputProps={{ maxLength: 45 }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -72,17 +48,8 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="ipsAsignada"
               value={formData.ipsAsignada || ""}
               onChange={handleChange}
-              helperText={`${
-                (formData.epsAfiliado || "").length
-              } / 55 caracteres`}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 55,
-                },
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
+              helperText={`${(formData.ipsAsignada || "").length} / 55 caracteres`}
+              inputProps={{ maxLength: 55 }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -92,17 +59,8 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="arsAfiliado"
               value={formData.arsAfiliado || ""}
               onChange={handleChange}
-              helperText={`${
-                (formData.epsAfiliado || "").length
-              } / 55 caracteres`}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 55,
-                },
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
+              helperText={`${(formData.arsAfiliado || "").length} / 55 caracteres`}
+              inputProps={{ maxLength: 55 }}
             />
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -112,17 +70,8 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="nroCarnetSisben"
               value={formData.nroCarnetSisben || ""}
               onChange={handleChange}
-              helperText={`${
-                (formData.epsAfiliado || "").length
-              } / 20 caracteres`}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 20,
-                },
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
+              helperText={`${(formData.nroCarnetSisben || "").length} / 20 caracteres`}
+              inputProps={{ maxLength: 20 }}
             />
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -132,34 +81,19 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="nivelSisben"
               value={formData.nivelSisben || ""}
               onChange={handleChange}
-              helperText={`${
-                (formData.epsAfiliado || "").length
-              } / 5 caracteres`}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 5,
-                },
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
+              helperText={`${(formData.nivelSisben || "").length} / 5 caracteres`}
+              inputProps={{ maxLength: 5 }}
             />
           </Grid>
-
 
           <Grid item xs={12} sm={4}>
             <TextField
               select
               fullWidth
-              label="Estato económico"
+              label="Estrato económico"
               name="estrato"
               value={formData.estrato || ""}
               onChange={handleChange}
-              slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
             >
               {estratoEconomico.map((respuestas) => (
                 <MenuItem key={respuestas} value={respuestas}>
@@ -168,7 +102,6 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               ))}
             </TextField>
           </Grid>
-
         </Grid>
       </CardContent>
     </Card>

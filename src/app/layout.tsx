@@ -16,7 +16,12 @@ export default function RootLayout({
       <body>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <SnackbarProvider maxSnack={3}>{children}</SnackbarProvider>
+          <SnackbarProvider maxSnack={3}>
+            {/* Contenedor global para suppressHydrationWarning */}
+            <div suppressHydrationWarning>
+              {children}
+            </div>
+          </SnackbarProvider>
         </ThemeProvider>
       </body>
     </html>

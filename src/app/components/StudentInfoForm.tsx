@@ -1,14 +1,7 @@
-import {
-  Card,
-  CardContent,
-  Grid,
-  MenuItem,
-  TextField,
-  Typography,
-} from "@mui/material";
-import React from "react";
+import { Card, CardContent, Grid, MenuItem, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import CustomTextField from "./CustomTextField";
 
-// Agrega estos tipos
 type OpcionSelect = {
   id: string;
   nombre: string;
@@ -43,6 +36,12 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
   cargarCiudades,
   tiposIdentificacion,
 }) => {
+  const [maxDate, setMaxDate] = useState("");
+
+  useEffect(() => {
+    setMaxDate(new Date().toISOString().split("T")[0]);
+  }, []);
+
   return (
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
       <CardContent>
@@ -55,29 +54,23 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={5}>
-            <TextField
+            <CustomTextField
               select
-              fullWidth
               label={`Tipo Identificación Estudiante`}
               name={`tipoIdentificacionEstudiante`}
               value={formData[`tipoIdentificacionEstudiante`]}
               onChange={handleChange}
-              slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
             >
+              <MenuItem value="">Seleccione un tipo de Identificación</MenuItem>
               {tiposIdentificacion.map((tipo) => (
                 <MenuItem key={tipo} value={tipo}>
                   {tipo}
                 </MenuItem>
               ))}
-            </TextField>
+            </CustomTextField>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth
+            <CustomTextField
               label={`Número Identificación Estudiante`}
               name={`numeroIdentificacionEstudiante`}
               value={formData[`numeroIdentificacionEstudiante`]}
@@ -89,15 +82,11 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                 htmlInput: {
                   maxLength: 50,
                 },
-                inputLabel: {
-                  shrink: true,
-                },
               }}
             />
           </Grid>
           <Grid item xs={12} sm={3}>
-            <TextField
-              fullWidth
+            <CustomTextField
               label="Primer Nombre"
               name="primerNombre"
               variant="outlined"
@@ -110,15 +99,11 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                 htmlInput: {
                   maxLength: 26,
                 },
-                inputLabel: {
-                  shrink: true,
-                },
               }}
             />
           </Grid>
           <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth
+            <CustomTextField
               label="Segundo Nombre"
               name="segundoNombre"
               variant="outlined"
@@ -131,15 +116,11 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                 htmlInput: {
                   maxLength: 26,
                 },
-                inputLabel: {
-                  shrink: true,
-                },
               }}
             />
           </Grid>
           <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth
+            <CustomTextField
               label="Primer Apellido"
               name="primerApellido"
               variant="outlined"
@@ -152,15 +133,11 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                 htmlInput: {
                   maxLength: 26,
                 },
-                inputLabel: {
-                  shrink: true,
-                },
               }}
             />
           </Grid>
           <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth
+            <CustomTextField
               label="Segundo Apellido"
               name="segundoApellido"
               variant="outlined"
@@ -173,16 +150,11 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                 htmlInput: {
                   maxLength: 26,
                 },
-                inputLabel: {
-                  shrink: true,
-                },
               }}
             />
           </Grid>
-
           <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
+            <CustomTextField
               label="Sede para donde se matrícula"
               name="sedeMatricula"
               variant="outlined"
@@ -195,63 +167,46 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                 htmlInput: {
                   maxLength: 50,
                 },
-                inputLabel: {
-                  shrink: true,
-                },
               }}
             />
           </Grid>
 
           <Grid item xs={12} sm={3}>
-            <TextField
+            <CustomTextField
               select
-              fullWidth
               label="Grado"
               name="grado"
               value={formData.grado}
               onChange={handleChange}
-              slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
             >
+              <MenuItem value="">Seleccione un grado</MenuItem>
               {grados.map((grado) => (
                 <MenuItem key={grado.id} value={grado.id}>
                   {grado.nombre}
                 </MenuItem>
               ))}
-
-
-              
-            </TextField>
+            </CustomTextField>
           </Grid>
 
           <Grid item xs={12} sm={3}>
-            <TextField
+            <CustomTextField
               select
-              fullWidth
               label="Jornada Escolar"
               name="jornada"
               value={formData.jornada}
               onChange={handleChange}
-              slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
             >
+              <MenuItem value="">Seleccione una jornada</MenuItem>
               {jornadaEscolar.map((jornada) => (
                 <MenuItem key={jornada} value={jornada}>
                   {jornada}
                 </MenuItem>
               ))}
-            </TextField>
+            </CustomTextField>
           </Grid>
 
           <Grid item xs={12} sm={12}>
-            <TextField
-              fullWidth
+            <CustomTextField
               label="Institución Educativa anterior (si aplica)"
               name="institucionEducativaAnterior"
               variant="outlined"
@@ -264,36 +219,26 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                 htmlInput: {
                   maxLength: 50,
                 },
-                inputLabel: {
-                  shrink: true,
-                },
               }}
             />
           </Grid>
           <Grid item xs={12} sm={3}>
-            <TextField
+            <CustomTextField
               select
-              fullWidth
               label="Último Grado Cursado"
               name="ultimoGradoCursado"
               value={formData.ultimoGradoCursado || ""}
               onChange={handleChange}
-              slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
             >
               {grados.map((grado) => (
                 <MenuItem key={grado.id} value={grado.id}>
-                {grado.nombre}
-              </MenuItem>
+                  {grado.nombre}
+                </MenuItem>
               ))}
-            </TextField>
+            </CustomTextField>
           </Grid>
           <Grid item xs={12} sm={3}>
-            <TextField
-              fullWidth
+            <CustomTextField
               label="Año del último grado cursado"
               name="ultimoAnioCursado"
               variant="outlined"
@@ -306,76 +251,58 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                 htmlInput: {
                   maxLength: 4,
                 },
-                inputLabel: {
-                  shrink: true,
-                },
               }}
             />
           </Grid>
           <Grid item xs={12} sm={3}>
-            <TextField
+            <CustomTextField
               select
-              fullWidth
               label="Género"
               name="genero"
               value={formData.genero || ""}
               onChange={handleChange}
-              slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
             >
               {generos.map((gen) => (
                 <MenuItem key={gen} value={gen}>
                   {gen}
                 </MenuItem>
               ))}
-            </TextField>
+            </CustomTextField>
           </Grid>
           <Grid item xs={12} sm={3}>
-            <TextField
+            <CustomTextField
               type="date"
-              fullWidth
               label="Fecha de Nacimiento"
               name="fechaNacimiento"
               value={formData.fechaNacimiento}
               onChange={handleChange}
               slotProps={{
                 inputLabel: { shrink: true },
-                htmlInput: { max: new Date().toISOString().split("T")[0] }, // Evitar fechas futuras
+                htmlInput: { max: maxDate },
               }}
             />
           </Grid>
           <Grid item xs={12} sm={2}>
-            <TextField
-              fullWidth
+            <CustomTextField
               label="Edad"
               name="edad"
               variant="outlined"
               value={formData.edad}
               slotProps={{
                 input: { readOnly: true },
-                inputLabel: { shrink: true },
               }}
             />
           </Grid>
           <Grid item xs={12} sm={4}>
-            <TextField
+            <CustomTextField
               label="País de Nacimiento"
               select
-              fullWidth
               variant="outlined"
               name="paisNacimiento"
               value={formData.paisNacimiento || ""}
               onChange={(e) => {
                 handleChange(e);
                 cargarDepartamentos(e.target.value as string);
-              }}
-              slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
               }}
             >
               <MenuItem value="">Seleccionar país</MenuItem>
@@ -384,23 +311,17 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                   {pais.nombre}
                 </MenuItem>
               ))}
-            </TextField>
+            </CustomTextField>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
+            <CustomTextField
               select
-              fullWidth
               label="Departamento de Nacimiento"
               name="departamentoNacimiento"
               value={formData.departamentoNacimiento || ""}
               onChange={(e) => {
                 handleChange(e);
                 cargarCiudades(e.target.value as string);
-              }}
-              slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
               }}
               disabled={!formData.paisNacimiento}
             >
@@ -410,21 +331,15 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                   {departamento.nombre}
                 </MenuItem>
               ))}
-            </TextField>
+            </CustomTextField>
           </Grid>
           <Grid item xs={12} sm={5}>
-            <TextField
+            <CustomTextField
               select
-              fullWidth
               label="Municipio de Nacimiento"
               name="municipioNacimiento"
               value={formData.municipioNacimiento || ""}
               onChange={handleChange}
-              slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
               disabled={!formData.departamentoNacimiento}
             >
               <MenuItem value="">Seleccionar municipio</MenuItem>
@@ -433,7 +348,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                   {ciudad.nombre}
                 </MenuItem>
               ))}
-            </TextField>
+            </CustomTextField>
           </Grid>
         </Grid>
       </CardContent>
