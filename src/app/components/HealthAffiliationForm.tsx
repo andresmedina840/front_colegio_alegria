@@ -1,5 +1,14 @@
-import { Card, CardContent, Grid, MenuItem, TextField, Typography } from "@mui/material";
-import React from "react";
+import {
+  Card,
+  CardContent,
+  Grid,
+  Autocomplete,
+  TextField,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
+import React, { useState, useEffect } from "react";
+import CustomTextField from "./personalizados/CustomTextField";
 
 type HealthAffiliationFormProps = {
   formData: Record<string, string>;
@@ -12,6 +21,14 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
   handleChange,
   estratoEconomico,
 }) => {
+  const [loading, setLoading] = useState(true);
+  const [options, setOptions] = useState<string[]>([]);
+
+  useEffect(() => {
+    setOptions(estratoEconomico);
+    setLoading(false);
+  }, [estratoEconomico]);
+
   return (
     <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
       <CardContent>
@@ -20,19 +37,18 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
+            <CustomTextField
               label="Tipo de Sangre y RH"
               name="tipoSangre"
               value={formData.tipoSangre || ""}
               onChange={handleChange}
               helperText={`${(formData.tipoSangre || "").length} / 5 caracteres`}
               inputProps={{ maxLength: 5 }}
+              uppercase
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
+            <CustomTextField
               label="Eps Afiliado"
               name="epsAfiliado"
               value={formData.epsAfiliado || ""}
@@ -42,8 +58,7 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
+            <CustomTextField
               label="IPS Asignada"
               name="ipsAsignada"
               value={formData.ipsAsignada || ""}
@@ -53,8 +68,7 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
+            <CustomTextField
               label="ARS Afiliado"
               name="arsAfiliado"
               value={formData.arsAfiliado || ""}
@@ -64,8 +78,7 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
             />
           </Grid>
           <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth
+            <CustomTextField
               label="Nro Carnet SISBEN"
               name="nroCarnetSisben"
               value={formData.nroCarnetSisben || ""}
@@ -75,32 +88,44 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
             />
           </Grid>
           <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth
+            <CustomTextField
               label="Nivel de SISBEN"
               name="nivelSisben"
               value={formData.nivelSisben || ""}
               onChange={handleChange}
               helperText={`${(formData.nivelSisben || "").length} / 5 caracteres`}
               inputProps={{ maxLength: 5 }}
+              fullWidth
             />
           </Grid>
-
           <Grid item xs={12} sm={4}>
-            <TextField
-              select
-              fullWidth
-              label="Estrato económico"
-              name="estrato"
-              value={formData.estrato || ""}
-              onChange={handleChange}
-            >
-              {estratoEconomico.map((respuestas) => (
-                <MenuItem key={respuestas} value={respuestas}>
-                  {respuestas}
-                </MenuItem>
-              ))}
-            </TextField>
+            <Autocomplete
+              options={options}
+              getOptionLabel={(option) => option}
+              value={formData.estrato || null}
+              onChange={(_, newValue) =>
+                handleChange({
+                  target: { name: "estrato", value: newValue || "" },
+                } as React.ChangeEvent<HTMLInputElement>)
+              }
+              loading={loading}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Estrato económico"
+                  fullWidth
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                        {params.InputProps?.endAdornment}
+                      </>
+                    ),
+                  }}
+                />
+              )}
+            />
           </Grid>
         </Grid>
       </CardContent>

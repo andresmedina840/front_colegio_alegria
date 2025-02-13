@@ -1,22 +1,26 @@
 "use client";
 
-import { Card, CardContent, Grid, TextField } from "@mui/material";
+import { Card, CardContent, Grid } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import CustomTextField from "../components/CustomTextField";
+import CustomTextField from "./personalizados/CustomTextField";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 
 type EnrollmentInfoFormProps = {
   formData: Record<string, string>;
-  handleChange: (e: React.ChangeEvent<{ name?: string; value: unknown }>) => void;
+  handleChange: (
+    e: React.ChangeEvent<{ name?: string; value: unknown }>
+  ) => void;
 };
 
-const EnrollmentInfoForm: React.FC<EnrollmentInfoFormProps> = ({ 
-  formData, 
-  handleChange 
+const EnrollmentInfoForm: React.FC<EnrollmentInfoFormProps> = ({
+  formData,
+  handleChange,
 }) => {
-  const [maxDate, setMaxDate] = useState("");
+  const [maxDate, setMaxDate] = useState(dayjs().format("YYYY-MM-DD"));
 
   useEffect(() => {
-    setMaxDate(new Date().toISOString().split("T")[0]);
+    setMaxDate(dayjs().format("YYYY-MM-DD"));
   }, []);
 
   return (
@@ -34,26 +38,45 @@ const EnrollmentInfoForm: React.FC<EnrollmentInfoFormProps> = ({
               slotProps={{
                 htmlInput: {
                   maxLength: 26,
-                  spellCheck: false // 3. Desactivar corrección ortográfica
                 },
               }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            {/* 5. Eliminar renderizado condicional */}
-            <CustomTextField
-              type="date"
+            <DatePicker
               label="Fecha de matrícula"
-              name="fechaMatricula"
-              value={formData.fechaMatricula || ""}
-              onChange={handleChange}
+              value={
+                formData.fechaMatricula &&
+                dayjs(formData.fechaMatricula).isValid()
+                  ? dayjs(formData.fechaMatricula)
+                  : null
+              }
+              onChange={(newValue) => {
+                console.log(
+                  "Nueva fecha seleccionada en Fecha Matricula:",
+                  newValue?.format("YYYY-MM-DD")
+                );
+                const event = {
+                  target: {
+                    name: "fechaMatricula",
+                    value: newValue ? newValue.format("YYYY-MM-DD") : "",
+                  },
+                } as unknown as React.ChangeEvent<{
+                  name?: string;
+                  value: unknown;
+                }>;
+                handleChange(event);
+              }}
+              maxDate={dayjs(maxDate)}
               slotProps={{
-                inputLabel: { shrink: true },
-                htmlInput: { 
-                  max: maxDate, 
-                  spellCheck: false 
+                textField: {
+                  fullWidth: true,
+                  InputLabelProps: {
+                    shrink: true,
+                  },
                 },
               }}
+              format="DD/MM/YYYY"
             />
           </Grid>
         </Grid>

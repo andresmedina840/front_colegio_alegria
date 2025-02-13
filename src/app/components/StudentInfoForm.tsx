@@ -1,6 +1,8 @@
 import { Card, CardContent, Grid, MenuItem, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import CustomTextField from "./CustomTextField";
+import React from "react";
+import CustomTextField from "./personalizados/CustomTextField";
+import CustomDatePicker from "./personalizados/CustomDatePicker";
+import { getCurrentDateISO }  from "./../utils/dateUtils";
 
 type OpcionSelect = {
   id: string;
@@ -36,11 +38,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
   cargarCiudades,
   tiposIdentificacion,
 }) => {
-  const [maxDate, setMaxDate] = useState("");
-
-  useEffect(() => {
-    setMaxDate(new Date().toISOString().split("T")[0]);
-  }, []);
+  const maxDateActual = getCurrentDateISO();
 
   return (
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
@@ -71,9 +69,9 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
           <Grid item xs={12} sm={4}>
             <CustomTextField
-              label={`Número Identificación Estudiante`}
-              name={`numeroIdentificacionEstudiante`}
-              value={formData[`numeroIdentificacionEstudiante`]}
+              label="Número Identificación Estudiante"
+              name="numeroIdentificacionEstudiante"
+              value={formData.numeroIdentificacionEstudiante || ""}
               onChange={handleChange}
               helperText={`${
                 (formData[`numeroIdentificacionEstudiante`] || "").length
@@ -270,18 +268,15 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
             </CustomTextField>
           </Grid>
           <Grid item xs={12} sm={3}>
-            <CustomTextField
-              type="date"
+            <CustomDatePicker
               label="Fecha de Nacimiento"
               name="fechaNacimiento"
               value={formData.fechaNacimiento}
-              onChange={handleChange}
-              slotProps={{
-                inputLabel: { shrink: true },
-                htmlInput: { max: maxDate },
-              }}
+              handleChange={handleChange}
+              maxDate={maxDateActual}
             />
           </Grid>
+
           <Grid item xs={12} sm={2}>
             <CustomTextField
               label="Edad"

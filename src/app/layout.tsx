@@ -3,6 +3,9 @@
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { SnackbarProvider } from "notistack";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import 'dayjs/locale/es';
 import theme from "./theme/theme";
 import "./globals.css";
 
@@ -17,10 +20,9 @@ export default function RootLayout({
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <SnackbarProvider maxSnack={3}>
-            {/* Contenedor global para suppressHydrationWarning */}
-            <div suppressHydrationWarning>
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
               {children}
-            </div>
+            </LocalizationProvider>
           </SnackbarProvider>
         </ThemeProvider>
       </body>

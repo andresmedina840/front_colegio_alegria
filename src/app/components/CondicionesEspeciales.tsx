@@ -1,7 +1,6 @@
 import { Card, CardContent, Typography } from "@mui/material";
 import Discapacidades from "./Discapacidades";
 import CapacidadesExcepcionales from "./CapacidadesExcepcionales";
-import SituacionAcademica from "./SituacionAcademica";
 
 type CondicionesEspecialesProps = {
     formData: Record<string, string>;
