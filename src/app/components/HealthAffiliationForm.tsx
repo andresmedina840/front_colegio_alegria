@@ -9,10 +9,13 @@ import {
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import CustomTextField from "./personalizados/CustomTextField";
+import CustomAutocomplete from "./personalizados/CustomAutocomplete";
 
 type HealthAffiliationFormProps = {
   formData: Record<string, string>;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
   estratoEconomico: string[];
 };
 
@@ -21,18 +24,23 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
   handleChange,
   estratoEconomico,
 }) => {
-  const [loading, setLoading] = useState(true);
-  const [options, setOptions] = useState<string[]>([]);
+  const [loadingEstratos, setLoadingEstratos] = useState(true);
+  const [estratosOptions, setEstratosOptions] = useState<string[]>([]);
 
   useEffect(() => {
-    setOptions(estratoEconomico);
-    setLoading(false);
+    // Simular carga de datos
+    setEstratosOptions(estratoEconomico);
+    setLoadingEstratos(false);
   }, [estratoEconomico]);
 
   return (
     <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
       <CardContent>
-        <Typography variant="h5" align="left" sx={{ fontWeight: "bold", mb: 3 }}>
+        <Typography
+          variant="h5"
+          align="left"
+          sx={{ fontWeight: "bold", mb: 3 }}
+        >
           Afiliación al sistema de salud
         </Typography>
         <Grid container spacing={2}>
@@ -42,7 +50,9 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="tipoSangre"
               value={formData.tipoSangre || ""}
               onChange={handleChange}
-              helperText={`${(formData.tipoSangre || "").length} / 5 caracteres`}
+              helperText={`${
+                (formData.tipoSangre || "").length
+              } / 5 caracteres`}
               inputProps={{ maxLength: 5 }}
               uppercase
             />
@@ -53,8 +63,11 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="epsAfiliado"
               value={formData.epsAfiliado || ""}
               onChange={handleChange}
-              helperText={`${(formData.epsAfiliado || "").length} / 45 caracteres`}
+              helperText={`${
+                (formData.epsAfiliado || "").length
+              } / 45 caracteres`}
               inputProps={{ maxLength: 45 }}
+              uppercase
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -63,8 +76,11 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="ipsAsignada"
               value={formData.ipsAsignada || ""}
               onChange={handleChange}
-              helperText={`${(formData.ipsAsignada || "").length} / 55 caracteres`}
+              helperText={`${
+                (formData.ipsAsignada || "").length
+              } / 55 caracteres`}
               inputProps={{ maxLength: 55 }}
+              uppercase
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -73,8 +89,11 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="arsAfiliado"
               value={formData.arsAfiliado || ""}
               onChange={handleChange}
-              helperText={`${(formData.arsAfiliado || "").length} / 55 caracteres`}
+              helperText={`${
+                (formData.arsAfiliado || "").length
+              } / 55 caracteres`}
               inputProps={{ maxLength: 55 }}
+              uppercase
             />
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -83,8 +102,11 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="nroCarnetSisben"
               value={formData.nroCarnetSisben || ""}
               onChange={handleChange}
-              helperText={`${(formData.nroCarnetSisben || "").length} / 20 caracteres`}
+              helperText={`${
+                (formData.nroCarnetSisben || "").length
+              } / 20 caracteres`}
               inputProps={{ maxLength: 20 }}
+              uppercase
             />
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -93,38 +115,29 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               name="nivelSisben"
               value={formData.nivelSisben || ""}
               onChange={handleChange}
-              helperText={`${(formData.nivelSisben || "").length} / 5 caracteres`}
+              helperText={`${
+                (formData.nivelSisben || "").length
+              } / 5 caracteres`}
               inputProps={{ maxLength: 5 }}
-              fullWidth
+              uppercase
             />
           </Grid>
           <Grid item xs={12} sm={4}>
-            <Autocomplete
-              options={options}
-              getOptionLabel={(option) => option}
+            <CustomAutocomplete<string>
+              options={estratosOptions}
               value={formData.estrato || null}
-              onChange={(_, newValue) =>
+              onChange={(newValue) => {
                 handleChange({
-                  target: { name: "estrato", value: newValue || "" },
-                } as React.ChangeEvent<HTMLInputElement>)
-              }
-              loading={loading}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Estrato económico"
-                  fullWidth
-                  InputProps={{
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {loading ? <CircularProgress color="inherit" size={20} /> : null}
-                        {params.InputProps?.endAdornment}
-                      </>
-                    ),
-                  }}
-                />
-              )}
+                  target: {
+                    name: "estrato",
+                    value: newValue || "",
+                  },
+                } as React.ChangeEvent<HTMLInputElement>);
+              }}
+              loading={loadingEstratos}
+              label="Estrato económico"
+              required
+              getOptionLabel={(option) => option}
             />
           </Grid>
         </Grid>

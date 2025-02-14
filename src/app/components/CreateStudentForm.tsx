@@ -6,15 +6,18 @@ import { useSnackbar } from "notistack";
 import api from "../axios/axiosClient";
 import initialFormData from "../estudiantes/initialFormData";
 import useFetchData from "../hooks/useFetchData";
-//import EnrollmentInfoForm from "./EnrollmentInfoForm";
+import EnrollmentInfoForm from "./EnrollmentInfoForm";
 import StudentInfoForm from "./StudentInfoForm";
-//import HealthAffiliationForm from "./HealthAffiliationForm";
+import HealthAffiliationForm from "./HealthAffiliationForm";
+import CondicionesEspeciales from "./CondicionesEspeciales";
+
+const siNo = ["Si","No"]
 
 const CreateStudentForm = () => {
   const { enqueueSnackbar } = useSnackbar();
   const {
     tiposIdentificacion,
-    //estratoEconomico,
+    estratoEconomico,
     grados,
     paises,
     departamentos,
@@ -75,7 +78,9 @@ const CreateStudentForm = () => {
   const handleSubmit = async () => {
     try {
       await api.post("/alumnos", formData);
-      enqueueSnackbar("Estudiante registrado con éxito", { variant: "success" });
+      enqueueSnackbar("Estudiante registrado con éxito", {
+        variant: "success",
+      });
       setFormData(initialFormData);
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -86,7 +91,7 @@ const CreateStudentForm = () => {
         enqueueSnackbar("Error desconocido", { variant: "error" });
       }
     }
-  };  
+  };
 
   return (
     <Box
@@ -107,7 +112,7 @@ const CreateStudentForm = () => {
         Registro de Estudiante
       </Typography>
 
-      {/*<EnrollmentInfoForm formData={formData} handleChange={handleChange} />*/}
+      <EnrollmentInfoForm formData={formData} handleChange={handleChange} />
 
       <StudentInfoForm
         formData={formData}
@@ -122,11 +127,17 @@ const CreateStudentForm = () => {
         cargarCiudades={cargarCiudades}
         tiposIdentificacion={tiposIdentificacion.map((tipo) => tipo.nombre)}
       />
-      {/*<HealthAffiliationForm
+      <HealthAffiliationForm
         formData={formData}
         handleChange={handleChange}
         estratoEconomico={estratoEconomico.map((tipo) => tipo.nombre)}
-      />*/}
+      />
+
+      <CondicionesEspeciales
+        formData={formData}
+        handleChange={handleChange}
+        siNo={siNo}
+      />
       <Button
         variant="contained"
         color="primary"

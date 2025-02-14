@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import CustomTextField from "./personalizados/CustomTextField";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
+import { getCurrentDateISO, formatDateToISO } from "../utils/dateUtils";
 
 type EnrollmentInfoFormProps = {
   formData: Record<string, string>;
@@ -17,11 +18,28 @@ const EnrollmentInfoForm: React.FC<EnrollmentInfoFormProps> = ({
   formData,
   handleChange,
 }) => {
-  const [maxDate, setMaxDate] = useState(dayjs().format("YYYY-MM-DD"));
+  const [maxDate, setMaxDate] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setMaxDate(dayjs().format("YYYY-MM-DD"));
+    setMaxDate(getCurrentDateISO());
+    setIsMounted(true);
   }, []);
+
+  const handleDateChange = (newValue: dayjs.Dayjs | null) => {
+    const event = {
+      target: {
+        name: "fechaMatricula",
+        value: newValue ? formatDateToISO(newValue.toDate()) : "",
+      },
+    } as unknown as React.ChangeEvent<{ name?: string; value: unknown }>;
+    
+    handleChange(event);
+  };
+
+  const formattedDateValue = formData.fechaMatricula && dayjs(formData.fechaMatricula).isValid()
+    ? dayjs(formData.fechaMatricula)
+    : null;
 
   return (
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
@@ -34,51 +52,41 @@ const EnrollmentInfoForm: React.FC<EnrollmentInfoFormProps> = ({
               variant="outlined"
               value={formData.numeroMatricula || ""}
               onChange={handleChange}
-              helperText={`${formData.numeroMatricula.length} / 26 caracteres`}
+              helperText={`${(formData.numeroMatricula || "").length} / 26 caracteres`}
               slotProps={{
                 htmlInput: {
                   maxLength: 26,
+                  suppressHydrationWarning: true,
+                  spellCheck: false,
+                  "data-ms-editor": "false"
                 },
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <DatePicker
-              label="Fecha de matrícula"
-              value={
-                formData.fechaMatricula &&
-                dayjs(formData.fechaMatricula).isValid()
-                  ? dayjs(formData.fechaMatricula)
-                  : null
-              }
-              onChange={(newValue) => {
-                console.log(
-                  "Nueva fecha seleccionada en Fecha Matricula:",
-                  newValue?.format("YYYY-MM-DD")
-                );
-                const event = {
-                  target: {
-                    name: "fechaMatricula",
-                    value: newValue ? newValue.format("YYYY-MM-DD") : "",
+          
+          {isMounted && (
+            <Grid item xs={12} sm={6}>
+              <DatePicker
+                label="Fecha de matrícula"
+                value={formattedDateValue}
+                onChange={handleDateChange}
+                maxDate={dayjs(maxDate)}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    InputLabelProps: { shrink: true },
+                    inputProps: {
+                      suppressHydrationWarning: true,
+                      spellCheck: false,
+                      "data-ms-editor": "false"
+                    } as React.InputHTMLAttributes<HTMLInputElement>,
                   },
-                } as unknown as React.ChangeEvent<{
-                  name?: string;
-                  value: unknown;
-                }>;
-                handleChange(event);
-              }}
-              maxDate={dayjs(maxDate)}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  InputLabelProps: {
-                    shrink: true,
-                  },
-                },
-              }}
-              format="DD/MM/YYYY"
-            />
-          </Grid>
+                }}
+                format="DD/MM/YYYY"
+                timezone="UTC"
+              />
+            </Grid>
+          )}
         </Grid>
       </CardContent>
     </Card>

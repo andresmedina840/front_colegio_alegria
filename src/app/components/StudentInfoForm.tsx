@@ -1,5 +1,5 @@
 import { Card, CardContent, Grid, MenuItem, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CustomTextField from "./personalizados/CustomTextField";
 import CustomDatePicker from "./personalizados/CustomDatePicker";
 import { getCurrentDateISO }  from "./../utils/dateUtils";
@@ -39,25 +39,40 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
   tiposIdentificacion,
 }) => {
   const maxDateActual = getCurrentDateISO();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return null;
+
+  const commonTextFieldProps = {
+    slotProps: {
+      htmlInput: {
+        suppressHydrationWarning: true,
+        spellCheck: false,
+        "data-ms-editor": "false"
+      }
+    }
+  };
 
   return (
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
       <CardContent>
-        <Typography
-          variant="h6"
-          align="left"
-          sx={{ fontWeight: "bold", mb: 3 }}
-        >
+        <Typography variant="h6" align="left" sx={{ fontWeight: "bold", mb: 3 }}>
           Información del estudiante
         </Typography>
         <Grid container spacing={2}>
+          {/* Campo Tipo Identificación */}
           <Grid item xs={12} sm={5}>
             <CustomTextField
               select
-              label={`Tipo Identificación Estudiante`}
-              name={`tipoIdentificacionEstudiante`}
-              value={formData[`tipoIdentificacionEstudiante`]}
+              label="Tipo Identificación Estudiante"
+              name="tipoIdentificacionEstudiante"
+              value={formData.tipoIdentificacionEstudiante || ""}
               onChange={handleChange}
+              {...commonTextFieldProps}
             >
               <MenuItem value="">Seleccione un tipo de Identificación</MenuItem>
               {tiposIdentificacion.map((tipo) => (
@@ -67,90 +82,45 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               ))}
             </CustomTextField>
           </Grid>
+
+          {/* Campo Número Identificación */}
           <Grid item xs={12} sm={4}>
             <CustomTextField
               label="Número Identificación Estudiante"
               name="numeroIdentificacionEstudiante"
               value={formData.numeroIdentificacionEstudiante || ""}
               onChange={handleChange}
-              helperText={`${
-                (formData[`numeroIdentificacionEstudiante`] || "").length
-              } / 50 caracteres`}
+              helperText={`${(formData.numeroIdentificacionEstudiante || "").length} / 50 caracteres`}
               slotProps={{
                 htmlInput: {
                   maxLength: 50,
-                },
+                  ...commonTextFieldProps.slotProps.htmlInput
+                }
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={3}>
-            <CustomTextField
-              label="Primer Nombre"
-              name="primerNombre"
-              variant="outlined"
-              value={formData.primerNombre || ""}
-              onChange={handleChange}
-              helperText={`${
-                (formData.primerNombre || "").length
-              } / 26 caracteres`}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 26,
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <CustomTextField
-              label="Segundo Nombre"
-              name="segundoNombre"
-              variant="outlined"
-              value={formData.segundoNombre || ""}
-              onChange={handleChange}
-              helperText={`${
-                (formData.segundoNombre || "").length
-              } / 26 caracteres`}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 26,
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <CustomTextField
-              label="Primer Apellido"
-              name="primerApellido"
-              variant="outlined"
-              value={formData.primerApellido || ""}
-              onChange={handleChange}
-              helperText={`${
-                (formData.primerApellido || "").length
-              } / 26 caracteres`}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 26,
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <CustomTextField
-              label="Segundo Apellido"
-              name="segundoApellido"
-              variant="outlined"
-              value={formData.segundoApellido || ""}
-              onChange={handleChange}
-              helperText={`${
-                (formData.segundoApellido || "").length
-              } / 26 caracteres`}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 26,
-                },
-              }}
-            />
-          </Grid>
+
+          {/* Campos de Nombres y Apellidos */}
+          {['primerNombre', 'segundoNombre', 'primerApellido', 'segundoApellido'].map((field, index) => (
+            <Grid item xs={12} sm={index < 2 ? 3 : 4} key={field}>
+              <CustomTextField
+                label={field.replace(/([A-Z])/g, ' $1').trim()}
+                name={field}
+                variant="outlined"
+                value={formData[field] || ""}
+                onChange={handleChange}
+                helperText={`${(formData[field] || "").length} / 26 caracteres`}
+                slotProps={{
+                  htmlInput: {
+                    maxLength: 26,
+                    ...commonTextFieldProps.slotProps.htmlInput
+                  }
+                }}
+              />
+            </Grid>
+          ))}
+
+          {/* Resto de campos */}
           <Grid item xs={12} sm={6}>
             <CustomTextField
               label="Sede para donde se matrícula"
@@ -158,13 +128,12 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               variant="outlined"
               value={formData.sedeMatricula || ""}
               onChange={handleChange}
-              helperText={`${
-                (formData.sedeMatricula || "").length
-              } / 50 caracteres`}
+              helperText={`${(formData.sedeMatricula || "").length} / 50 caracteres`}
               slotProps={{
                 htmlInput: {
                   maxLength: 50,
-                },
+                  ...commonTextFieldProps.slotProps.htmlInput
+                }
               }}
             />
           </Grid>
@@ -174,8 +143,9 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               select
               label="Grado"
               name="grado"
-              value={formData.grado}
+              value={formData.grado || ""}
               onChange={handleChange}
+              {...commonTextFieldProps}
             >
               <MenuItem value="">Seleccione un grado</MenuItem>
               {grados.map((grado) => (
@@ -191,8 +161,9 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               select
               label="Jornada Escolar"
               name="jornada"
-              value={formData.jornada}
+              value={formData.jornada || ""}
               onChange={handleChange}
+              {...commonTextFieldProps}
             >
               <MenuItem value="">Seleccione una jornada</MenuItem>
               {jornadaEscolar.map((jornada) => (
@@ -203,23 +174,23 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
             </CustomTextField>
           </Grid>
 
-          <Grid item xs={12} sm={12}>
+          <Grid item xs={12}>
             <CustomTextField
               label="Institución Educativa anterior (si aplica)"
               name="institucionEducativaAnterior"
               variant="outlined"
               value={formData.institucionEducativaAnterior || ""}
               onChange={handleChange}
-              helperText={`${
-                (formData.institucionEducativaAnterior || "").length
-              } / 50 caracteres`}
+              helperText={`${(formData.institucionEducativaAnterior || "").length} / 50 caracteres`}
               slotProps={{
                 htmlInput: {
                   maxLength: 50,
-                },
+                  ...commonTextFieldProps.slotProps.htmlInput
+                }
               }}
             />
           </Grid>
+
           <Grid item xs={12} sm={3}>
             <CustomTextField
               select
@@ -227,6 +198,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               name="ultimoGradoCursado"
               value={formData.ultimoGradoCursado || ""}
               onChange={handleChange}
+              {...commonTextFieldProps}
             >
               {grados.map((grado) => (
                 <MenuItem key={grado.id} value={grado.id}>
@@ -235,6 +207,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               ))}
             </CustomTextField>
           </Grid>
+
           <Grid item xs={12} sm={3}>
             <CustomTextField
               label="Año del último grado cursado"
@@ -242,16 +215,16 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               variant="outlined"
               value={formData.ultimoAnioCursado || ""}
               onChange={handleChange}
-              helperText={`${
-                (formData.ultimoAnioCursado || "").length
-              } / 4 caracteres`}
+              helperText={`${(formData.ultimoAnioCursado || "").length} / 4 caracteres`}
               slotProps={{
                 htmlInput: {
                   maxLength: 4,
-                },
+                  ...commonTextFieldProps.slotProps.htmlInput
+                }
               }}
             />
           </Grid>
+
           <Grid item xs={12} sm={3}>
             <CustomTextField
               select
@@ -259,6 +232,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               name="genero"
               value={formData.genero || ""}
               onChange={handleChange}
+              {...commonTextFieldProps}
             >
               {generos.map((gen) => (
                 <MenuItem key={gen} value={gen}>
@@ -267,11 +241,12 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               ))}
             </CustomTextField>
           </Grid>
+
           <Grid item xs={12} sm={3}>
             <CustomDatePicker
               label="Fecha de Nacimiento"
               name="fechaNacimiento"
-              value={formData.fechaNacimiento}
+              value={formData.fechaNacimiento || ""}
               handleChange={handleChange}
               maxDate={maxDateActual}
             />
@@ -282,23 +257,26 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               label="Edad"
               name="edad"
               variant="outlined"
-              value={formData.edad}
+              value={formData.edad || ""}
               slotProps={{
                 input: { readOnly: true },
+                htmlInput: commonTextFieldProps.slotProps.htmlInput
               }}
             />
           </Grid>
+
+          {/* Campos de ubicación geográfica */}
           <Grid item xs={12} sm={4}>
             <CustomTextField
-              label="País de Nacimiento"
               select
-              variant="outlined"
+              label="País de Nacimiento"
               name="paisNacimiento"
               value={formData.paisNacimiento || ""}
               onChange={(e) => {
                 handleChange(e);
                 cargarDepartamentos(e.target.value as string);
               }}
+              {...commonTextFieldProps}
             >
               <MenuItem value="">Seleccionar país</MenuItem>
               {paises.map((pais) => (
@@ -308,6 +286,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               ))}
             </CustomTextField>
           </Grid>
+
           <Grid item xs={12} sm={6}>
             <CustomTextField
               select
@@ -319,6 +298,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                 cargarCiudades(e.target.value as string);
               }}
               disabled={!formData.paisNacimiento}
+              {...commonTextFieldProps}
             >
               <MenuItem value="">Seleccionar departamento</MenuItem>
               {departamentos.map((departamento) => (
@@ -328,6 +308,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               ))}
             </CustomTextField>
           </Grid>
+
           <Grid item xs={12} sm={5}>
             <CustomTextField
               select
@@ -336,6 +317,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               value={formData.municipioNacimiento || ""}
               onChange={handleChange}
               disabled={!formData.departamentoNacimiento}
+              {...commonTextFieldProps}
             >
               <MenuItem value="">Seleccionar municipio</MenuItem>
               {ciudades.map((ciudad) => (
