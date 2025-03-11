@@ -1,24 +1,13 @@
 "use client";
 
-import {
-  Box,
-  Button,
-  Grid,
-  Link,
-  MenuItem,
-  TextField,
-  Typography,
-} from "@mui/material";
 import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
+import { Box, Button, Grid, Link, MenuItem, Typography } from "@mui/material";
 import api from "../axios/axiosClient";
+import CustomTextField from "../components/personalizados/CustomTextField";
 
-// Definir un tipo para las opciones de selección
-type OpcionSelect = {
-  id: string;
-  nombre: string;
-};
+type OpcionSelect = { id: string; nombre: string };
 
 const CreateUserForm = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -26,20 +15,20 @@ const CreateUserForm = () => {
 
   const [formData, setFormData] = useState({
     username: "",
-    primerNombre: "",
-    segundoNombre: "",
-    primerApellido: "",
-    segundoApellido: "",
+    primer_nombre: "",
+    segundo_nombre: "",
+    primer_apellido: "",
+    segundo_apellido: "",
     email: "",
     password: "",
-    rol: "",
-    fechaNacimiento: "",
-    tipoIdentificacionId: "",
-    numeroIdentificacion: "",
-    numeroCelular1: "",
-    numeroCelular2: "",
-    usuarioTelegram: "",
-    direccionCompleta: "",
+    rol: "PADRE" as "ADMIN" | "PADRE" | "PROFESOR",
+    fecha_nacimiento: "",
+    tipo_identificacion_id: "",
+    numero_identificacion: "",
+    numero_celular1: "",
+    numero_celular2: "",
+    usuario_telegram: "",
+    direccion_completa: "",
     ciudad: "",
     departamento: "",
     pais: "",
@@ -48,178 +37,305 @@ const CreateUserForm = () => {
   const [paises, setPaises] = useState<OpcionSelect[]>([]);
   const [departamentos, setDepartamentos] = useState<OpcionSelect[]>([]);
   const [ciudades, setCiudades] = useState<OpcionSelect[]>([]);
+  const [tiposIdentificacion, setTiposIdentificacion] = useState<OpcionSelect[]>([]);
 
-  // Cargar países al iniciar
   useEffect(() => {
-    const fetchPaises = async () => {
+    const fetchData = async () => {
       try {
-        const response = await api.get<OpcionSelect[]>("/ubicacion/paises");
-        setPaises(response.data);
+        const [paisesRes, tiposRes] = await Promise.all([
+          api.get("/ubicacion/paises"),
+          api.get("/tipo-identificacion/tiposDeIdentificacion", {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+          })
+        ]);
+        setPaises(paisesRes.data);
+        setTiposIdentificacion(tiposRes.data);
       } catch (error) {
-        console.error("Error al cargar países:", error);
+        enqueueSnackbar("Error cargando datos iniciales", { variant: "error" });
       }
     };
-    fetchPaises();
+    fetchData();
   }, []);
 
-  // Cargar departamentos cuando se selecciona un país
-  useEffect(() => {
-    if (formData.pais) {
-      const fetchDepartamentos = async () => {
-        try {
-          const response = await api.get<OpcionSelect[]>(`/ubicacion/departamentos/${formData.pais}`);
-          setDepartamentos(response.data);
-        } catch (error) {
-          console.error("Error al cargar departamentos:", error);
-        }
-      };
-      fetchDepartamentos();
-    } else {
-      setDepartamentos([]);
-      setCiudades([]);
-    }
-  }, [formData.pais]);
-
-  // Cargar ciudades cuando se selecciona un departamento
-  useEffect(() => {
-    if (formData.departamento) {
-      const fetchCiudades = async () => {
-        try {
-          const response = await api.get<OpcionSelect[]>(`/ubicacion/ciudades/${formData.departamento}`);
-          setCiudades(response.data);
-        } catch (error) {
-          console.error("Error al cargar ciudades:", error);
-        }
-      };
-      fetchCiudades();
-    } else {
-      setCiudades([]);
-    }
-  }, [formData.departamento]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
-    setFormData((prevData) => ({
-      ...prevData,
+    setFormData(prev => ({
+      ...prev,
       [name]: value,
-      ...(name === "pais" ? { departamento: "", ciudad: "" } : {}),
-      ...(name === "departamento" ? { ciudad: "" } : {}),
+      ...(name === "pais" && { departamento: "", ciudad: "" }),
+      ...(name === "departamento" && { ciudad: "" })
     }));
   };
 
-  const handleCreateUser = async () => {
+  const handleSubmit = async () => {
     try {
-      const response = await api.post("/auth/crearUsuario", formData);
-      enqueueSnackbar(response.data.message || "Usuario creado exitosamente", { variant: "success" });
+      await api.post("/auth/crearUsuario", formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
+      enqueueSnackbar("Usuario creado exitosamente", { variant: "success" });
       router.push("/login");
-    } catch (error: unknown) {
-      let errorMessage = "Error al crear usuario";
-
-      if (
-        typeof error === "object" &&
-        error !== null &&
-        "response" in error &&
-        typeof error.response === "object" &&
-        error.response !== null &&
-        "data" in error.response &&
-        typeof error.response.data === "object" &&
-        error.response.data !== null &&
-        "message" in error.response.data &&
-        typeof error.response.data.message === "string"
-      ) {
-        errorMessage = error.response.data.message;
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-
-      enqueueSnackbar(errorMessage, { variant: "error" });
+    } catch (error: any) {
+      enqueueSnackbar(error.response?.data?.message || "Error creando usuario", { 
+        variant: "error" 
+      });
     }
   };
 
   return (
-    <Box
-      sx={{
-        width: 600,
-        padding: 3,
-        backgroundColor: "white",
-        borderRadius: 2,
-        boxShadow: 3,
-      }}
-    >
-      <Typography variant="h5" sx={{ mb: 3 }}>
-        Crear Usuario
-      </Typography>
-      <Grid container spacing={2}>
-        {/* Campo País */}
-        <Grid item xs={12} sm={4}>
-          <TextField
-            label="País"
-            select
-            fullWidth
-            variant="outlined"
-            name="pais"
-            value={formData.pais}
-            onChange={handleChange}
-          >
-            {paises.map((pais) => (
-              <MenuItem key={pais.id} value={pais.id}>
-                {pais.nombre}
-              </MenuItem>
-            ))}
-          </TextField>
+    <Box sx={{ maxWidth: 800, margin: "auto", p: 3, boxShadow: 3 }}>
+      <Typography variant="h4" gutterBottom>Registro de Usuario</Typography>
+      
+      <Grid container spacing={3}>
+        {/* Columna Izquierda */}
+        <Grid item xs={12} md={6}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <CustomTextField
+                label="Primer Nombre"
+                name="primer_nombre"
+                value={formData.primer_nombre}
+                onChange={handleChange}
+                required
+                uppercase
+              />
+            </Grid>
+            
+            <Grid item xs={12}>
+              <CustomTextField
+                label="Segundo Nombre"
+                name="segundo_nombre"
+                value={formData.segundo_nombre}
+                onChange={handleChange}
+                uppercase
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                label="Primer Apellido"
+                name="primer_apellido"
+                value={formData.primer_apellido}
+                onChange={handleChange}
+                required
+                uppercase
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                label="Segundo Apellido"
+                name="segundo_apellido"
+                value={formData.segundo_apellido}
+                onChange={handleChange}
+                uppercase
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                label="Fecha Nacimiento"
+                type="date"
+                name="fecha_nacimiento"
+                value={formData.fecha_nacimiento}
+                onChange={handleChange}
+                required
+                slotProps={{ inputLabel: { shrink: true } }}
+              />
+            </Grid>
+          </Grid>
         </Grid>
 
-        {/* Campo Departamento */}
-        <Grid item xs={12} sm={4}>
-          <TextField
-            label="Departamento"
-            select
-            fullWidth
-            variant="outlined"
-            name="departamento"
-            value={formData.departamento}
-            onChange={handleChange}
-            disabled={!formData.pais}
-          >
-            {departamentos.map((departamento) => (
-              <MenuItem key={departamento.id} value={departamento.id}>
-                {departamento.nombre}
-              </MenuItem>
-            ))}
-          </TextField>
+        {/* Columna Derecha */}
+        <Grid item xs={12} md={6}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <CustomTextField
+                label="Tipo Identificación"
+                select
+                name="tipo_identificacion_id"
+                value={formData.tipo_identificacion_id}
+                onChange={handleChange}
+                required
+              >
+                {tiposIdentificacion.map((tipo) => (
+                  <MenuItem key={tipo.id} value={tipo.id}>
+                    {tipo.nombre}
+                  </MenuItem>
+                ))}
+              </CustomTextField>
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                label="Número Identificación"
+                name="numero_identificacion"
+                value={formData.numero_identificacion}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                label="Email"
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                label="Teléfono Principal"
+                name="numero_celular1"
+                value={formData.numero_celular1}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                label="Teléfono Secundario"
+                name="numero_celular2"
+                value={formData.numero_celular2}
+                onChange={handleChange}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                label="Usuario Telegram"
+                name="usuario_telegram"
+                value={formData.usuario_telegram}
+                onChange={handleChange}
+              />
+            </Grid>
+          </Grid>
         </Grid>
 
-        {/* Campo Ciudad */}
-        <Grid item xs={12} sm={4}>
-          <TextField
-            label="Ciudad"
-            select
-            fullWidth
-            variant="outlined"
-            name="ciudad"
-            value={formData.ciudad}
-            onChange={handleChange}
-            disabled={!formData.departamento}
-          >
-            {ciudades.map((ciudad) => (
-              <MenuItem key={ciudad.id} value={ciudad.id}>
-                {ciudad.nombre}
-              </MenuItem>
-            ))}
-          </TextField>
+        {/* Sección Inferior */}
+        <Grid item xs={12}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                label="País"
+                select
+                name="pais"
+                value={formData.pais}
+                onChange={handleChange}
+                required
+              >
+                {paises.map((pais) => (
+                  <MenuItem key={pais.id} value={pais.id}>
+                    {pais.nombre}
+                  </MenuItem>
+                ))}
+              </CustomTextField>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                label="Departamento"
+                select
+                name="departamento"
+                value={formData.departamento}
+                onChange={handleChange}
+                disabled={!formData.pais}
+                required
+              >
+                {departamentos.map((dep) => (
+                  <MenuItem key={dep.id} value={dep.id}>
+                    {dep.nombre}
+                  </MenuItem>
+                ))}
+              </CustomTextField>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                label="Ciudad"
+                select
+                name="ciudad"
+                value={formData.ciudad}
+                onChange={handleChange}
+                disabled={!formData.departamento}
+                required
+              >
+                {ciudades.map((ciudad) => (
+                  <MenuItem key={ciudad.id} value={ciudad.id}>
+                    {ciudad.nombre}
+                  </MenuItem>
+                ))}
+              </CustomTextField>
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                label="Dirección Completa"
+                name="direccion_completa"
+                value={formData.direccion_completa}
+                onChange={handleChange}
+                required
+                uppercase
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <CustomTextField
+                label="Nombre de Usuario"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <CustomTextField
+                label="Contraseña"
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomTextField
+                label="Rol"
+                select
+                name="rol"
+                value={formData.rol}
+                onChange={handleChange}
+                required
+              >
+                {["ADMIN", "PADRE", "PROFESOR"].map((rol) => (
+                  <MenuItem key={rol} value={rol}>
+                    {rol}
+                  </MenuItem>
+                ))}
+              </CustomTextField>
+            </Grid>
+          </Grid>
         </Grid>
       </Grid>
 
-      <Button variant="contained" color="primary" fullWidth sx={{ mt: 3 }} onClick={handleCreateUser}>
-        Crear Usuario
+      <Button
+        variant="contained"
+        fullWidth
+        onClick={handleSubmit}
+        sx={{ mt: 4, py: 2 }}
+      >
+        Registrar Usuario
       </Button>
-      <Typography variant="body2" sx={{ mt: 2 }}>
-        ¿Ya tienes una cuenta?{" "}
-        <Link href="/login" color="primary" underline="hover">
-          Inicia sesión
-        </Link>
-      </Typography>
     </Box>
   );
 };
