@@ -37,7 +37,9 @@ const CreateUserForm = () => {
   const [paises, setPaises] = useState<OpcionSelect[]>([]);
   const [departamentos, setDepartamentos] = useState<OpcionSelect[]>([]);
   const [ciudades, setCiudades] = useState<OpcionSelect[]>([]);
-  const [tiposIdentificacion, setTiposIdentificacion] = useState<OpcionSelect[]>([]);
+  const [tiposIdentificacion, setTiposIdentificacion] = useState<
+    OpcionSelect[]
+  >([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,9 +48,9 @@ const CreateUserForm = () => {
           api.get("/ubicacion/paises"),
           api.get("/tipo-identificacion/tiposDeIdentificacion", {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`
-            }
-          })
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }),
         ]);
         setPaises(paisesRes.data);
         setTiposIdentificacion(tiposRes.data);
@@ -59,13 +61,55 @@ const CreateUserForm = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (!formData.pais) {
+      setDepartamentos([]);
+      setCiudades([]);
+      return;
+    }
+
+    const fetchDepartamentos = async () => {
+      try {
+        const response = await api.get(
+          `/ubicacion/departamentos/${formData.pais}`
+        );
+        setDepartamentos(response.data);
+        setCiudades([]); // Limpia ciudades cuando cambia el departamento
+      } catch (error) {
+        enqueueSnackbar("Error cargando departamentos", { variant: "error" });
+      }
+    };
+
+    fetchDepartamentos();
+  }, [formData.pais]);
+
+  useEffect(() => {
+    if (!formData.departamento) {
+      setCiudades([]);
+      return;
+    }
+
+    const fetchCiudades = async () => {
+      try {
+        const response = await api.get(
+          `/ubicacion/ciudades/${formData.departamento}`
+        );
+        setCiudades(response.data);
+      } catch (error) {
+        enqueueSnackbar("Error cargando ciudades", { variant: "error" });
+      }
+    };
+
+    fetchCiudades();
+  }, [formData.departamento]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
       ...(name === "pais" && { departamento: "", ciudad: "" }),
-      ...(name === "departamento" && { ciudad: "" })
+      ...(name === "departamento" && { ciudad: "" }),
     }));
   };
 
@@ -73,22 +117,27 @@ const CreateUserForm = () => {
     try {
       await api.post("/auth/crearUsuario", formData, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`
-        }
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
       enqueueSnackbar("Usuario creado exitosamente", { variant: "success" });
       router.push("/login");
     } catch (error: any) {
-      enqueueSnackbar(error.response?.data?.message || "Error creando usuario", { 
-        variant: "error" 
-      });
+      enqueueSnackbar(
+        error.response?.data?.message || "Error creando usuario",
+        {
+          variant: "error",
+        }
+      );
     }
   };
 
   return (
     <Box sx={{ maxWidth: 800, margin: "auto", p: 3, boxShadow: 3 }}>
-      <Typography variant="h4" gutterBottom>Registro de Usuario</Typography>
-      
+      <Typography variant="h4" gutterBottom>
+        Registro de Usuario
+      </Typography>
+
       <Grid container spacing={3}>
         {/* Columna Izquierda */}
         <Grid item xs={12} md={6}>
@@ -103,7 +152,7 @@ const CreateUserForm = () => {
                 uppercase
               />
             </Grid>
-            
+
             <Grid item xs={12}>
               <CustomTextField
                 label="Segundo Nombre"
