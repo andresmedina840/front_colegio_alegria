@@ -1,56 +1,41 @@
-import { Autocomplete, CircularProgress, TextField } from "@mui/material";
+import { Autocomplete, TextField } from "@mui/material";
 import React from "react";
 
-interface CustomAutocompleteProps<T> {
-  options: T[];
-  value: T | null;
-  onChange: (value: T | null) => void;
-  loading?: boolean;
+type CustomAutocompleteProps = {
   label: string;
-  getOptionLabel?: (option: T) => string;
-  disabled?: boolean;
+  options: any[];
+  value: any;
+  onChange: (value: any) => void;
+  getOptionLabel: (option: any) => string;
   required?: boolean;
-}
+  disabled?: boolean;
+};
 
-const CustomAutocomplete = <T extends {}>({
+const CustomAutocomplete = ({
+  label,
   options,
   value,
   onChange,
-  loading = false,
-  label,
-  getOptionLabel = (option: T) => String(option),
-  disabled = false,
+  getOptionLabel,
   required = false,
-}: CustomAutocompleteProps<T>) => {
+  disabled = false,
+}: CustomAutocompleteProps) => {
   return (
     <Autocomplete
       options={options}
-      getOptionLabel={getOptionLabel}
       value={value}
       onChange={(_, newValue) => onChange(newValue)}
-      loading={loading}
+      getOptionLabel={getOptionLabel}
+      isOptionEqualToValue={(option, value) => option?.id === value?.id}
       disabled={disabled}
-      isOptionEqualToValue={(option, value) =>
-        getOptionLabel(option) === getOptionLabel(value)
-      }
       renderInput={(params) => (
         <TextField
           {...params}
           label={label}
           required={required}
+          variant="outlined"
           fullWidth
-          slotProps={{
-            input: {
-              ...params.InputProps, // Asegura que todas las props se mantengan
-              endAdornment: (
-                <>
-                  {loading && <CircularProgress color="inherit" size={20} />}
-                  {params.InputProps?.endAdornment}
-                </>
-              ),
-            },
-            inputLabel: { shrink: true },
-          }}
+          InputLabelProps={{ shrink: true }}
         />
       )}
     />

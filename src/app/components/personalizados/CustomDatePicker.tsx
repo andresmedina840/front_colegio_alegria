@@ -6,39 +6,32 @@ import React from "react";
 
 type CustomDatePickerProps = {
   label: string;
-  name: string;
   value: string | null;
-  handleChange: (
-    e: React.ChangeEvent<{ name?: string; value: unknown }>
-  ) => void;
-  maxDate?: string; // Opcional, por si quieres limitar la fecha máxima
+  onChange: (value: string | null) => void;
+  maxDate?: string;
+  error?: boolean;
+  helperText?: string;
 };
 
 const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   label,
-  name,
   value,
-  handleChange,
+  onChange,
   maxDate,
+  error,
+  helperText,
 }) => {
   return (
     <DatePicker
       label={label}
-      value={value && dayjs(value).isValid() ? dayjs(value) : null}
-      onChange={(newValue) => {
-        const event = {
-          target: {
-            name,
-            value: newValue ? newValue.format("YYYY-MM-DD") : "",
-          },
-        } as unknown as React.ChangeEvent<{ name?: string; value: unknown }>;
-        handleChange(event);
-      }}
+      value={value ? dayjs(value) : null}
+      onChange={(newValue) => onChange(newValue?.format("YYYY-MM-DD") || null)}
       maxDate={maxDate ? dayjs(maxDate) : undefined}
       slotProps={{
         textField: {
           fullWidth: true,
-          inputProps: { spellCheck: false },
+          error,
+          helperText,
           InputLabelProps: { shrink: true },
         },
       }}

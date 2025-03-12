@@ -1,53 +1,33 @@
-// components/personalizados/CustomTextField.tsx
-import { TextField } from "@mui/material";
+import { TextField, TextFieldProps } from "@mui/material";
 import React from "react";
 
-type CustomTextFieldProps = {
+type CustomTextFieldProps = TextFieldProps & {
   uppercase?: boolean;
-  fullWidth?: boolean;
-  slotProps?: {
-    htmlInput?: React.InputHTMLAttributes<HTMLInputElement> & {
-      suppressHydrationWarning?: boolean;
-      "data-ms-editor"?: string;
-    };
-  };
-} & React.ComponentProps<typeof TextField>;
+};
 
-const CustomTextField = (props: CustomTextFieldProps) => {
-  const { 
-    uppercase, 
-    fullWidth = true,
-    slotProps = {}, 
-    ...rest 
-  } = props;
-
-  const mergedSlotProps = {
-    htmlInput: {
-      suppressHydrationWarning: true,
-      spellCheck: false,
-      "data-ms-editor": "false",
-      style: {
-        textTransform: uppercase ? "uppercase" : "none",
-        ...slotProps?.htmlInput?.style,
-      },
-      ...slotProps?.htmlInput,
-    } as React.InputHTMLAttributes<HTMLInputElement> & { 
-      "data-ms-editor"?: string 
-    },
-    
-    inputLabel: {
-      shrink: true,
-      ...slotProps?.inputLabel,
-    },
-    ...slotProps,
-  };
+const CustomTextField = ({ uppercase, InputProps, ...props }: CustomTextFieldProps) => {
+  const textTransformStyle = uppercase
+    ? { textTransform: "uppercase" as React.CSSProperties["textTransform"] }
+    : undefined;
 
   return (
-    <TextField 
-      {...rest}
-      fullWidth={fullWidth}
-      slotProps={mergedSlotProps}
-      value={rest.value || ""}
+    <TextField
+      {...props}
+      variant="outlined"
+      fullWidth
+      InputProps={{
+        ...InputProps, // Se mantiene lo que venga de `props`
+      }}
+      slotProps={{
+        inputLabel: {
+          shrink: true,
+        },
+        htmlInput: {
+          style: textTransformStyle,
+          spellCheck: false,
+          "data-ms-editor": "false",
+        },
+      }}
     />
   );
 };
