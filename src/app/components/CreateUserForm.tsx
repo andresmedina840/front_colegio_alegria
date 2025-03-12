@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Button, Grid, IconButton, InputAdornment, Typography } from "@mui/material";
 import api from "../axios/axiosClient";
 import CustomTextField from "../components/personalizados/CustomTextField";
 import CustomAutocomplete from "../components/personalizados/CustomAutocomplete";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 type OpcionSelect = { id: string; nombre: string };
 
@@ -15,21 +16,22 @@ const CreateUserForm = () => {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
+    tipoIdentificacionId: null as OpcionSelect | null,
+    numeroIdentificacion: "",
     username: "",
-    primer_nombre: "",
-    segundo_nombre: "",
-    primer_apellido: "",
-    segundo_apellido: "",
+    primerNombre: "",
+    segundoNombre: "",
+    primerApellido: "",
+    segundoApellido: "",
     email: "",
     password: "",
+    confirmPassword: "",
     rol: "PADRE" as "ADMIN" | "PADRE" | "PROFESOR",
-    fecha_nacimiento: "",
-    tipo_identificacion_id: null as OpcionSelect | null,
-    numero_identificacion: "",
-    numero_celular1: "",
-    numero_celular2: "",
-    usuario_telegram: "",
-    direccion_completa: "",
+    fechaNacimiento: "",
+    numeroCelular1: "",
+    numeroCelular2: "",
+    usuarioTelegram: "",
+    direccionCompleta: "",
     ciudad: null as OpcionSelect | null,
     departamento: null as OpcionSelect | null,
     pais: null as OpcionSelect | null,
@@ -41,6 +43,15 @@ const CreateUserForm = () => {
   const [tiposIdentificacion, setTiposIdentificacion] = useState<
     OpcionSelect[]
   >([]);
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const listaDeRoles = [
+    { id: "ADMIN", nombre: "ADMIN" },
+    { id: "PADRE", nombre: "PADRE" },
+    { id: "PROFESOR", nombre: "PROFESOR" },
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -104,7 +115,7 @@ const CreateUserForm = () => {
     try {
       await api.post("/auth/crearUsuario", {
         ...formData,
-        tipo_identificacion_id: formData.tipo_identificacion_id?.id || "",
+        tipoIdentificacionId: formData.tipoIdentificacionId?.id || "",
         pais: formData.pais?.id || "",
         departamento: formData.departamento?.id || "",
         ciudad: formData.ciudad?.id || "",
@@ -143,8 +154,8 @@ const CreateUserForm = () => {
           <CustomAutocomplete
             label="Tipo de Identificación"
             options={tiposIdentificacion}
-            value={formData.tipo_identificacion_id}
-            onChange={(value) => handleChange("tipo_identificacion_id", value)}
+            value={formData.tipoIdentificacionId}
+            onChange={(value) => handleChange("tipoIdentificacionId", value)}
             getOptionLabel={(option) => option.nombre}
             required
           />
@@ -153,19 +164,21 @@ const CreateUserForm = () => {
         <Grid item xs={12} sm={6}>
           <CustomTextField
             label="Número Identificación"
-            name="numero_identificacion"
-            value={formData.numero_identificacion}
-            onChange={(e) => handleChange("numero_identificacion", e.target.value)}
+            name="numeroIdentificacion"
+            value={formData.numeroIdentificacion}
+            onChange={(e) =>
+              handleChange("numeroIdentificacion", e.target.value)
+            }
             required
             slotProps={{ inputLabel: { shrink: true } }}
           />
         </Grid>
 
         {[
-          { label: "Primer Nombre", name: "primer_nombre", required: true },
-          { label: "Segundo Nombre", name: "segundo_nombre" },
-          { label: "Primer Apellido", name: "primer_apellido", required: true },
-          { label: "Segundo Apellido", name: "segundo_apellido" },
+          { label: "Primer Nombre", name: "primerNombre", required: true },
+          { label: "Segundo Nombre", name: "segundoNombre" },
+          { label: "Primer Apellido", name: "primerApellido", required: true },
+          { label: "Segundo Apellido", name: "segundoApellido" },
         ].map((field) => (
           <Grid item xs={12} sm={6} key={field.name}>
             <CustomTextField
@@ -188,9 +201,9 @@ const CreateUserForm = () => {
           <CustomTextField
             label="Fecha de Nacimiento"
             type="date"
-            name="fecha_nacimiento"
-            value={formData.fecha_nacimiento}
-            onChange={(e) => handleChange("fecha_nacimiento", e.target.value)}
+            name="fechaNacimiento"
+            value={formData.fechaNacimiento}
+            onChange={(e) => handleChange("fechaNacimiento", e.target.value)}
             required
             slotProps={{ inputLabel: { shrink: true } }}
           />
@@ -234,11 +247,131 @@ const CreateUserForm = () => {
         <Grid item xs={12} sm={8}>
           <CustomTextField
             label="Dirección Completa"
-            name="direccion_completa"
-            value={formData.direccion_completa}
-            onChange={(e) => handleChange("direccion_completa", e.target.value)}
+            name="direccionCompleta"
+            value={formData.direccionCompleta}
+            onChange={(e) => handleChange("direccionCompleta", e.target.value)}
             required
             uppercase
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={12}>
+          <CustomTextField
+            label="Email"
+            name="email"
+            value={formData.email}
+            onChange={(e) => handleChange("email", e.target.value)}
+            required
+            slotProps={{ inputLabel: { shrink: true } }}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <CustomTextField
+            label="Usuario de Telegram"
+            name="usuarioTelegram"
+            value={formData.usuarioTelegram}
+            onChange={(e) => handleChange("usuarioTelegram", e.target.value)}
+            required
+            slotProps={{ inputLabel: { shrink: true } }}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={3}>
+          <CustomTextField
+            label="No. celular principal"
+            name="numeroCelular1"
+            value={formData.numeroCelular1}
+            onChange={(e) => handleChange("numeroCelular1", e.target.value)}
+            required
+            slotProps={{ inputLabel: { shrink: true } }}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={3}>
+          <CustomTextField
+            label="No. celular secundario"
+            name="numeroCelular2"
+            value={formData.numeroCelular2}
+            onChange={(e) => handleChange("numeroCelular2", e.target.value)}
+            slotProps={{ inputLabel: { shrink: true } }}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <CustomTextField
+            label="Nombre de Usuario"
+            name="username"
+            value={formData.username}
+            onChange={(e) => handleChange("username", e.target.value)}
+            required
+            slotProps={{ inputLabel: { shrink: true } }}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <CustomAutocomplete
+            label="Rol"
+            options={listaDeRoles} 
+            value={listaDeRoles.find((r) => r.id === formData.rol) || null} 
+            onChange={(value) => handleChange("rol", value?.id || "")}
+            getOptionLabel={(option) => option.nombre}
+            required
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <CustomTextField
+            label="Contraseña"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            value={formData.password}
+            onChange={(e) => handleChange("password", e.target.value)}
+            required
+            slotProps={{ inputLabel: { shrink: true } }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+
+        {/* Campo de confirmación de contraseña */}
+        <Grid item xs={12} sm={6}>
+          <CustomTextField
+            label="Confirmar Contraseña"
+            name="confirmPassword"
+            type={showConfirmPassword ? "text" : "password"}
+            value={formData.confirmPassword}
+            onChange={(e) => handleChange("confirmPassword", e.target.value)}
+            required
+            error={formData.password !== formData.confirmPassword}
+            helperText={
+              formData.password !== formData.confirmPassword
+                ? "Las contraseñas no coinciden"
+                : ""
+            }
+            slotProps={{ inputLabel: { shrink: true } }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    edge="end"
+                  >
+                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
         </Grid>
       </Grid>
