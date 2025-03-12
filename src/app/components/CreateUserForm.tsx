@@ -80,6 +80,11 @@ const CreateUserForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [edadCalculada, setEdadCalculada] = useState<string>("");
+  // Agrega este estado para controlar campos "touched"
+  const [touchedFields, setTouchedFields] = useState({
+    numeroCelular1: false,
+    numeroCelular2: false,
+  });
 
   const listaDeRoles: OpcionSelect[] = [
     { id: "ADMIN", nombre: "ADMIN" },
@@ -406,16 +411,39 @@ const CreateUserForm = () => {
 
         <Grid item xs={12} sm={2}>
           <CustomTextField
-            label="No. celular principal"
+            label="No. celular principal *"
             value={formData.numeroCelular1}
             onChange={(e) => {
-              const newValue = e.target.value.slice(0, 10);
-              handleChange("numeroCelular1", newValue);
+              const numericValue = e.target.value.replace(/[^0-9]/g, "");
+              let validatedValue = numericValue;
+
+              if (numericValue.length > 0 && !numericValue.startsWith("3")) {
+                validatedValue = "3" + numericValue.slice(0, 9);
+              }
+
+              validatedValue = validatedValue.slice(0, 10);
+              handleChange("numeroCelular1", validatedValue);
             }}
-            helperText={`${formData.numeroCelular1.length} / 10 caracteres`}
+            onBlur={() =>
+              setTouchedFields((prev) => ({ ...prev, numeroCelular1: true }))
+            }
+            helperText={
+              !touchedFields.numeroCelular1
+                ? "Requerido"
+                : formData.numeroCelular1.length !== 10
+                ? "Debe tener 10 dígitos comenzando con 3"
+                : "Número válido"
+            }
+            error={
+              touchedFields.numeroCelular1 &&
+              formData.numeroCelular1.length !== 10
+            }
             slotProps={{
               htmlInput: {
                 maxLength: 10,
+                inputMode: "numeric",
+                pattern: "[0-9]*",
+                placeholder: "3XXXXXXXXX",
               },
             }}
             required
@@ -427,13 +455,38 @@ const CreateUserForm = () => {
             label="No. celular secundario"
             value={formData.numeroCelular2}
             onChange={(e) => {
-              const newValue = e.target.value.slice(0, 10);
-              handleChange("numeroCelular2", newValue);
+              const numericValue = e.target.value.replace(/[^0-9]/g, "");
+              let validatedValue = numericValue;
+
+              if (numericValue.length > 0 && !numericValue.startsWith("3")) {
+                validatedValue = "3" + numericValue.slice(0, 9);
+              }
+
+              validatedValue = validatedValue.slice(0, 10);
+              handleChange("numeroCelular2", validatedValue);
             }}
-            helperText={`${formData.numeroCelular2.length} / 10 caracteres`}
+            onBlur={() =>
+              setTouchedFields((prev) => ({ ...prev, numeroCelular2: true }))
+            }
+            helperText={
+              !touchedFields.numeroCelular2 &&
+              formData.numeroCelular2.length === 0
+                ? "Opcional"
+                : formData.numeroCelular2.length !== 10
+                ? "Debe tener 10 dígitos comenzando con 3"
+                : "Número válido"
+            }
+            error={
+              touchedFields.numeroCelular2 &&
+              formData.numeroCelular2.length > 0 &&
+              formData.numeroCelular2.length !== 10
+            }
             slotProps={{
               htmlInput: {
                 maxLength: 10,
+                inputMode: "numeric",
+                pattern: "[0-9]*",
+                placeholder: "3XXXXXXXXX (opcional)",
               },
             }}
           />
