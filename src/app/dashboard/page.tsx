@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Layout from "../components/Layout";
+import FusionTemplateColegio from "../components/TemplateColegio";
 import {
   Typography,
   Box,
@@ -10,7 +10,7 @@ import {
   Grid,
   CircularProgress,
 } from "@mui/material";
-import api from "../axios/axiosClient"; // Asegúrate de tener configurado tu archivo de servicio API.
+import api from "../axios/axiosClient"; 
 
 // Simulación del rol del usuario actual
 const currentUserRole = "ADMIN"; // Cambia este valor según la lógica de autenticación
@@ -23,7 +23,7 @@ const Dashboard = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (currentUserRole !== "ADMIN") return; // Evitar llamadas si el usuario no es ADMIN
 
     const fetchData = async () => {
@@ -47,10 +47,10 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, []);
+  }, []);*/
 
   return (
-    <Layout>
+    <FusionTemplateColegio>
       <Box>
         <Typography variant="h4" gutterBottom>
           Bienvenido al Dashboard
@@ -63,7 +63,7 @@ const Dashboard = () => {
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
-                    Estudiantes por Año
+                    Total de Estudiantes por Año
                   </Typography>
                   {loading ? (
                     <CircularProgress />
@@ -112,7 +112,7 @@ const Dashboard = () => {
           </Typography>
         )}
       </Box>
-    </Layout>
+    </FusionTemplateColegio>
   );
 };
 
