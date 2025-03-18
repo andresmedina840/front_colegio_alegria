@@ -2,11 +2,10 @@ import {
   Card, 
   CardContent, 
   Grid, 
-  TextField, 
-  MenuItem, 
   Typography 
 } from "@mui/material";
 import React from "react";
+import CustomAutocomplete from "./personalizados/CustomAutocomplete";
 
 interface DiscapacidadesProps {
   formData: Record<string, string>;
@@ -29,19 +28,17 @@ const Discapacidades: React.FC<DiscapacidadesProps> = ({
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={3}>
-            <TextField
-              select
-              fullWidth
+            <CustomAutocomplete
               label="No aplica"
-              name="discapacidadesNoAplica"
+              options={siNo}
               value={formData.discapacidadesNoAplica || ""}
-              onChange={handleChange}
-              slotProps={{ inputLabel: { shrink: true } }}
-            >
-              {siNo.map((respuesta) => (
-                <MenuItem key={respuesta} value={respuesta}>{respuesta}</MenuItem>
-              ))}
-            </TextField>
+              onChange={(value) =>
+                handleChange({
+                  target: { name: "discapacidadesNoAplica", value: value ?? "" },
+                } as React.ChangeEvent<HTMLInputElement>)
+              }
+              getOptionLabel={(option) => option}
+            />
           </Grid>
 
           {[
@@ -54,20 +51,18 @@ const Discapacidades: React.FC<DiscapacidadesProps> = ({
             { label: "Síndrome de Down", name: "discapacidadesSindromeDown" },
           ].map((item) => (
             <Grid item xs={12} sm={3} key={item.name}>
-              <TextField
-                select
-                fullWidth
+              <CustomAutocomplete
                 label={item.label}
-                name={item.name}
+                options={siNo}
                 value={formData[item.name] || ""}
-                onChange={handleChange}
+                onChange={(value) =>
+                  handleChange({
+                    target: { name: item.name, value: value ?? "" },
+                  } as React.ChangeEvent<HTMLInputElement>)
+                }
+                getOptionLabel={(option) => option}
                 disabled={disableOtrosCampos} // Desactiva si "No aplica = SI"
-                slotProps={{ inputLabel: { shrink: true } }}
-              >
-                {siNo.map((respuesta) => (
-                  <MenuItem key={respuesta} value={respuesta}>{respuesta}</MenuItem>
-                ))}
-              </TextField>
+              />
             </Grid>
           ))}
         </Grid>

@@ -7,9 +7,7 @@ import {
   Button,
   Card,
   CardContent,
-  TextField,
   Grid,
-  MenuItem,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import api from "../axios/axiosClient";
@@ -23,6 +21,7 @@ import SituacionAcademica from "./SituacionAcademica";
 import DocumentacionRecibida from "./DocumentacionRecibida";
 import ParentForm from "./ParentForm";
 import EmergencyContactForm from "./EmergencyContactForm";
+import CustomAutocomplete from "./personalizados/CustomAutocomplete";
 
 const siNo = ["SI", "NO"];
 
@@ -193,25 +192,18 @@ const CreateStudentForm = () => {
           </Box>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12} sm={12}>
-              <TextField
-                select
-                fullWidth
+              <CustomAutocomplete
                 label="Autorización para contacto de emergencia"
-                name="autorizacionCoctactoEmergencia"
+                options={siNo}
                 value={formData.autorizacionCoctactoEmergencia || ""}
-                onChange={handleChange}
-                slotProps={{
-                  inputLabel: {
-                    shrink: true,
-                  },
-                }}
-              >
-                {siNo.map((respuestas) => (
-                  <MenuItem key={respuestas} value={respuestas}>
-                    {respuestas}
-                  </MenuItem>
-                ))}
-              </TextField>
+                onChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    autorizacionCoctactoEmergencia: value ?? "",
+                  }))
+                }
+                getOptionLabel={(option) => option}
+              />
             </Grid>
 
             {formData.autorizacionCoctactoEmergencia === "SI" && (
@@ -227,46 +219,33 @@ const CreateStudentForm = () => {
             )}
 
             <Grid item xs={12} sm={6}>
-              <TextField
-                select
-                fullWidth
+              <CustomAutocomplete
                 label="Autorizo para uso de imagen (Fotografía/videos)"
-                name="autorizacionImagen"
+                options={siNo}
                 value={formData.autorizacionImagen || ""}
-                onChange={handleChange}
-                slotProps={{
-                  inputLabel: {
-                    shrink: true,
-                  },
-                }}
-              >
-                {siNo.map((respuestas) => (
-                  <MenuItem key={respuestas} value={respuestas}>
-                    {respuestas}
-                  </MenuItem>
-                ))}
-              </TextField>
+                onChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    autorizacionImagen: value ?? "",
+                  }))
+                }
+                getOptionLabel={(option) => option}
+              />
             </Grid>
+
             <Grid item xs={12} sm={6}>
-              <TextField
-                select
-                fullWidth
+              <CustomAutocomplete
                 label="Declaración de veracidad de la información"
-                name="veracidadInformacion"
+                options={siNo}
                 value={formData.veracidadInformacion || ""}
-                onChange={handleChange}
-                slotProps={{
-                  inputLabel: {
-                    shrink: true,
-                  },
-                }}
-              >
-                {siNo.map((respuestas) => (
-                  <MenuItem key={respuestas} value={respuestas}>
-                    {respuestas}
-                  </MenuItem>
-                ))}
-              </TextField>
+                onChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    veracidadInformacion: value ?? "",
+                  }))
+                }
+                getOptionLabel={(option) => option}
+              />
             </Grid>
 
             <Grid item xs={12} sm={12}>

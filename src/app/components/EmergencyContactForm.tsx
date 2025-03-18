@@ -21,7 +21,7 @@ const EmergencyContactForm: React.FC<EmergencyContactFormProps> = ({
         Contacto de Emergencia
       </Typography>
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={12} sm={12}>
           <CustomTextField
             fullWidth
             label="Primer Nombre Contacto Emergencia"

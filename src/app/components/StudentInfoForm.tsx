@@ -4,6 +4,7 @@ import CustomTextField from "./personalizados/CustomTextField";
 import CustomDatePicker from "./personalizados/CustomDatePicker";
 import { getCurrentDateISO } from "./../utils/dateUtils";
 import dayjs from "dayjs";
+import CustomAutocomplete from "./personalizados/CustomAutocomplete";
 
 type OpcionSelect = {
   id: string;
@@ -80,21 +81,20 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
         <Grid container spacing={2}>
           {/* Campo Tipo Identificación */}
           <Grid item xs={12} sm={5}>
-            <CustomTextField
-              select
+            <CustomAutocomplete
               label="Tipo Identificación Estudiante"
-              name="tipoIdentificacionEstudiante"
+              options={tiposIdentificacion}
               value={formData.tipoIdentificacionEstudiante || ""}
-              onChange={handleChange}
-              {...commonTextFieldProps}
-            >
-              <MenuItem value="">Seleccione un tipo de Identificación</MenuItem>
-              {tiposIdentificacion.map((tipo) => (
-                <MenuItem key={tipo} value={tipo}>
-                  {tipo}
-                </MenuItem>
-              ))}
-            </CustomTextField>
+              onChange={(value) =>
+                handleChange({
+                  target: {
+                    name: "tipoIdentificacionEstudiante",
+                    value: value ?? "",
+                  },
+                } as React.ChangeEvent<HTMLInputElement>)
+              }
+              getOptionLabel={(option) => option}
+            />
           </Grid>
           {/* Campo Número Identificación */}
           <Grid item xs={12} sm={4}>
@@ -159,39 +159,36 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               }}
             />
           </Grid>
+          {/* Campo Grado */}
           <Grid item xs={12} sm={3}>
-            <CustomTextField
-              select
+            <CustomAutocomplete
               label="Grado"
-              name="grado"
+              options={grados.map((grado) => grado.id)}
               value={formData.grado || ""}
-              onChange={handleChange}
-              {...commonTextFieldProps}
-            >
-              <MenuItem value="">Seleccione un grado</MenuItem>
-              {grados.map((grado) => (
-                <MenuItem key={grado.id} value={grado.id}>
-                  {grado.nombre}
-                </MenuItem>
-              ))}
-            </CustomTextField>
+              onChange={(value) =>
+                handleChange({
+                  target: { name: "grado", value: value ?? "" },
+                } as React.ChangeEvent<HTMLInputElement>)
+              }
+              getOptionLabel={(option) =>
+                grados.find((g) => g.id === option)?.nombre || ""
+              }
+            />
           </Grid>
+
+          {/* Campo Jornada Escolar */}
           <Grid item xs={12} sm={3}>
-            <CustomTextField
-              select
+            <CustomAutocomplete
               label="Jornada Escolar"
-              name="jornada"
+              options={jornadaEscolar}
               value={formData.jornada || ""}
-              onChange={handleChange}
-              {...commonTextFieldProps}
-            >
-              <MenuItem value="">Seleccione una jornada</MenuItem>
-              {jornadaEscolar.map((jornada) => (
-                <MenuItem key={jornada} value={jornada}>
-                  {jornada}
-                </MenuItem>
-              ))}
-            </CustomTextField>
+              onChange={(value) =>
+                handleChange({
+                  target: { name: "jornada", value: value ?? "" },
+                } as React.ChangeEvent<HTMLInputElement>)
+              }
+              getOptionLabel={(option) => option}
+            />
           </Grid>
           <Grid item xs={12}>
             <CustomTextField
@@ -212,21 +209,21 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               }}
             />
           </Grid>
+          {/* Campo Último Grado Cursado */}
           <Grid item xs={12} sm={3}>
-            <CustomTextField
-              select
+            <CustomAutocomplete
               label="Último Grado Cursado"
-              name="ultimoGradoCursado"
+              options={grados.map((grado) => grado.id)}
               value={formData.ultimoGradoCursado || ""}
-              onChange={handleChange}
-              {...commonTextFieldProps}
-            >
-              {grados.map((grado) => (
-                <MenuItem key={grado.id} value={grado.id}>
-                  {grado.nombre}
-                </MenuItem>
-              ))}
-            </CustomTextField>
+              onChange={(value) =>
+                handleChange({
+                  target: { name: "ultimoGradoCursado", value: value ?? "" },
+                } as React.ChangeEvent<HTMLInputElement>)
+              }
+              getOptionLabel={(option) =>
+                grados.find((g) => g.id === option)?.nombre || ""
+              }
+            />
           </Grid>
           <Grid item xs={12} sm={3}>
             <CustomTextField
@@ -246,21 +243,19 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               }}
             />
           </Grid>
+          {/* Campo Género */}
           <Grid item xs={12} sm={3}>
-            <CustomTextField
-              select
+            <CustomAutocomplete
               label="Género"
-              name="genero"
+              options={generos}
               value={formData.genero || ""}
-              onChange={handleChange}
-              {...commonTextFieldProps}
-            >
-              {generos.map((gen) => (
-                <MenuItem key={gen} value={gen}>
-                  {gen}
-                </MenuItem>
-              ))}
-            </CustomTextField>
+              onChange={(value) =>
+                handleChange({
+                  target: { name: "genero", value: value ?? "" },
+                } as React.ChangeEvent<HTMLInputElement>)
+              }
+              getOptionLabel={(option) => option}
+            />
           </Grid>
 
           <Grid item xs={12} sm={3}>
@@ -279,7 +274,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                 handleChange({
                   target: {
                     name: "edad",
-                    value: calcularEdad(value || ""), 
+                    value: calcularEdad(value || ""),
                   },
                 } as React.ChangeEvent<HTMLInputElement>);
               }}
@@ -298,65 +293,62 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               }}
             />
           </Grid>
-          {/* Campos de ubicación geográfica */}
+          {/* Campo País de Nacimiento */}
           <Grid item xs={12} sm={4}>
-            <CustomTextField
-              select
+            <CustomAutocomplete
               label="País de Nacimiento"
-              name="paisNacimiento"
+              options={paises.map((pais) => pais.id)}
               value={formData.paisNacimiento || ""}
-              onChange={(e) => {
-                handleChange(e);
-                cargarDepartamentos(e.target.value as string);
+              onChange={(value) => {
+                handleChange({
+                  target: { name: "paisNacimiento", value: value ?? "" },
+                } as React.ChangeEvent<HTMLInputElement>);
+                cargarDepartamentos(value ?? "");
               }}
-              {...commonTextFieldProps}
-            >
-              <MenuItem value="">Seleccionar país</MenuItem>
-              {paises.map((pais) => (
-                <MenuItem key={pais.id} value={pais.id}>
-                  {pais.nombre}
-                </MenuItem>
-              ))}
-            </CustomTextField>
+              getOptionLabel={(option) =>
+                paises.find((p) => p.id === option)?.nombre || ""
+              }
+            />
           </Grid>
+
+          {/* Campo Departamento de Nacimiento */}
           <Grid item xs={12} sm={6}>
-            <CustomTextField
-              select
+            <CustomAutocomplete
               label="Departamento de Nacimiento"
-              name="departamentoNacimiento"
+              options={departamentos.map((dep) => dep.id)}
               value={formData.departamentoNacimiento || ""}
-              onChange={(e) => {
-                handleChange(e);
-                cargarCiudades(e.target.value as string);
+              onChange={(value) => {
+                handleChange({
+                  target: {
+                    name: "departamentoNacimiento",
+                    value: value ?? "",
+                  },
+                } as React.ChangeEvent<HTMLInputElement>);
+                cargarCiudades(value ?? "");
               }}
+              getOptionLabel={(option) =>
+                departamentos.find((d) => d.id === option)?.nombre || ""
+              }
               disabled={!formData.paisNacimiento}
-              {...commonTextFieldProps}
-            >
-              <MenuItem value="">Seleccionar departamento</MenuItem>
-              {departamentos.map((departamento) => (
-                <MenuItem key={departamento.id} value={departamento.id}>
-                  {departamento.nombre}
-                </MenuItem>
-              ))}
-            </CustomTextField>
+            />
           </Grid>
+
+          {/* Campo Municipio de Nacimiento */}
           <Grid item xs={12} sm={5}>
-            <CustomTextField
-              select
+            <CustomAutocomplete
               label="Municipio de Nacimiento"
-              name="municipioNacimiento"
+              options={ciudades.map((ciudad) => ciudad.id)}
               value={formData.municipioNacimiento || ""}
-              onChange={handleChange}
+              onChange={(value) =>
+                handleChange({
+                  target: { name: "municipioNacimiento", value: value ?? "" },
+                } as React.ChangeEvent<HTMLInputElement>)
+              }
+              getOptionLabel={(option) =>
+                ciudades.find((c) => c.id === option)?.nombre || ""
+              }
               disabled={!formData.departamentoNacimiento}
-              {...commonTextFieldProps}
-            >
-              <MenuItem value="">Seleccionar municipio</MenuItem>
-              {ciudades.map((ciudad) => (
-                <MenuItem key={ciudad.id} value={ciudad.id}>
-                  {ciudad.nombre}
-                </MenuItem>
-              ))}
-            </CustomTextField>
+            />
           </Grid>
         </Grid>
       </CardContent>

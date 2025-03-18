@@ -1,5 +1,11 @@
-import { Card, CardContent, Grid, TextField, MenuItem, Typography } from "@mui/material";
+import { 
+  Card, 
+  CardContent, 
+  Grid, 
+  Typography 
+} from "@mui/material";
 import React from "react";
+import CustomAutocomplete from "./personalizados/CustomAutocomplete";
 
 type CapacidadesExcepcionalesProps = {
   formData: Record<string, string>;
@@ -12,7 +18,7 @@ const CapacidadesExcepcionales: React.FC<CapacidadesExcepcionalesProps> = ({
   handleChange,
   siNo,
 }) => {
-  const disableOtrosCampos = formData.capacidadesExcepcionalesNoAplica === "NO"; // Nombre corregido
+  const disableOtrosCampos = formData.capacidadesExcepcionalesNoAplica === "NO";
 
   return (
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
@@ -22,19 +28,17 @@ const CapacidadesExcepcionales: React.FC<CapacidadesExcepcionalesProps> = ({
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={3}>
-            <TextField
-              select
-              fullWidth
+            <CustomAutocomplete
               label="No aplica"
-              name="capacidadesExcepcionalesNoAplica" // Nombre corregido
+              options={siNo}
               value={formData.capacidadesExcepcionalesNoAplica || ""}
-              onChange={handleChange}
-              slotProps={{ inputLabel: { shrink: true } }}
-            >
-              {siNo.map((respuesta) => (
-                <MenuItem key={respuesta} value={respuesta}>{respuesta}</MenuItem>
-              ))}
-            </TextField>
+              onChange={(value) =>
+                handleChange({
+                  target: { name: "capacidadesExcepcionalesNoAplica", value: value ?? "" },
+                } as React.ChangeEvent<HTMLInputElement>)
+              }
+              getOptionLabel={(option) => option}
+            />
           </Grid>
 
           {[
@@ -44,20 +48,18 @@ const CapacidadesExcepcionales: React.FC<CapacidadesExcepcionalesProps> = ({
             { label: "Con talento subje", name: "capacidadesExcepcionalesTalentoSubjetivo" },
           ].map((item) => (
             <Grid item xs={12} sm={3} key={item.name}>
-              <TextField
-                select
-                fullWidth
+              <CustomAutocomplete
                 label={item.label}
-                name={item.name}
+                options={siNo}
                 value={formData[item.name] || ""}
-                onChange={handleChange}
+                onChange={(value) =>
+                  handleChange({
+                    target: { name: item.name, value: value ?? "" },
+                  } as React.ChangeEvent<HTMLInputElement>)
+                }
+                getOptionLabel={(option) => option}
                 disabled={disableOtrosCampos}
-                slotProps={{ inputLabel: { shrink: true } }}
-              >
-                {siNo.map((respuesta) => (
-                  <MenuItem key={respuesta} value={respuesta}>{respuesta}</MenuItem>
-                ))}
-              </TextField>
+              />
             </Grid>
           ))}
         </Grid>
