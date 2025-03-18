@@ -21,8 +21,6 @@ const DocumentacionRecibida: React.FC<DocumentacionRecibidaProps> = ({
   handleChange,
   siNo,
 }) => {
-  // Determinar si debemos deshabilitar los demás campos
-  const disableOtrosCampos = formData.discapacidadesNoAplica === "NO";
   return (
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
       <CardContent>
@@ -108,7 +106,6 @@ const DocumentacionRecibida: React.FC<DocumentacionRecibidaProps> = ({
               name="documentacionRecibidaSistemaSocial"
               value={formData.documentacionRecibidaSistemaSocial || ""}
               onChange={handleChange}
-              disabled={disableOtrosCampos}
               slotProps={{
                 inputLabel: {
                   shrink: true,
@@ -131,7 +128,6 @@ const DocumentacionRecibida: React.FC<DocumentacionRecibidaProps> = ({
               name="documentacionRecibidaFotos"
               value={formData.documentacionRecibidaFotos || ""}
               onChange={handleChange}
-              disabled={disableOtrosCampos}
               slotProps={{
                 inputLabel: {
                   shrink: true,
@@ -154,7 +150,6 @@ const DocumentacionRecibida: React.FC<DocumentacionRecibidaProps> = ({
               name="documentacionRecibidaEntidadAseguradora"
               value={formData.documentacionRecibidaEntidadAseguradora || ""}
               onChange={handleChange}
-              disabled={disableOtrosCampos}
               slotProps={{
                 inputLabel: {
                   shrink: true,
@@ -177,7 +172,6 @@ const DocumentacionRecibida: React.FC<DocumentacionRecibidaProps> = ({
               name="documentacionRecibidaSeguroEstudiantil"
               value={formData.documentacionRecibidaSeguroEstudiantil || ""}
               onChange={handleChange}
-              disabled={disableOtrosCampos}
               slotProps={{
                 inputLabel: {
                   shrink: true,
@@ -203,7 +197,6 @@ const DocumentacionRecibida: React.FC<DocumentacionRecibidaProps> = ({
                 ""
               }
               onChange={handleChange}
-              disabled={disableOtrosCampos}
               slotProps={{
                 inputLabel: {
                   shrink: true,
@@ -226,7 +219,6 @@ const DocumentacionRecibida: React.FC<DocumentacionRecibidaProps> = ({
               name="documentacionRecibidaPagoSalvo"
               value={formData.documentacionRecibidaPagoSalvo || ""}
               onChange={handleChange}
-              disabled={disableOtrosCampos}
               slotProps={{
                 inputLabel: {
                   shrink: true,
@@ -249,7 +241,6 @@ const DocumentacionRecibida: React.FC<DocumentacionRecibidaProps> = ({
               name="documentacionRecibidaRegistroVacunacion"
               value={formData.documentacionRecibidaRegistroVacunacion || ""}
               onChange={handleChange}
-              disabled={disableOtrosCampos}
               slotProps={{
                 inputLabel: {
                   shrink: true,
@@ -272,7 +263,6 @@ const DocumentacionRecibida: React.FC<DocumentacionRecibidaProps> = ({
               name="documentacionRecibidaExamenSerologia"
               value={formData.documentacionRecibidaExamenSerologia || ""}
               onChange={handleChange}
-              disabled={disableOtrosCampos}
               slotProps={{
                 inputLabel: {
                   shrink: true,
