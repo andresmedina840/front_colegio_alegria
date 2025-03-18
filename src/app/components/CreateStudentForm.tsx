@@ -1,7 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Box, Typography, Button, Card, CardContent, TextField, Grid, MenuItem } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  Card,
+  CardContent,
+  TextField,
+  Grid,
+  MenuItem,
+} from "@mui/material";
 import { useSnackbar } from "notistack";
 import api from "../axios/axiosClient";
 import initialFormData from "../estudiantes/initialFormData";
@@ -155,7 +164,125 @@ const CreateStudentForm = () => {
         siNo={siNo}
       />
 
-      
+      <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
+        <CardContent>
+          <Typography
+            variant="h5"
+            align="left"
+            sx={{ fontWeight: "bold", mb: 3 }}
+          >
+            Información Familiar
+          </Typography>
+
+          <ParentForm
+            title="Padre"
+            formData={formData}
+            handleChange={handleChange}
+            tiposIdentificacion={tiposIdentificacion.map((tipo) => tipo.nombre)}
+          />
+
+          <Box sx={{ mt: 2 }}>
+            <ParentForm
+              title="Madre"
+              formData={formData}
+              handleChange={handleChange}
+              tiposIdentificacion={tiposIdentificacion.map(
+                (tipo) => tipo.nombre
+              )}
+            />
+          </Box>
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid item xs={12} sm={12}>
+              <TextField
+                select
+                fullWidth
+                label="Autorización para contacto de emergencia"
+                name="autorizacionCoctactoEmergencia"
+                value={formData.autorizacionCoctactoEmergencia || ""}
+                onChange={handleChange}
+                slotProps={{
+                  inputLabel: {
+                    shrink: true,
+                  },
+                }}
+              >
+                {siNo.map((respuestas) => (
+                  <MenuItem key={respuestas} value={respuestas}>
+                    {respuestas}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            {formData.autorizacionCoctactoEmergencia === "SI" && (
+              <Box sx={{ mt: 2, ml: 2 }}>
+                <EmergencyContactForm
+                  formData={formData}
+                  handleChange={handleChange}
+                  tiposIdentificacion={tiposIdentificacion.map(
+                    (tipo) => tipo.nombre
+                  )}
+                />
+              </Box>
+            )}
+
+            <Grid item xs={12} sm={6}>
+              <TextField
+                select
+                fullWidth
+                label="Autorizo para uso de imagen (Fotografía/videos)"
+                name="autorizacionImagen"
+                value={formData.autorizacionImagen || ""}
+                onChange={handleChange}
+                slotProps={{
+                  inputLabel: {
+                    shrink: true,
+                  },
+                }}
+              >
+                {siNo.map((respuestas) => (
+                  <MenuItem key={respuestas} value={respuestas}>
+                    {respuestas}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                select
+                fullWidth
+                label="Declaración de veracidad de la información"
+                name="veracidadInformacion"
+                value={formData.veracidadInformacion || ""}
+                onChange={handleChange}
+                slotProps={{
+                  inputLabel: {
+                    shrink: true,
+                  },
+                }}
+              >
+                {siNo.map((respuestas) => (
+                  <MenuItem key={respuestas} value={respuestas}>
+                    {respuestas}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} sm={12}>
+              <Typography
+                variant="h5"
+                align="justify"
+                sx={{ fontWeight: "bold", mb: 3 }}
+              >
+                Con mi firma y con la de mi padre, madre o acudiente, nos
+                comprometemos a cumplir con lo establecido en el Manual de
+                Convivencia del Colegio Alegria del Norte.
+              </Typography>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
 
       <Button
         variant="contained"

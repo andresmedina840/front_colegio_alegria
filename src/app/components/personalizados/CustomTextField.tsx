@@ -15,15 +15,15 @@ const CustomTextField = ({ uppercase, InputProps, ...props }: CustomTextFieldPro
       {...props}
       variant="outlined"
       fullWidth
-      InputProps={{
-        ...InputProps, // Se mantiene lo que venga de `props`
-      }}
       slotProps={{
+        input: {
+          ...InputProps, // Se mueve de InputProps a slotProps.input
+          style: textTransformStyle, // Mantiene el estilo
+        },
         inputLabel: {
           shrink: true,
         },
         htmlInput: {
-          style: textTransformStyle,
           spellCheck: false,
           "data-ms-editor": "false",
         },
