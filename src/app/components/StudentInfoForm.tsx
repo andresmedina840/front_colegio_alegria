@@ -88,18 +88,18 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           <Grid item xs={12} sm={5}>
             <CustomAutocomplete
               label="Tipo Identificación Estudiante"
-              name="tipoIdentificacionEstudiante"
+              name="tipoIdentificacionEstudianteId"
               options={tiposIdentificacion}
               required
               value={
                 tiposIdentificacion.find(
-                  (tipo) => tipo.id === formData.tipoIdentificacionEstudiante
+                  (tipo) => tipo.id === formData.tipoIdentificacionEstudianteId
                 ) || null
               }
               onChange={(value) => {
                 handleChange({
                   target: {
-                    name: "tipoIdentificacionEstudiante",
+                    name: "tipoIdentificacionEstudianteId",
                     value: value ? value.id : "",
                   },
                 } as React.ChangeEvent<HTMLInputElement>);
@@ -176,7 +176,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           {/* Campo Grado */}
           <Grid item xs={12} sm={3}>
             <CustomAutocomplete
-              label="Grado"
+              label="Grado a matricular"
               name="gradoId"
               required
               options={grados.map((grado) => grado.id)}
