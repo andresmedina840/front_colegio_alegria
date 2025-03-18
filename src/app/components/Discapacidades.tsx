@@ -30,6 +30,7 @@ const Discapacidades: React.FC<DiscapacidadesProps> = ({
           <Grid item xs={12} sm={3}>
             <CustomAutocomplete
               label="No aplica"
+              name="discapacidadesNoAplica"
               options={siNo}
               value={formData.discapacidadesNoAplica || ""}
               onChange={(value) =>
@@ -53,6 +54,7 @@ const Discapacidades: React.FC<DiscapacidadesProps> = ({
             <Grid item xs={12} sm={3} key={item.name}>
               <CustomAutocomplete
                 label={item.label}
+                name={item.name}
                 options={siNo}
                 value={formData[item.name] || ""}
                 onChange={(value) =>

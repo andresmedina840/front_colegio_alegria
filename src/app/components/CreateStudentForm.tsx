@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -25,6 +25,12 @@ import CustomAutocomplete from "./personalizados/CustomAutocomplete";
 
 const siNo = ["SI", "NO"];
 
+// Definir el tipo para opciones select
+type OpcionSelect = {
+  id: string;
+  nombre: string;
+};
+
 const CreateStudentForm = () => {
   const { enqueueSnackbar } = useSnackbar();
   const {
@@ -39,6 +45,19 @@ const CreateStudentForm = () => {
   } = useFetchData();
 
   const [formData, setFormData] = useState(initialFormData);
+  const [generos, setGeneros] = useState<OpcionSelect[]>([]);
+
+  useEffect(() => {
+    const fetchGeneros = async () => {
+      try {
+        const response = await api.get("/generos");
+        setGeneros(response.data);
+      } catch (error) {
+        console.error("Error al obtener géneros:", error);
+      }
+    };
+    fetchGeneros();
+  }, []);
 
   const cargarDepartamentos = async (paisId: string) => {
     if (!paisId) {
@@ -46,14 +65,12 @@ const CreateStudentForm = () => {
       setCiudades([]);
       return;
     }
-
     setFormData((prevData) => ({
       ...prevData,
       paisNacimiento: paisId,
       departamentoNacimiento: "",
       municipioNacimiento: "",
     }));
-
     try {
       const response = await api.get(`/ubicacion/departamentos/${paisId}`);
       setDepartamentos(response.data);
@@ -69,7 +86,6 @@ const CreateStudentForm = () => {
       departamentoNacimiento: departamentoId,
       municipioNacimiento: "",
     }));
-
     try {
       const response = await api.get(`/ubicacion/ciudades/${departamentoId}`);
       setCiudades(response.data);
@@ -131,14 +147,15 @@ const CreateStudentForm = () => {
         handleChange={handleChange}
         grados={grados}
         jornadaEscolar={["Mañana", "Tarde", "Completa"]}
-        generos={["Masculino", "Femenino", "Otro"]}
+        generos={generos}
         paises={paises}
         departamentos={departamentos}
         ciudades={ciudades}
         cargarDepartamentos={cargarDepartamentos}
         cargarCiudades={cargarCiudades}
-        tiposIdentificacion={tiposIdentificacion.map((tipo) => tipo.nombre)}
+        tiposIdentificacion={tiposIdentificacion}
       />
+
       <HealthAffiliationForm
         formData={formData}
         handleChange={handleChange}
@@ -150,13 +167,11 @@ const CreateStudentForm = () => {
         handleChange={handleChange}
         siNo={siNo}
       />
-
       <SituacionAcademica
         formData={formData}
         handleChange={handleChange}
         siNo={siNo}
       />
-
       <DocumentacionRecibida
         formData={formData}
         handleChange={handleChange}
@@ -177,7 +192,7 @@ const CreateStudentForm = () => {
             title="Padre"
             formData={formData}
             handleChange={handleChange}
-            tiposIdentificacion={tiposIdentificacion.map((tipo) => tipo.nombre)}
+            tiposIdentificacion={tiposIdentificacion}
           />
 
           <Box sx={{ mt: 2 }}>
@@ -185,15 +200,14 @@ const CreateStudentForm = () => {
               title="Madre"
               formData={formData}
               handleChange={handleChange}
-              tiposIdentificacion={tiposIdentificacion.map(
-                (tipo) => tipo.nombre
-              )}
+              tiposIdentificacion={tiposIdentificacion}
             />
           </Box>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12} sm={12}>
               <CustomAutocomplete
                 label="Autorización para contacto de emergencia"
+                name="autorizacionCoctactoEmergencia"
                 options={siNo}
                 value={formData.autorizacionCoctactoEmergencia || ""}
                 onChange={(value) =>
@@ -221,6 +235,7 @@ const CreateStudentForm = () => {
             <Grid item xs={12} sm={6}>
               <CustomAutocomplete
                 label="Autorizo para uso de imagen (Fotografía/videos)"
+                name="autorizacionImagen"
                 options={siNo}
                 value={formData.autorizacionImagen || ""}
                 onChange={(value) =>
@@ -236,6 +251,7 @@ const CreateStudentForm = () => {
             <Grid item xs={12} sm={6}>
               <CustomAutocomplete
                 label="Declaración de veracidad de la información"
+                name="veracidadInformacion"
                 options={siNo}
                 value={formData.veracidadInformacion || ""}
                 onChange={(value) =>

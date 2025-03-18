@@ -46,6 +46,7 @@ const DocumentacionRecibida: React.FC<DocumentacionRecibidaProps> = ({
           ].map((doc) => (
             <Grid item xs={12} sm={3} key={doc}>
               <CustomAutocomplete
+              name={`documentacionRecibida${doc}`}
                 label={doc.replace(/([A-Z])/g, " $1").trim()}
                 options={siNo}
                 value={formData[`documentacionRecibida${doc}`] || ""}

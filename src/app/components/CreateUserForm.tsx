@@ -27,10 +27,10 @@ type FormValues = {
   tipoIdentificacionId: OpcionSelect | null;
   numeroIdentificacion: string;
   username: string;
-  primerNombre: string;
-  segundoNombre: string;
-  primerApellido: string;
-  segundoApellido: string;
+  primerNombreEstudiante: string;
+  segundoNombreEstudiante: string;
+  primerApellidoEstudiante: string;
+  segundoApellidoEstudiante: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -53,10 +53,10 @@ const CreateUserForm = () => {
     tipoIdentificacionId: null,
     numeroIdentificacion: "",
     username: "",
-    primerNombre: "",
-    segundoNombre: "",
-    primerApellido: "",
-    segundoApellido: "",
+    primerNombreEstudiante: "",
+    segundoNombreEstudiante: "",
+    primerApellidoEstudiante: "",
+    segundoApellidoEstudiante: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -214,6 +214,7 @@ const CreateUserForm = () => {
         <Grid item xs={12} sm={4}>
           <CustomAutocomplete
             label="Tipo de Identificación"
+            name="tipoIdentificacionId"
             options={tiposIdentificacion}
             value={formData.tipoIdentificacionId}
             onChange={(value) => handleChange("tipoIdentificacionId", value)}
@@ -241,10 +242,10 @@ const CreateUserForm = () => {
         </Grid>
 
         {[
-          { name: "primerNombre", label: "Primer Nombre", required: true },
-          { name: "segundoNombre", label: "Segundo Nombre" },
-          { name: "primerApellido", label: "Primer Apellido", required: true },
-          { name: "segundoApellido", label: "Segundo Apellido" },
+          { name: "primerNombreEstudiante", label: "Primer Nombre Estudiante", required: true },
+          { name: "segundoNombreEstudiante", label: "Segundo Nombre Estudiante" },
+          { name: "primerApellidoEstudiante", label: "Primer Apellido Estudiante", required: true },
+          { name: "segundoApellidoEstudiante", label: "Segundo Apellido Estudiante" },
         ].map((field) => (
           <Grid item xs={12} sm={3} key={field.name}>
             <CustomTextField
@@ -304,6 +305,7 @@ const CreateUserForm = () => {
         <Grid item xs={12} sm={3}>
           <CustomAutocomplete
             label="País"
+            name="pais"
             options={paises}
             value={formData.pais}
             onChange={(value) => handleChange("pais", value)}
@@ -315,6 +317,7 @@ const CreateUserForm = () => {
         <Grid item xs={12} sm={4}>
           <CustomAutocomplete
             label="Departamento"
+            name="departamento"
             options={departamentos}
             value={formData.departamento}
             onChange={(value) => handleChange("departamento", value)}
@@ -327,6 +330,7 @@ const CreateUserForm = () => {
         <Grid item xs={12} sm={5}>
           <CustomAutocomplete
             label="Ciudad"
+            name="ciudad"
             options={ciudades}
             value={formData.ciudad}
             onChange={(value) => handleChange("ciudad", value)}
@@ -495,6 +499,7 @@ const CreateUserForm = () => {
         <Grid item xs={12} sm={2}>
           <CustomAutocomplete
             label="Rol"
+            name="rol"
             options={listaDeRoles}
             value={formData.rol}
             onChange={(value) => handleChange("rol", value)}

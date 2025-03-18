@@ -1,15 +1,12 @@
-import { 
-  Card, 
-  CardContent, 
-  Grid, 
-  Typography 
-} from "@mui/material";
+import { Card, CardContent, Grid, Typography } from "@mui/material";
 import React from "react";
 import CustomAutocomplete from "./personalizados/CustomAutocomplete";
 
 type CapacidadesExcepcionalesProps = {
   formData: Record<string, string>;
-  handleChange: (e: React.ChangeEvent<{ name?: string; value: unknown }>) => void;
+  handleChange: (
+    e: React.ChangeEvent<{ name?: string; value: unknown }>
+  ) => void;
   siNo: string[];
 };
 
@@ -23,18 +20,26 @@ const CapacidadesExcepcionales: React.FC<CapacidadesExcepcionalesProps> = ({
   return (
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
       <CardContent>
-        <Typography variant="h6" align="left" sx={{ fontWeight: "bold", mb: 3 }}>
+        <Typography
+          variant="h6"
+          align="left"
+          sx={{ fontWeight: "bold", mb: 3 }}
+        >
           Capacidades excepcionales
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={3}>
             <CustomAutocomplete
               label="No aplica"
+              name="capacidadesExcepcionalesNoAplica"
               options={siNo}
               value={formData.capacidadesExcepcionalesNoAplica || ""}
               onChange={(value) =>
                 handleChange({
-                  target: { name: "capacidadesExcepcionalesNoAplica", value: value ?? "" },
+                  target: {
+                    name: "capacidadesExcepcionalesNoAplica",
+                    value: value ?? "",
+                  },
                 } as React.ChangeEvent<HTMLInputElement>)
               }
               getOptionLabel={(option) => option}
@@ -42,13 +47,26 @@ const CapacidadesExcepcionales: React.FC<CapacidadesExcepcionalesProps> = ({
           </Grid>
 
           {[
-            { label: "Superdotado", name: "capacidadesExcepcionalesSuperdotado" },
-            { label: "Con talento cient", name: "capacidadesExcepcionalesTalentoCientifico" },
-            { label: "Con talento tecno", name: "capacidadesExcepcionalesTalentoTecnologico" },
-            { label: "Con talento subje", name: "capacidadesExcepcionalesTalentoSubjetivo" },
+            {
+              label: "Superdotado",
+              name: "capacidadesExcepcionalesSuperdotado",
+            },
+            {
+              label: "Con talento cient",
+              name: "capacidadesExcepcionalesTalentoCientifico",
+            },
+            {
+              label: "Con talento tecno",
+              name: "capacidadesExcepcionalesTalentoTecnologico",
+            },
+            {
+              label: "Con talento subje",
+              name: "capacidadesExcepcionalesTalentoSubjetivo",
+            },
           ].map((item) => (
             <Grid item xs={12} sm={3} key={item.name}>
               <CustomAutocomplete
+                name={item.name}
                 label={item.label}
                 options={siNo}
                 value={formData[item.name] || ""}

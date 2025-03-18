@@ -61,6 +61,7 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
           <Grid item xs={12} sm={3}>
             <CustomAutocomplete
               options={estratosOptions}
+              name="estrato"
               value={formData.estrato || ""}
               onChange={(newValue) => {
                 handleChange({

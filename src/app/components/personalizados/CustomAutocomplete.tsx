@@ -3,6 +3,7 @@ import React from "react";
 
 type CustomAutocompleteProps = {
   label: string;
+  name: string;
   options: any[];
   value: any;
   onChange: (value: any) => void;
@@ -13,6 +14,7 @@ type CustomAutocompleteProps = {
 
 const CustomAutocomplete = ({
   label,
+  name,
   options,
   value,
   onChange,
@@ -32,6 +34,7 @@ const CustomAutocomplete = ({
         <TextField
           {...params}
           label={label}
+          name={name}
           required={required}
           variant="outlined"
           fullWidth

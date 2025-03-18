@@ -36,6 +36,7 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
           <Grid item xs={12} sm={4}>
             <CustomAutocomplete
               label="No estudio en la vigencia anterior"
+              name="situacionAcademicaNoEstudioVigenciaAnterior"
               options={siNo}
               value={formData.situacionAcademicaNoEstudioVigenciaAnterior || ""}
               onChange={(value) =>
@@ -50,6 +51,7 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
           <Grid item xs={12} sm={2}>
             <CustomAutocomplete
               label="Aprobó"
+              name="situacionAcademicaAprobo"
               options={siNo}
               value={formData.situacionAcademicaAprobo || ""}
               onChange={(value) =>
@@ -65,6 +67,7 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
           <Grid item xs={12} sm={2}>
             <CustomAutocomplete
               label="Reprobó"
+              name="situcionAcademicaReprobo"
               options={siNo}
               value={formData.situcionAcademicaReprobo || ""}
               onChange={(value) =>
@@ -80,6 +83,7 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
           <Grid item xs={12} sm={4}>
             <CustomAutocomplete
               label="Pendiente de logros"
+              name="situacionAcademicaPendienteLogros"
               options={siNo}
               value={formData.situacionAcademicaPendienteLogros || ""}
               onChange={(value) =>
@@ -95,6 +99,7 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
           <Grid item xs={12} sm={3}>
             <CustomAutocomplete
               label="Viene de otra I.E."
+              name="situacionAcademicaVieneOtraIE"
               options={siNo}
               value={formData.situacionAcademicaVieneOtraIE || ""}
               onChange={(value) =>
@@ -110,6 +115,7 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
           <Grid item xs={12} sm={4}>
             <CustomAutocomplete
               label="Ingresa por primera vez a la I.E."
+              name="situcionAcademicaIngresaPrimeraVezIE"
               options={siNo}
               value={formData.situcionAcademicaIngresaPrimeraVezIE || ""}
               onChange={(value) =>
@@ -125,6 +131,7 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
           <Grid item xs={12} sm={3}>
             <CustomAutocomplete
               label="No culminó estudios"
+              name="situcionAcademicaNoCulminoEstudios"
               options={siNo}
               value={formData.situcionAcademicaNoCulminoEstudios || ""}
               onChange={(value) =>
