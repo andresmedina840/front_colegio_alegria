@@ -18,10 +18,11 @@ import {
   Button,
   CircularProgress,
   Alert,
+  Toolbar,
 } from "@mui/material";
 import axiosClient from "../axios/axiosClient";
 import { GradoAcademico, BoletinEstudiante, EstadoCarga } from "../types";
-import SearchIcon from "@mui/icons-material/Search";
+import AssessmentIcon from '@mui/icons-material/Assessment';
 
 const SeleccionGrado = ({
   grados,
@@ -86,6 +87,7 @@ export default function PaginaBoletines() {
     cargando: false,
     mensajeError: "",
   });
+  const [consultaRealizada, setConsultaRealizada] = useState(false);
 
   useEffect(() => {
     const cargarGrados = async () => {
@@ -93,7 +95,6 @@ export default function PaginaBoletines() {
         const { data } = await axiosClient.get<GradoAcademico[]>(
           "/grados/listaGrados"
         );
-        console.log(data);
         setGrados(data);
       } catch (error) {
         setEstado({
@@ -108,6 +109,7 @@ export default function PaginaBoletines() {
   const generarBoletines = async () => {
     if (!gradoSeleccionado) return;
 
+    setConsultaRealizada(true);
     setEstado({ cargando: true, mensajeError: "" });
 
     try {
@@ -128,64 +130,100 @@ export default function PaginaBoletines() {
   return (
     <FusionTemplateColegio>
       <Box p={4}>
-        
-        <Typography
-          variant="h4"
-          gutterBottom
-          sx={{
-            fontWeight: 700,
-            color: "primary.main",
-            display: "flex",
-            alignItems: "center",
-            gap: 2,
-            mb: 4,
-          }}
-        >
-          <SearchIcon fontSize="large" />
-          Reportes Académicos
-        </Typography>
-
-        <Box display="flex" gap={3} mb={4}>
-          <SeleccionGrado grados={grados} onChange={setGradoSeleccionado} />
-
-          <Button
-            variant="contained"
-            onClick={generarBoletines}
-            disabled={!gradoSeleccionado || estado.cargando}
-            sx={{ height: "56px" }}
+        <Box sx={{ 
+          maxWidth: 1200,
+          mx: "auto",
+          bgcolor: "background.paper",
+          borderRadius: 2,
+          boxShadow: 3,
+          p: 4,
+          mb: 4
+        }}>
+          <Typography
+            variant="h4"
+            gutterBottom
+            sx={{
+              fontWeight: 700,
+              color: "primary.main",
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              mb: 4,
+            }}
           >
-            {estado.cargando ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              "Generar Reporte"
-            )}
-          </Button>
+            <AssessmentIcon fontSize="large" />
+            Reportes Académicos
+          </Typography>
+
+          <Box display="flex" gap={3} mb={4}>
+            <SeleccionGrado grados={grados} onChange={setGradoSeleccionado} />
+
+            <Button
+              variant="contained"
+              onClick={generarBoletines}
+              disabled={!gradoSeleccionado || estado.cargando}
+              sx={{ 
+                minWidth: 180,
+                height: 56,
+                fontSize: "1rem",
+                "& .MuiButton-startIcon": {
+                  marginRight: estado.cargando ? 0 : 1,
+                }
+              }}
+            >
+              {estado.cargando ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Generar Reporte"
+              )}
+            </Button>
+          </Box>
+
+          {estado.mensajeError && (
+            <Alert severity="error" sx={{ mb: 3, borderRadius: 1 }}>
+              {estado.mensajeError}
+            </Alert>
+          )}
+
+          {consultaRealizada && (
+            <TableContainer
+              component={Paper}
+              sx={{
+                border: 2,
+                borderColor: "divider",
+                borderRadius: 2,
+                overflowX: "auto",
+              }}
+            >
+              <Table aria-label="Tabla de rendimiento académico" size="medium">
+                <TableHead sx={{ bgcolor: "primary.main" }}>
+                  <TableRow>
+                    <TableCell sx={{ color: "primary.contrastText", fontWeight: 700 }}>Estudiante</TableCell>
+                    <TableCell sx={{ color: "primary.contrastText", fontWeight: 700 }}>Grado</TableCell>
+                    <TableCell sx={{ color: "primary.contrastText", fontWeight: 700 }}>Detalle por Materia</TableCell>
+                    <TableCell sx={{ color: "primary.contrastText", fontWeight: 700 }}>Promedio General</TableCell>
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  {boletines.length > 0 ? (
+                    boletines.map((boletin) => (
+                      <FilaEstudiante key={boletin.id} boletin={boletin} />
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={4} align="center" sx={{ py: 6 }}>
+                        <Typography variant="body1" color="text.disabled">
+                          No hay resultados
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </Box>
-
-        {estado.mensajeError && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {estado.mensajeError}
-          </Alert>
-        )}
-
-        <TableContainer component={Paper} elevation={3}>
-          <Table aria-label="Tabla de rendimiento académico">
-            <TableHead sx={{ bgcolor: "background.default" }}>
-              <TableRow>
-                <TableCell>Estudiante</TableCell>
-                <TableCell>Grado</TableCell>
-                <TableCell>Detalle por Materia</TableCell>
-                <TableCell>Promedio General</TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {boletines.map((boletin) => (
-                <FilaEstudiante key={boletin.id} boletin={boletin} />
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
       </Box>
     </FusionTemplateColegio>
   );

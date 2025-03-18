@@ -1,17 +1,18 @@
 import { Autocomplete, TextField } from "@mui/material";
 import React from "react";
 
-type CustomAutocompleteProps = {
+interface CustomAutocompleteProps<T> {
   label: string;
-  options: any[];
-  value: any;
-  onChange: (value: any) => void;
-  getOptionLabel: (option: any) => string;
+  options: T[];
+  value: T | null;
+  onChange: (value: T | null) => void;
+  getOptionLabel: (option: T) => string;
   required?: boolean;
   disabled?: boolean;
-};
+  loading?: boolean;
+}
 
-const CustomAutocomplete = ({
+const CustomAutocomplete = <T,> ({
   label,
   options,
   value,
@@ -19,15 +20,17 @@ const CustomAutocomplete = ({
   getOptionLabel,
   required = false,
   disabled = false,
-}: CustomAutocompleteProps) => {
+  loading = false,
+}: CustomAutocompleteProps<T>) => {
   return (
     <Autocomplete
       options={options}
       value={value}
       onChange={(_, newValue) => onChange(newValue)}
       getOptionLabel={getOptionLabel}
-      isOptionEqualToValue={(option, value) => option?.id === value?.id}
+      isOptionEqualToValue={(option, value) => JSON.stringify(option) === JSON.stringify(value)}
       disabled={disabled}
+      loading={loading}
       renderInput={(params) => (
         <TextField
           {...params}
@@ -35,7 +38,11 @@ const CustomAutocomplete = ({
           required={required}
           variant="outlined"
           fullWidth
-          InputLabelProps={{ shrink: true }}
+          slotProps={{
+            inputLabel: {
+              shrink: true,
+            },
+          }}
         />
       )}
     />

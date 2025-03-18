@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button, Card, CardContent, TextField, Grid, MenuItem } from "@mui/material";
 import { useSnackbar } from "notistack";
 import api from "../axios/axiosClient";
 import initialFormData from "../estudiantes/initialFormData";
@@ -10,8 +10,12 @@ import EnrollmentInfoForm from "./EnrollmentInfoForm";
 import StudentInfoForm from "./StudentInfoForm";
 import HealthAffiliationForm from "./HealthAffiliationForm";
 import CondicionesEspeciales from "./CondicionesEspeciales";
+import SituacionAcademica from "./SituacionAcademica";
+import DocumentacionRecibida from "./DocumentacionRecibida";
+import ParentForm from "./ParentForm";
+import EmergencyContactForm from "./EmergencyContactForm";
 
-const siNo = ["Si","No"]
+const siNo = ["SI", "NO"];
 
 const CreateStudentForm = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -138,6 +142,21 @@ const CreateStudentForm = () => {
         handleChange={handleChange}
         siNo={siNo}
       />
+
+      <SituacionAcademica
+        formData={formData}
+        handleChange={handleChange}
+        siNo={siNo}
+      />
+
+      <DocumentacionRecibida
+        formData={formData}
+        handleChange={handleChange}
+        siNo={siNo}
+      />
+
+      
+
       <Button
         variant="contained"
         color="primary"
