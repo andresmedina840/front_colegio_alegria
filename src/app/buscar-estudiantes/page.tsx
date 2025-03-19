@@ -12,22 +12,23 @@ import {
   TableHead,
   TableRow,
   Paper,
-  TextField,
   Button,
   CircularProgress,
   Alert,
   InputAdornment,
-  Toolbar,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import axios from "axios";
+import api from "../axios/axiosClient";
+import { useRouter } from "next/navigation";
+import CustomTextField from "../components/personalizados/CustomTextField";
 
 interface Estudiante {
   id: number;
   nombre: string;
   apellido: string;
-  documentoIdentidad: string;
+  numeroIdentificacionEstudiante: string;
   gradoNombre: string;
+  gradoId: number;
   acudientes: string[];
 }
 
@@ -38,6 +39,7 @@ interface EstadoBusqueda {
 }
 
 const BuscarEstudiantes = () => {
+  const router = useRouter();
   const [terminoBusqueda, setTerminoBusqueda] = useState("");
   const [resultados, setResultados] = useState<Estudiante[]>([]);
   const [estado, setEstado] = useState<EstadoBusqueda>({
@@ -52,9 +54,7 @@ const BuscarEstudiantes = () => {
     setEstado({ ...estado, cargando: true, mensajeError: "" });
 
     try {
-      const response = await axios.get(
-        `/v1/api/alumnos/buscar?q=${terminoBusqueda}`
-      );
+      const response = await api.get(`/alumnos/buscar?q=${terminoBusqueda}`);
       setResultados(response.data.data);
       setEstado((prev) => ({ ...prev, busquedaRealizada: true }));
     } catch (error) {
@@ -65,6 +65,23 @@ const BuscarEstudiantes = () => {
       });
     } finally {
       setEstado((prev) => ({ ...prev, cargando: false }));
+    }
+  };
+
+  const generarBoletin = async (estudiante: Estudiante) => {
+    try {
+      const response = await api.get(
+        `/materias/grado/${estudiante.gradoId}`
+      );
+      const materias = response.data;
+      router.push(
+        `/boletines/${estudiante.id}?materias=${encodeURIComponent(
+          JSON.stringify(materias)
+        )}`
+      );
+    } catch (error) {
+      console.error("Error obteniendo materias:", error);
+      alert("Error al obtener las materias del estudiante");
     }
   };
 
@@ -99,9 +116,9 @@ const BuscarEstudiantes = () => {
           </Typography>
 
           <Box display="flex" gap={2} mb={4}>
-            <TextField
+            <CustomTextField
               fullWidth
-              variant="filled"
+              variant="outlined"
               label="Nombre, apellido o documento"
               value={terminoBusqueda}
               onChange={(e) => setTerminoBusqueda(e.target.value)}
@@ -113,11 +130,6 @@ const BuscarEstudiantes = () => {
                   </InputAdornment>
                 ),
               }}
-              sx={{
-                "& .MuiFilledInput-root": {
-                  backgroundColor: "background.default",
-                },
-              }}
             />
 
             <Button
@@ -128,9 +140,6 @@ const BuscarEstudiantes = () => {
                 minWidth: 140,
                 height: 56,
                 fontSize: "1rem",
-                "& .MuiButton-startIcon": {
-                  marginRight: estado.cargando ? 0 : 1,
-                },
               }}
             >
               {estado.cargando ? (
@@ -148,68 +157,36 @@ const BuscarEstudiantes = () => {
           )}
 
           {estado.busquedaRealizada && (
-            <TableContainer
-              component={Paper}
-              sx={{
-                border: 2,
-                borderColor: "divider",
-                borderRadius: 2,
-                overflowX: "auto",
-              }}
-            >
+            <TableContainer component={Paper} sx={{ border: 2, borderColor: "divider", borderRadius: 2, overflowX: "auto" }}>
               <Table aria-label="Resultados de búsqueda" size="medium">
                 <TableHead sx={{ bgcolor: "primary.main" }}>
                   <TableRow>
-                    <TableCell
-                      sx={{ color: "primary.contrastText", fontWeight: 700 }}
-                    >
-                      Estudiante
-                    </TableCell>
-                    <TableCell
-                      sx={{ color: "primary.contrastText", fontWeight: 700 }}
-                    >
-                      Documento
-                    </TableCell>
-                    <TableCell
-                      sx={{ color: "primary.contrastText", fontWeight: 700 }}
-                    >
-                      Grado
-                    </TableCell>
-                    <TableCell
-                      sx={{ color: "primary.contrastText", fontWeight: 700 }}
-                    >
-                      Acudientes
-                    </TableCell>
+                    <TableCell sx={{ color: "primary.contrastText", fontWeight: 700 }}>Estudiante</TableCell>
+                    <TableCell sx={{ color: "primary.contrastText", fontWeight: 700 }}>Documento</TableCell>
+                    <TableCell sx={{ color: "primary.contrastText", fontWeight: 700 }}>Grado</TableCell>
+                    <TableCell sx={{ color: "primary.contrastText", fontWeight: 700 }}>Acudientes</TableCell>
+                    <TableCell sx={{ color: "primary.contrastText", fontWeight: 700 }}>Acciones</TableCell>
                   </TableRow>
                 </TableHead>
 
                 <TableBody>
                   {resultados.length > 0 ? (
                     resultados.map((estudiante) => (
-                      <TableRow
-                        key={estudiante.id}
-                        hover
-                        sx={{ "&:last-child td": { borderBottom: 0 } }}
-                      >
-                        <TableCell
-                          sx={{ fontWeight: 500 }}
-                        >{`${estudiante.nombre} ${estudiante.apellido}`}</TableCell>
-                        <TableCell>{estudiante.documentoIdentidad}</TableCell>
+                      <TableRow key={estudiante.id} hover>
+                        <TableCell>{`${estudiante.nombre} ${estudiante.apellido}`}</TableCell>
+                        <TableCell>{estudiante.numeroIdentificacionEstudiante || "-"}</TableCell>
                         <TableCell>{estudiante.gradoNombre || "-"}</TableCell>
-                        <TableCell
-                          sx={{ maxWidth: 300, color: "text.secondary" }}
-                        >
-                          {estudiante.acudientes.join(", ")}
+                        <TableCell>{(estudiante.acudientes || []).join(", ")}</TableCell>
+                        <TableCell>
+                          <Button variant="contained" color="primary" onClick={() => generarBoletin(estudiante)}>
+                            Generar Boletín
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={4} align="center" sx={{ py: 6 }}>
-                        <Typography variant="body1" color="text.disabled">
-                          No se encontraron registros
-                        </Typography>
-                      </TableCell>
+                      <TableCell colSpan={5} align="center">No se encontraron registros</TableCell>
                     </TableRow>
                   )}
                 </TableBody>

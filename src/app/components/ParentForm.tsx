@@ -76,6 +76,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             label={`Primer Nombre ${title}`}
             name={`primerNombre${title}`}
             variant="outlined"
+            uppercase
             value={formData[`primerNombre${title}`] || ""}
             onChange={handleChange}
             helperText={`${
@@ -97,6 +98,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             label={`Segundo Nombre ${title}`}
             name={`segundoNombre${title}`}
             variant="outlined"
+            uppercase
             value={formData[`segundoNombre${title}`] || ""}
             onChange={handleChange}
             helperText={`${
@@ -118,6 +120,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             label={`Primer Apellido ${title}`}
             name={`primerApellido${title}`}
             variant="outlined"
+            uppercase
             value={formData[`primerApellido${title}`] || ""}
             onChange={handleChange}
             helperText={`${
@@ -139,6 +142,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             label={`Segundo Apellido ${title}`}
             name={`segundoApellido${title}`}
             variant="outlined"
+            uppercase
             value={formData[`segundoApellido${title}`] || ""}
             onChange={handleChange}
             helperText={`${
