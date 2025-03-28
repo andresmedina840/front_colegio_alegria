@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import FusionTemplateColegio from "../components/TemplateColegio";
 import {
   Typography,
@@ -10,12 +10,21 @@ import {
   Grid,
   CircularProgress,
 } from "@mui/material";
-import api from "../axios/axiosClient"; 
 
 // Simulación del rol del usuario actual
-const currentUserRole = "ADMIN"; // Cambia este valor según la lógica de autenticación
+const currentUserRole = "ADMIN"; // Esto debería venir de tu sistema de autenticación
 
 const Dashboard = () => {
+  // Estado simplificado ya que no estamos usando la API actualmente
+  const loading = false;
+  const data = {
+    estudiantes: 125, // Valores de ejemplo
+    profesores: 15,   // Valores de ejemplo
+    materias: 30      // Valores de ejemplo
+  };
+
+  // Si en el futuro necesitas usar la API, puedes descomentar este código:
+  /*
   const [data, setData] = useState({
     estudiantes: null,
     profesores: null,
@@ -23,21 +32,21 @@ const Dashboard = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  /*useEffect(() => {
-    if (currentUserRole !== "ADMIN") return; // Evitar llamadas si el usuario no es ADMIN
+  useEffect(() => {
+    if (currentUserRole !== "ADMIN") return;
 
     const fetchData = async () => {
       try {
         const [estudiantesRes, profesoresRes, materiasRes] = await Promise.all([
-          api.get("/estudiantes/year"), // Reemplaza con la ruta correcta de tu API
-          api.get("/profesores/year"), // Reemplaza con la ruta correcta de tu API
-          api.get("/materias"), // Reemplaza con la ruta correcta de tu API
+          api.get("/estudiantes/year"),
+          api.get("/profesores/year"),
+          api.get("/materias"),
         ]);
 
         setData({
-          estudiantes: estudiantesRes.data.valor, // Ajusta según la respuesta de tu API
-          profesores: profesoresRes.data.valor, // Ajusta según la respuesta de tu API
-          materias: materiasRes.data.valor, // Ajusta según la respuesta de tu API
+          estudiantes: estudiantesRes.data.valor,
+          profesores: profesoresRes.data.valor,
+          materias: materiasRes.data.valor,
         });
       } catch (error) {
         console.error("Error al cargar los datos:", error);
@@ -47,7 +56,23 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, []);*/
+  }, []);
+  */
+
+  const renderStatCard = (title: string, value: number | null) => (
+    <Card>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          {title}
+        </Typography>
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <Typography variant="h4">{value ?? 0}</Typography>
+        )}
+      </CardContent>
+    </Card>
+  );
 
   return (
     <FusionTemplateColegio>
@@ -58,52 +83,14 @@ const Dashboard = () => {
 
         {currentUserRole === "ADMIN" ? (
           <Grid container spacing={3}>
-            {/* Card de Estudiantes */}
             <Grid item xs={12} sm={4}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Total de Estudiantes por Año
-                  </Typography>
-                  {loading ? (
-                    <CircularProgress />
-                  ) : (
-                    <Typography variant="h4">{data.estudiantes ?? 0}</Typography>
-                  )}
-                </CardContent>
-              </Card>
+              {renderStatCard("Total de Estudiantes por Año", data.estudiantes)}
             </Grid>
-
-            {/* Card de Profesores */}
             <Grid item xs={12} sm={4}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Profesores por Año
-                  </Typography>
-                  {loading ? (
-                    <CircularProgress />
-                  ) : (
-                    <Typography variant="h4">{data.profesores ?? 0}</Typography>
-                  )}
-                </CardContent>
-              </Card>
+              {renderStatCard("Profesores por Año", data.profesores)}
             </Grid>
-
-            {/* Card de Materias */}
             <Grid item xs={12} sm={4}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Materias Totales
-                  </Typography>
-                  {loading ? (
-                    <CircularProgress />
-                  ) : (
-                    <Typography variant="h4">{data.materias ?? 0}</Typography>
-                  )}
-                </CardContent>
-              </Card>
+              {renderStatCard("Materias Totales", data.materias)}
             </Grid>
           </Grid>
         ) : (

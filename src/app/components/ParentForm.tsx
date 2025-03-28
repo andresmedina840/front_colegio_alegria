@@ -1,4 +1,4 @@
-import { Grid, MenuItem, Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import React from "react";
 import CustomTextField from "../components/personalizados/CustomTextField";
 import CustomAutocomplete from "../components/personalizados/CustomAutocomplete";

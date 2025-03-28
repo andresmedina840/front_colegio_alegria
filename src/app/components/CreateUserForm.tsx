@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
 import {
@@ -17,13 +17,13 @@ import CustomAutocomplete from "../components/personalizados/CustomAutocomplete"
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import dayjs from "dayjs";
 
-type OpcionSelect = {
+interface OpcionSelect {
   id: string;
   nombre: string;
   [key: string]: unknown;
-};
+}
 
-type FormValues = {
+interface FormValues {
   tipoIdentificacionId: OpcionSelect | null;
   numeroIdentificacion: string;
   username: string;
@@ -43,7 +43,21 @@ type FormValues = {
   ciudad: OpcionSelect | null;
   departamento: OpcionSelect | null;
   pais: OpcionSelect | null;
-};
+}
+
+interface ApiError extends Error {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
+
+const listaDeRoles: OpcionSelect[] = [
+  { id: "ADMIN", nombre: "ADMIN" },
+  { id: "PADRE", nombre: "PADRE" },
+  { id: "PROFESOR", nombre: "PROFESOR" },
+];
 
 const CreateUserForm = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -74,92 +88,100 @@ const CreateUserForm = () => {
   const [paises, setPaises] = useState<OpcionSelect[]>([]);
   const [departamentos, setDepartamentos] = useState<OpcionSelect[]>([]);
   const [ciudades, setCiudades] = useState<OpcionSelect[]>([]);
-  const [tiposIdentificacion, setTiposIdentificacion] = useState<
-    OpcionSelect[]
-  >([]);
+  const [tiposIdentificacion, setTiposIdentificacion] = useState<OpcionSelect[]>([]);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [edadCalculada, setEdadCalculada] = useState<string>("");
-  // Agrega este estado para controlar campos "touched"
   const [touchedFields, setTouchedFields] = useState({
     numeroCelular1: false,
     numeroCelular2: false,
   });
 
-  const listaDeRoles: OpcionSelect[] = [
-    { id: "ADMIN", nombre: "ADMIN" },
-    { id: "PADRE", nombre: "PADRE" },
-    { id: "PROFESOR", nombre: "PROFESOR" },
-  ];
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [paisesRes, tiposRes] = await Promise.all([
-          api.get("/ubicacion/paises"),
-          api.get("/tipo-identificacion/tiposDeIdentificacion"),
-        ]);
-        setPaises(paisesRes.data);
-        setTiposIdentificacion(tiposRes.data);
-      } catch (error) {
-        enqueueSnackbar("Error cargando datos iniciales", { variant: "error" });
-      }
-    };
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    if (!formData.pais?.id) return;
-    const fetchDepartamentos = async () => {
-      try {
-        const response = await api.get(
-          `/ubicacion/departamentos/${formData.pais?.id}`
-        );
-        setDepartamentos(response.data);
-        setFormData((prev) => ({ ...prev, departamento: null, ciudad: null }));
-      } catch (error) {
-        enqueueSnackbar("Error cargando departamentos", { variant: "error" });
-      }
-    };
-    fetchDepartamentos();
-  }, [formData.pais]);
-
-  useEffect(() => {
-    if (!formData.departamento?.id) return;
-    const fetchCiudades = async () => {
-      try {
-        const response = await api.get(
-          `/ubicacion/ciudades/${formData.departamento?.id}`
-        );
-        setCiudades(response.data);
-        setFormData((prev) => ({ ...prev, ciudad: null }));
-      } catch (error) {
-        enqueueSnackbar("Error cargando ciudades", { variant: "error" });
-      }
-    };
-    fetchCiudades();
-  }, [formData.departamento]);
-
-  useEffect(() => {
-    if (formData.fechaNacimiento) {
-      const fechaNacimiento = dayjs(formData.fechaNacimiento);
-      const hoy = dayjs();
-
-      if (fechaNacimiento.isAfter(hoy)) {
-        enqueueSnackbar("La fecha no puede ser futura", { variant: "error" });
-        setEdadCalculada("");
-        return;
-      }
-
-      const edad = hoy.diff(fechaNacimiento, "year");
-      setEdadCalculada(`${edad} años`);
-    } else {
-      setEdadCalculada("");
+  const fetchInitialData = useCallback(async () => {
+    try {
+      const [paisesRes, tiposRes] = await Promise.all([
+        api.get<OpcionSelect[]>("/ubicacion/paises"),
+        api.get<OpcionSelect[]>("/tipo-identificacion/tiposDeIdentificacion"),
+      ]);
+      setPaises(paisesRes.data);
+      setTiposIdentificacion(tiposRes.data);
+    } catch (error) {
+      const err = error as ApiError;
+      enqueueSnackbar(err.response?.data?.message || "Error cargando datos iniciales", { 
+        variant: "error" 
+      });
     }
-  }, [formData.fechaNacimiento]);
+  }, [enqueueSnackbar]);
 
-  const handleChange = (name: keyof FormValues, value: any) => {
-    setFormData((prev) => ({
+  const fetchDepartamentos = useCallback(async () => {
+    if (!formData.pais?.id) return;
+    try {
+      const response = await api.get<OpcionSelect[]>(
+        `/ubicacion/departamentos/${formData.pais.id}`
+      );
+      setDepartamentos(response.data);
+      setFormData(prev => ({ ...prev, departamento: null, ciudad: null }));
+    } catch (error) {
+      const err = error as ApiError;
+      enqueueSnackbar(err.response?.data?.message || "Error cargando departamentos", { 
+        variant: "error" 
+      });
+    }
+  }, [formData.pais?.id, enqueueSnackbar]);
+
+  const fetchCiudades = useCallback(async () => {
+    if (!formData.departamento?.id) return;
+    try {
+      const response = await api.get<OpcionSelect[]>(
+        `/ubicacion/ciudades/${formData.departamento.id}`
+      );
+      setCiudades(response.data);
+      setFormData(prev => ({ ...prev, ciudad: null }));
+    } catch (error) {
+      const err = error as ApiError;
+      enqueueSnackbar(err.response?.data?.message || "Error cargando ciudades", { 
+        variant: "error" 
+      });
+    }
+  }, [formData.departamento?.id, enqueueSnackbar]);
+
+  const calculateAge = useCallback(() => {
+    if (!formData.fechaNacimiento) {
+      setEdadCalculada("");
+      return;
+    }
+
+    const fechaNacimiento = dayjs(formData.fechaNacimiento);
+    const hoy = dayjs();
+
+    if (fechaNacimiento.isAfter(hoy)) {
+      enqueueSnackbar("La fecha no puede ser futura", { variant: "error" });
+      setEdadCalculada("");
+      return;
+    }
+
+    const edad = hoy.diff(fechaNacimiento, "year");
+    setEdadCalculada(`${edad} años`);
+  }, [formData.fechaNacimiento, enqueueSnackbar]);
+
+  useEffect(() => {
+    fetchInitialData();
+  }, [fetchInitialData]);
+
+  useEffect(() => {
+    fetchDepartamentos();
+  }, [fetchDepartamentos]);
+
+  useEffect(() => {
+    fetchCiudades();
+  }, [fetchCiudades]);
+
+  useEffect(() => {
+    calculateAge();
+  }, [calculateAge]);
+
+  const handleChange = (name: keyof FormValues, value: unknown) => {
+    setFormData(prev => ({
       ...prev,
       [name]: value,
       ...(name === "pais" && { departamento: null, ciudad: null }),
@@ -181,9 +203,10 @@ const CreateUserForm = () => {
       await api.post("/auth/crearUsuario", payload);
       enqueueSnackbar("Usuario creado exitosamente", { variant: "success" });
       router.push("/login");
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as ApiError;
       enqueueSnackbar(
-        error.response?.data?.message || "Error creando usuario",
+        err.response?.data?.message || "Error creando usuario",
         { variant: "error" }
       );
     }

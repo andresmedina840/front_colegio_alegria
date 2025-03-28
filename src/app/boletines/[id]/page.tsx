@@ -14,10 +14,6 @@ import {
   Paper,
   CircularProgress,
   Alert,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
 } from "@mui/material";
 import FusionTemplateColegio from "../../components/TemplateColegio";
 import api from "../../axios/axiosClient";
@@ -25,8 +21,12 @@ import { useParams } from "next/navigation";
 import StudentCard from "@/app/components/personalizados/StudentCard";
 import CustomTextField from "@/app/components/personalizados/CustomTextField";
 import { useSnackbar } from "notistack";
+import { AxiosError } from "axios";
 
-const periodos = ["I", "II", "III", "IV"];
+interface MateriaAPI {
+  nombre: string;
+  intensidadHoraria?: number;
+}
 
 interface Materia {
   nombre: string;
@@ -126,7 +126,7 @@ const PaginaBoletin = () => {
         ]);
 
         const materiasTransformadas = materiasResponse.data.map(
-          (materia: any) => ({
+          (materia: MateriaAPI) => ({
             nombre: materia.nombre,
             fortalezas: "",
             debilidades: "",
@@ -177,7 +177,7 @@ const PaginaBoletin = () => {
   const guardarBoletin = async () => {
     try {
       const {
-        data: { code, message },
+        data: { message },
       } = await api.post("/boletines/crearBoletin", formData);
 
       enqueueSnackbar(message, { variant: "success" });
@@ -185,8 +185,7 @@ const PaginaBoletin = () => {
       let errorMessage = "Error al guardar el boletín";
 
       if (err instanceof Error) {
-        // Verificamos si err es de Axios
-        const axiosError = err as any;
+        const axiosError = err as AxiosError<{ message?: string }>;
         errorMessage = axiosError.response?.data?.message || errorMessage;
       }
 

@@ -21,6 +21,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import api from "../axios/axiosClient";
 import { useRouter } from "next/navigation";
 import CustomTextField from "../components/personalizados/CustomTextField";
+import { useSnackbar } from "notistack";
 
 interface Estudiante {
   id: number;
@@ -38,7 +39,17 @@ interface EstadoBusqueda {
   busquedaRealizada: boolean;
 }
 
+interface MateriaResponse {
+  data: {
+    id: number;
+    nombre: string;
+    intensidadHoraria?: number;
+  }[];
+  message?: string;
+}
+
 const BuscarEstudiantes = () => {
+  const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
   const [terminoBusqueda, setTerminoBusqueda] = useState("");
   const [resultados, setResultados] = useState<Estudiante[]>([]);
@@ -54,15 +65,17 @@ const BuscarEstudiantes = () => {
     setEstado({ ...estado, cargando: true, mensajeError: "" });
 
     try {
-      const response = await api.get(`/alumnos/buscar?q=${terminoBusqueda}`);
-      setResultados(response.data.data);
+      const { data } = await api.get<{ data: Estudiante[] }>(`/alumnos/buscar?q=${terminoBusqueda}`);
+      setResultados(data.data);
       setEstado((prev) => ({ ...prev, busquedaRealizada: true }));
-    } catch (error) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Error en la búsqueda";
       setEstado({
         cargando: false,
-        mensajeError: "Error en la búsqueda. Intente nuevamente.",
+        mensajeError: errorMessage,
         busquedaRealizada: true,
       });
+      enqueueSnackbar(errorMessage, { variant: "error" });
     } finally {
       setEstado((prev) => ({ ...prev, cargando: false }));
     }
@@ -70,14 +83,17 @@ const BuscarEstudiantes = () => {
 
   const generarBoletin = async (estudiante: Estudiante) => {
     try {
-      const response = await api.get(
-        `/materias/grado/${estudiante.gradoId}`
-      );
-      const materias = response.data;
+      const { data } = await api.get<MateriaResponse>(`/materias/grado/${estudiante.gradoId}`);
+      
+      if (data.message) {
+        enqueueSnackbar(data.message, { variant: "success" });
+      }
+      
       router.push(`/boletines/${estudiante.id}`);
-    } catch (error) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Error al obtener las materias";
+      enqueueSnackbar(errorMessage, { variant: "error" });
       console.error("Error obteniendo materias:", error);
-      alert("Error al obtener las materias del estudiante");
     }
   };
 

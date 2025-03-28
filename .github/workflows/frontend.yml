@@ -16,14 +16,13 @@ jobs:
       - name: Deploy to Contabo VPS
         uses: appleboy/ssh-action@master
         env:
-          DOCKER_COMPOSE_FILE: "docker-compose-frontend.yml"
-          APP_DIR: "/root/apps/colegio/frontend"
+          APP_DIR: "/root/apps/colegio/front_colegio_alegria"
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            set -e  # Exit immediately on error
+            set -e
             echo "🔄 Iniciando despliegue del frontend..."
             
             # Configurar swap temporal
@@ -32,27 +31,23 @@ jobs:
             sudo mkswap /swapfile
             sudo swapon /swapfile
             
-            cd $APP_DIR
+            cd /root/apps/colegio
             
-            # Actualizar código
+            # Clonar/actualizar repositorio
+            if [ ! -d "front_colegio_alegria" ]; then
+              git clone https://github.com/andresmedina840/front_colegio_alegria.git
+            fi
+            
+            cd front_colegio_alegria
             git reset --hard HEAD
             git clean -fd
             git pull origin main
             
-            # Instalar dependencias si es necesario
-            npm install
+            # Reconstruir y desplegar
+            docker-compose -f ../docker-compose.yml build frontend
+            docker-compose -f ../docker-compose.yml up -d --no-deps frontend
             
-            # Limpiar recursos Docker previos
-            docker-compose -f $DOCKER_COMPOSE_FILE down --volumes --remove-orphans
-            
-            # Construir con límites de recursos
-            docker-compose -f $DOCKER_COMPOSE_FILE build --no-cache --memory 2GB
-            
-            # Iniciar servicios
-            docker-compose -f $DOCKER_COMPOSE_FILE up -d --force-recreate
-            
-            # Limpiar recursos no utilizados
+            # Limpieza
             docker system prune -af --volumes
             sudo swapoff /swapfile && sudo rm /swapfile
-            
             echo "✅ Frontend desplegado con éxito"

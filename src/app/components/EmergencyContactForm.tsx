@@ -1,4 +1,4 @@
-import { Grid, MenuItem, Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import React from "react";
 import CustomTextField from "../components/personalizados/CustomTextField";
 
@@ -7,13 +7,12 @@ type EmergencyContactFormProps = {
   handleChange: (
     e: React.ChangeEvent<{ name?: string; value: unknown }>
   ) => void;
-  tiposIdentificacion: string[];
+  // Eliminamos tiposIdentificacion ya que no se usa
 };
 
 const EmergencyContactForm: React.FC<EmergencyContactFormProps> = ({
   formData,
   handleChange,
-  tiposIdentificacion,
 }) => {
   return (
     <>
