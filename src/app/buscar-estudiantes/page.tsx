@@ -74,11 +74,7 @@ const BuscarEstudiantes = () => {
         `/materias/grado/${estudiante.gradoId}`
       );
       const materias = response.data;
-      router.push(
-        `/boletines/${estudiante.id}?materias=${encodeURIComponent(
-          JSON.stringify(materias)
-        )}`
-      );
+      router.push(`/boletines/${estudiante.id}`);
     } catch (error) {
       console.error("Error obteniendo materias:", error);
       alert("Error al obtener las materias del estudiante");

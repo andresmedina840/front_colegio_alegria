@@ -13,17 +13,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Deploy to EC2
+      - name: Deploy to Contabo VPS
         uses: appleboy/ssh-action@master
         env:
           DOCKER_COMPOSE_FILE: "docker-compose-frontend.yml"
+          APP_DIR: "/root/apps/colegio/frontend"
         with:
-          host: ${{ secrets.AWS_HOST }}
-          username: ubuntu
-          key: ${{ secrets.AWS_SSH_KEY }}
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             set -e  # Exit immediately on error
-            echo "🔄 Iniciando despliegue..."
+            echo "🔄 Iniciando despliegue del frontend..."
             
             # Configurar swap temporal
             sudo fallocate -l 2G /swapfile
@@ -31,18 +32,15 @@ jobs:
             sudo mkswap /swapfile
             sudo swapon /swapfile
             
-            cd /home/ubuntu/colegio_alegria_norte
-            
-            # Clonar repositorio si no existe
-            if [ ! -d "front_colegio_alegria" ]; then
-              git clone https://github.com/andresmedina840/front_colegio_alegria.git
-            fi
+            cd $APP_DIR
             
             # Actualizar código
-            cd front_colegio_alegria
             git reset --hard HEAD
             git clean -fd
             git pull origin main
+            
+            # Instalar dependencias si es necesario
+            npm install
             
             # Limpiar recursos Docker previos
             docker-compose -f $DOCKER_COMPOSE_FILE down --volumes --remove-orphans
@@ -57,4 +55,4 @@ jobs:
             docker system prune -af --volumes
             sudo swapoff /swapfile && sudo rm /swapfile
             
-            echo "✅ Despliegue completado con éxito"
+            echo "✅ Frontend desplegado con éxito"

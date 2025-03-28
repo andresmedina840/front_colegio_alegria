@@ -12,36 +12,37 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
   CircularProgress,
   Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
 import FusionTemplateColegio from "../../components/TemplateColegio";
 import api from "../../axios/axiosClient";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import StudentCard from "@/app/components/personalizados/StudentCard";
 import CustomTextField from "@/app/components/personalizados/CustomTextField";
+import { useSnackbar } from "notistack";
+
+const periodos = ["I", "II", "III", "IV"];
 
 interface Materia {
   nombre: string;
   fortalezas: string;
   debilidades: string;
-  recomendaciones: string;
-  valoracion: number;
   intensidadHoraria: number;
   fallas: number;
-  nivelDesempeno: string;
+  valoracion: number;
+  recomendaciones: string;
 }
 
 interface BoletinData {
   estudiante: {
     id: number;
     nombre: string;
+    gradoId: number;
     grado: string;
     directorGrupo: string;
     periodo: string;
@@ -51,60 +52,63 @@ interface BoletinData {
   observaciones: string;
 }
 
-const styles = StyleSheet.create({
-  page: {
-    padding: 30,
-  },
-  header: {
-    fontSize: 24,
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  table: {
-    width: "100%",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderRightWidth: 0,
-    borderBottomWidth: 0,
-  },
-  tableRow: {
-    flexDirection: "row",
-  },
-  tableCellHeader: {
-    backgroundColor: "#f0f0f0",
-    padding: 5,
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-  },
-  tableCell: {
-    padding: 5,
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-  },
-});
-
 const PaginaBoletin = () => {
-  const router = useRouter();
+  const { enqueueSnackbar } = useSnackbar();
   const params = useParams();
   const id = params?.id as string;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [totalHoras, setTotalHoras] = useState(0);
+  const [totalFallas, setTotalFallas] = useState(0);
+  const [promedio, setPromedio] = useState(0);
+
   const [formData, setFormData] = useState<BoletinData>({
     estudiante: {
       id: 0,
       nombre: "",
+      gradoId: 0,
       grado: "",
       directorGrupo: "",
-      periodo: "IV",
+      periodo: "I",
       fechaReporte: new Date().toLocaleDateString(),
     },
     materias: [],
     observaciones: "",
   });
+
+  const determinarNivel = (valoracion: number) => {
+    if (valoracion >= 4.6) return "SUPERIOR";
+    if (valoracion >= 4.0) return "ALTO";
+    if (valoracion >= 2.9) return "BÁSICO";
+    return "BAJO";
+  };
+
+  useEffect(() => {
+    const calcularTotales = () => {
+      const horas = formData.materias.reduce(
+        (acc, materia) => acc + materia.intensidadHoraria,
+        0
+      );
+      const fallas = formData.materias.reduce(
+        (acc, materia) => acc + materia.fallas,
+        0
+      );
+      const valoraciones = formData.materias.reduce(
+        (acc, materia) => acc + materia.valoracion,
+        0
+      );
+      const promedioCalc =
+        formData.materias.length > 0
+          ? valoraciones / formData.materias.length
+          : 0;
+
+      setTotalHoras(horas);
+      setTotalFallas(fallas);
+      setPromedio(promedioCalc);
+    };
+
+    calcularTotales();
+  }, [formData.materias]);
 
   useEffect(() => {
     if (!id) return;
@@ -114,15 +118,12 @@ const PaginaBoletin = () => {
         const alumnoResponse = await api.get(`/alumnos/${id}`);
         const alumnoData = alumnoResponse.data?.data;
         const gradoIdEstudiante = alumnoData?.gradoId;
+        if (!gradoIdEstudiante) return;
 
-        if (!gradoIdEstudiante) {
-          console.error("Error: gradoId es undefined: ", gradoIdEstudiante);
-          return;
-        }
-
-        const materiasResponse = await api.get(
-          `/materias/grado/${gradoIdEstudiante}`
-        );
+        const [materiasResponse, directoraResponse] = await Promise.all([
+          api.get(`/materias/grado/${gradoIdEstudiante}`),
+          api.get(`/grados/${gradoIdEstudiante}/directora`),
+        ]);
 
         const materiasTransformadas = materiasResponse.data.map(
           (materia: any) => ({
@@ -131,9 +132,8 @@ const PaginaBoletin = () => {
             debilidades: "",
             recomendaciones: "",
             valoracion: 0,
-            intensidadHoraria: 0,
+            intensidadHoraria: materia.intensidadHoraria || 0,
             fallas: 0,
-            nivelDesempeno: "ALTO",
           })
         );
 
@@ -141,9 +141,10 @@ const PaginaBoletin = () => {
           estudiante: {
             id: alumnoData.id,
             nombre: `${alumnoData.nombre} ${alumnoData.apellido}`.trim(),
+            gradoId: gradoIdEstudiante,
             grado: alumnoData.gradoNombre,
-            directorGrupo: "Ángela Jimena Inseca Cruz",
-            periodo: "IV",
+            directorGrupo: directoraResponse.data.data,
+            periodo: "I",
             fechaReporte: new Date().toLocaleDateString(),
           },
           materias: materiasTransformadas,
@@ -175,10 +176,23 @@ const PaginaBoletin = () => {
 
   const guardarBoletin = async () => {
     try {
-      await api.post("/boletines", formData);
-      alert("Boletín guardado exitosamente");
+      const {
+        data: { code, message },
+      } = await api.post("/boletines/crearBoletin", formData);
+
+      enqueueSnackbar(message, { variant: "success" });
     } catch (err) {
-      setError("Error al guardar el boletín");
+      let errorMessage = "Error al guardar el boletín";
+
+      if (err instanceof Error) {
+        // Verificamos si err es de Axios
+        const axiosError = err as any;
+        errorMessage = axiosError.response?.data?.message || errorMessage;
+      }
+
+      console.error("Error en guardarBoletin:", errorMessage);
+      setError(errorMessage);
+      enqueueSnackbar(errorMessage, { variant: "error" });
     }
   };
 
@@ -188,16 +202,22 @@ const PaginaBoletin = () => {
     <FusionTemplateColegio>
       <Box p={4}>
         <Typography variant="h4" gutterBottom>
-          REGISTRO ESCOLAR DE VALORACIÓN DESCRIPTIVO -{" "}
-          {formData.estudiante.nombre}
+          Boletin de Notas
         </Typography>
 
         <StudentCard
           nombre={formData.estudiante.nombre}
+          //gradoId={formData.estudiante.gradoId}
           grado={formData.estudiante.grado}
           periodo={formData.estudiante.periodo}
           fechaReporte={formData.estudiante.fechaReporte}
           directorGrupo={formData.estudiante.directorGrupo}
+          onPeriodoChange={(nuevoPeriodo) =>
+            setFormData({
+              ...formData,
+              estudiante: { ...formData.estudiante, periodo: nuevoPeriodo },
+            })
+          }
         />
 
         {error && <Alert severity="error">{error}</Alert>}
@@ -264,7 +284,7 @@ const PaginaBoletin = () => {
                     fontWeight: "bold",
                     textAlign: "center",
                     color: "white",
-                    width: 20,
+                    width: 80,
                   }}
                 >
                   Valoración
@@ -370,16 +390,20 @@ const PaginaBoletin = () => {
                     <CustomTextField
                       type="number"
                       value={materia.valoracion}
-                      onChange={(e) =>
-                        handleChangeMateria(
-                          index,
-                          "valoracion",
-                          Number(e.target.value)
-                        )
-                      }
-                      inputProps={{ step: "0.1", min: "0", max: "5" }}
+                      onChange={(e) => {
+                        let value = Math.min(
+                          5,
+                          Math.max(0, Number(e.target.value))
+                        ); // Cierre correcto
+                        handleChangeMateria(index, "valoracion", value);
+                      }}
+                      inputProps={{
+                        step: "0.1",
+                        min: "0",
+                        max: "5",
+                      }}
                       sx={{
-                        width: 40,
+                        width: 60,
                         textAlign: "center",
                         borderRadius: 1,
                         "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
@@ -392,41 +416,33 @@ const PaginaBoletin = () => {
                       }}
                     />
                   </TableCell>
-                  <TableCell>
-                    <FormControl fullWidth>
-                      <InputLabel>Nivel</InputLabel>
-                      <Select
-                        value={materia.nivelDesempeno}
-                        onChange={(e) =>
-                          handleChangeMateria(
-                            index,
-                            "nivelDesempeno",
-                            e.target.value
-                          )
-                        }
-                        sx={{
-                          width: 70,
-                          textAlign: "center",
-                          borderRadius: 1,
-                          "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
-                            {
-                              display: "none",
-                            },
-                          "& input[type=number]": {
-                            MozAppearance: "textfield",
-                          },
-                        }}
-                      >
-                        {["SUPERIOR", "ALTO", "BÁSICO", "BAJO"].map((nivel) => (
-                          <MenuItem key={nivel} value={nivel}>
-                            {nivel}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
+                  <TableCell sx={{ textAlign: "center" }}>
+                    <Typography>
+                      {determinarNivel(materia.valoracion)}
+                    </Typography>
                   </TableCell>
                 </TableRow>
               ))}
+              <TableRow sx={{ backgroundColor: "#f0f0f0" }}>
+                <TableCell
+                  colSpan={3}
+                  sx={{ textAlign: "right", fontWeight: "bold" }}
+                >
+                  TOTALES
+                </TableCell>
+                <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+                  {totalHoras}
+                </TableCell>
+                <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+                  {totalFallas}
+                </TableCell>
+                <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+                  {promedio.toFixed(1)}
+                </TableCell>
+                <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+                  {determinarNivel(promedio)}
+                </TableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </TableContainer>
