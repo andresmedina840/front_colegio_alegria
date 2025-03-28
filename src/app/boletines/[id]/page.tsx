@@ -390,7 +390,7 @@ const PaginaBoletin = () => {
                       type="number"
                       value={materia.valoracion}
                       onChange={(e) => {
-                        let value = Math.min(
+                        const value = Math.min(
                           5,
                           Math.max(0, Number(e.target.value))
                         ); // Cierre correcto

@@ -22,8 +22,12 @@ import DocumentacionRecibida from "./DocumentacionRecibida";
 import ParentForm from "./ParentForm";
 import EmergencyContactForm from "./EmergencyContactForm";
 import CustomAutocomplete from "./personalizados/CustomAutocomplete";
+import { AutocompleteChangeReason } from "@mui/material";
 
-const siNo = ["SI", "NO"];
+const siNo: OpcionSelect[] = [
+  { id: "SI", nombre: "SI" },
+  { id: "NO", nombre: "NO" },
+];
 
 // Definir el tipo para opciones select
 type OpcionSelect = {
@@ -165,17 +169,17 @@ const CreateStudentForm = () => {
       <CondicionesEspeciales
         formData={formData}
         handleChange={handleChange}
-        siNo={siNo}
+        siNo={siNo.map((item) => item.id)}
       />
       <SituacionAcademica
         formData={formData}
         handleChange={handleChange}
-        siNo={siNo}
+        siNo={siNo.map((item) => item.id)}
       />
       <DocumentacionRecibida
         formData={formData}
         handleChange={handleChange}
-        siNo={siNo}
+        siNo={siNo.map((item) => item.id)}
       />
 
       <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
@@ -209,14 +213,23 @@ const CreateStudentForm = () => {
                 label="Autorización para contacto de emergencia"
                 name="autorizacionCoctactoEmergencia"
                 options={siNo}
-                value={formData.autorizacionCoctactoEmergencia || ""}
-                onChange={(value) =>
+                value={
+                  siNo.find(
+                    (option) =>
+                      option.id === formData.autorizacionCoctactoEmergencia
+                  ) || null
+                }
+                onChange={(
+                  event: React.SyntheticEvent,
+                  value: OpcionSelect | null,
+                  reason: AutocompleteChangeReason
+                ) => {
                   setFormData((prev) => ({
                     ...prev,
-                    autorizacionCoctactoEmergencia: value ?? "",
-                  }))
-                }
-                getOptionLabel={(option) => option}
+                    autorizacionCoctactoEmergencia: value ? value.id : "",
+                  }));
+                }}
+                getOptionLabel={(option) => option.nombre}
               />
             </Grid>
 
@@ -225,9 +238,6 @@ const CreateStudentForm = () => {
                 <EmergencyContactForm
                   formData={formData}
                   handleChange={handleChange}
-                  tiposIdentificacion={tiposIdentificacion.map(
-                    (tipo) => tipo.nombre
-                  )}
                 />
               </Box>
             )}
@@ -237,14 +247,22 @@ const CreateStudentForm = () => {
                 label="Autorizo para uso de imagen (Fotografía/videos)"
                 name="autorizacionImagen"
                 options={siNo}
-                value={formData.autorizacionImagen || ""}
-                onChange={(value) =>
+                value={
+                  siNo.find(
+                    (option) => option.id === formData.autorizacionImagen
+                  ) || null
+                }
+                onChange={(
+                  event: React.SyntheticEvent,
+                  value: OpcionSelect | null,
+                  reason: AutocompleteChangeReason
+                ) => {
                   setFormData((prev) => ({
                     ...prev,
-                    autorizacionImagen: value ?? "",
-                  }))
-                }
-                getOptionLabel={(option) => option}
+                    autorizacionImagen: value ? value.id : "",
+                  }));
+                }}
+                getOptionLabel={(option) => option.nombre}
               />
             </Grid>
 
@@ -253,14 +271,22 @@ const CreateStudentForm = () => {
                 label="Declaración de veracidad de la información"
                 name="veracidadInformacion"
                 options={siNo}
-                value={formData.veracidadInformacion || ""}
-                onChange={(value) =>
+                value={
+                  siNo.find(
+                    (option) => option.id === formData.veracidadInformacion
+                  ) || null
+                }
+                onChange={(
+                  event: React.SyntheticEvent,
+                  value: OpcionSelect | null,
+                  reason: AutocompleteChangeReason
+                ) => {
                   setFormData((prev) => ({
                     ...prev,
-                    veracidadInformacion: value ?? "",
-                  }))
-                }
-                getOptionLabel={(option) => option}
+                    veracidadInformacion: value ? value.id : "",
+                  }));
+                }}
+                getOptionLabel={(option) => option.nombre}
               />
             </Grid>
 
