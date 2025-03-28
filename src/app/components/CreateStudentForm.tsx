@@ -22,7 +22,6 @@ import DocumentacionRecibida from "./DocumentacionRecibida";
 import ParentForm from "./ParentForm";
 import EmergencyContactForm from "./EmergencyContactForm";
 import CustomAutocomplete from "./personalizados/CustomAutocomplete";
-import { AutocompleteChangeReason } from "@mui/material";
 
 const siNo: OpcionSelect[] = [
   { id: "SI", nombre: "SI" },
@@ -107,6 +106,16 @@ const CreateStudentForm = () => {
     }
   };
 
+  const handleAutocompleteChange = (fieldName: string) => (
+    _: React.SyntheticEvent,
+    value: OpcionSelect | null
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [fieldName]: value ? value.id : "",
+    }));
+  };
+
   const handleSubmit = async () => {
     try {
       await api.post("/alumnos", formData);
@@ -174,12 +183,12 @@ const CreateStudentForm = () => {
       <SituacionAcademica
         formData={formData}
         handleChange={handleChange}
-        siNo={siNo.map((item) => item.id)}
+        siNo={siNo}
       />
       <DocumentacionRecibida
         formData={formData}
         handleChange={handleChange}
-        siNo={siNo.map((item) => item.id)}
+        siNo={siNo}
       />
 
       <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
@@ -219,16 +228,7 @@ const CreateStudentForm = () => {
                       option.id === formData.autorizacionCoctactoEmergencia
                   ) || null
                 }
-                onChange={(
-                  event: React.SyntheticEvent,
-                  value: OpcionSelect | null,
-                  reason: AutocompleteChangeReason
-                ) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    autorizacionCoctactoEmergencia: value ? value.id : "",
-                  }));
-                }}
+                onChange={handleAutocompleteChange("autorizacionCoctactoEmergencia")}
                 getOptionLabel={(option) => option.nombre}
               />
             </Grid>
@@ -252,16 +252,7 @@ const CreateStudentForm = () => {
                     (option) => option.id === formData.autorizacionImagen
                   ) || null
                 }
-                onChange={(
-                  event: React.SyntheticEvent,
-                  value: OpcionSelect | null,
-                  reason: AutocompleteChangeReason
-                ) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    autorizacionImagen: value ? value.id : "",
-                  }));
-                }}
+                onChange={handleAutocompleteChange("autorizacionImagen")}
                 getOptionLabel={(option) => option.nombre}
               />
             </Grid>
@@ -276,16 +267,7 @@ const CreateStudentForm = () => {
                     (option) => option.id === formData.veracidadInformacion
                   ) || null
                 }
-                onChange={(
-                  event: React.SyntheticEvent,
-                  value: OpcionSelect | null,
-                  reason: AutocompleteChangeReason
-                ) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    veracidadInformacion: value ? value.id : "",
-                  }));
-                }}
+                onChange={handleAutocompleteChange("veracidadInformacion")}
                 getOptionLabel={(option) => option.nombre}
               />
             </Grid>

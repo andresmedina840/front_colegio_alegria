@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, Grid, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import CustomTextField from "./personalizados/CustomTextField";
@@ -73,6 +75,62 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
     return ahora.diff(nacimiento, "year").toString();
   };
 
+  const handleAutocompleteChange =
+    (fieldName: string) =>
+    (_: React.SyntheticEvent, value: OpcionSelect | null) => {
+      const newValue = value?.id || "";
+      handleChange({
+        target: {
+          name: fieldName,
+          value: newValue,
+        },
+      } as React.ChangeEvent<HTMLInputElement>);
+
+      // Lógica específica para el campo gradoId
+      if (fieldName === "gradoId" && newValue) {
+        setLoadingPension(true);
+        api
+          .get(`/pensiones/by-grado/${newValue}`)
+          .then((response) => {
+            if (response.data.length > 0) {
+              setPensionValue(response.data[0].valor);
+              handleChange({
+                target: {
+                  name: "pensionId",
+                  value: response.data[0].id,
+                },
+              } as React.ChangeEvent<HTMLInputElement>);
+            }
+          })
+          .catch((error) => {
+            enqueueSnackbar(error.message, { variant: "error" });
+            setPensionValue("");
+          })
+          .finally(() => setLoadingPension(false));
+      } else if (fieldName === "gradoId" && !newValue) {
+        setPensionValue("");
+        handleChange({
+          target: { name: "pensionId", value: "" },
+        } as React.ChangeEvent<HTMLInputElement>);
+      }
+
+      // Lógica específica para campos de ubicación
+      if (fieldName === "paisNacimiento") {
+        cargarDepartamentos(newValue);
+      } else if (fieldName === "departamentoNacimiento") {
+        cargarCiudades(newValue);
+      }
+    };
+
+  const handleJornadaChange = (
+    _: React.SyntheticEvent,
+    value: OpcionSelect | null
+  ) => {
+    handleChange({
+      target: { name: "jornada", value: value?.id ?? "" },
+    } as React.ChangeEvent<HTMLInputElement>);
+  };
+
   return (
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
       <CardContent>
@@ -96,15 +154,10 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                   (tipo) => tipo.id === formData.tipoIdentificacionEstudianteId
                 ) || null
               }
-              onChange={(value) => {
-                handleChange({
-                  target: {
-                    name: "tipoIdentificacionEstudianteId",
-                    value: value ? value.id : "",
-                  },
-                } as React.ChangeEvent<HTMLInputElement>);
-              }}
-              getOptionLabel={(option) => option.nombre} // Muestra el nombre en el dropdown
+              onChange={handleAutocompleteChange(
+                "tipoIdentificacionEstudianteId"
+              )}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
             />
           </Grid>
 
@@ -127,6 +180,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               }}
             />
           </Grid>
+
           {/* Campos de Nombres y Apellidos */}
           {[
             "primerNombreEstudiante",
@@ -152,7 +206,8 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               />
             </Grid>
           ))}
-          {/* Resto de campos */}
+
+          {/* Campo Sede */}
           <Grid item xs={12} sm={6}>
             <CustomTextField
               label="Sede para donde se matrícula"
@@ -179,43 +234,12 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               label="Grado a matricular"
               name="gradoId"
               required
-              options={grados.map((grado) => grado.id)}
-              value={formData.gradoId || ""}
-              onChange={(value) => {
-                handleChange({
-                  target: { name: "gradoId", value: value ?? "" },
-                } as React.ChangeEvent<HTMLInputElement>);
-
-                if (value) {
-                  setLoadingPension(true);
-                  api
-                    .get(`/pensiones/by-grado/${value}`)
-                    .then((response) => {
-                      if (response.data.length > 0) {
-                        setPensionValue(response.data[0].valor);
-                        handleChange({
-                          target: {
-                            name: "pensionId",
-                            value: response.data[0].id,
-                          },
-                        } as React.ChangeEvent<HTMLInputElement>);
-                      }
-                    })
-                    .catch((error) => {
-                      enqueueSnackbar(error.message, { variant: "error" });
-                      setPensionValue("");
-                    })
-                    .finally(() => setLoadingPension(false));
-                } else {
-                  setPensionValue("");
-                  handleChange({
-                    target: { name: "pensionId", value: "" },
-                  } as React.ChangeEvent<HTMLInputElement>);
-                }
-              }}
-              getOptionLabel={(option) =>
-                grados.find((g) => g.id === option)?.nombre || ""
+              options={grados}
+              value={
+                grados.find((grado) => grado.id === formData.gradoId) || null
               }
+              onChange={handleAutocompleteChange("gradoId")}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
             />
             {loadingPension && (
               <Typography variant="body2">Cargando...</Typography>
@@ -231,18 +255,23 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           <Grid item xs={12} sm={3}>
             <CustomAutocomplete
               label="Jornada Escolar"
-              options={jornadaEscolar}
+              options={jornadaEscolar.map((jornada) => ({
+                id: jornada,
+                nombre: jornada,
+              }))}
               name="jornada"
               required
-              value={formData.jornada || ""}
-              onChange={(value) =>
-                handleChange({
-                  target: { name: "jornada", value: value ?? "" },
-                } as React.ChangeEvent<HTMLInputElement>)
+              value={
+                jornadaEscolar
+                  .map((jornada) => ({ id: jornada, nombre: jornada }))
+                  .find((option) => option.id === formData.jornada) || null
               }
-              getOptionLabel={(option) => option}
+              onChange={handleJornadaChange}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
             />
           </Grid>
+
+          {/* Campo Institución Educativa Anterior */}
           <Grid item xs={12}>
             <CustomTextField
               label="Institución Educativa anterior (si aplica)"
@@ -262,23 +291,24 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               }}
             />
           </Grid>
+
           {/* Campo Último Grado Cursado */}
           <Grid item xs={12} sm={3}>
             <CustomAutocomplete
               label="Último Grado Cursado"
               name="ultimoGradoCursado"
-              options={grados.map((grado) => grado.id)}
-              value={formData.ultimoGradoCursado || ""}
-              onChange={(value) =>
-                handleChange({
-                  target: { name: "ultimoGradoCursado", value: value ?? "" },
-                } as React.ChangeEvent<HTMLInputElement>)
+              options={grados}
+              value={
+                grados.find(
+                  (grado) => grado.id === formData.ultimoGradoCursado
+                ) || null
               }
-              getOptionLabel={(option) =>
-                grados.find((g) => g.id === option)?.nombre || ""
-              }
+              onChange={handleAutocompleteChange("ultimoGradoCursado")}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
             />
           </Grid>
+
+          {/* Campo Año Último Grado Cursado */}
           <Grid item xs={12} sm={3}>
             <CustomTextField
               label="Año del último grado cursado"
@@ -297,6 +327,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               }}
             />
           </Grid>
+
           {/* Campo Género */}
           <Grid item xs={12} sm={3}>
             <CustomAutocomplete
@@ -308,18 +339,12 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                 generos.find((g) => g.id === formData.generoEstudianteId) ||
                 null
               }
-              onChange={(value) =>
-                handleChange({
-                  target: {
-                    name: "generoEstudianteId",
-                    value: value ? value.id : "",
-                  },
-                } as React.ChangeEvent<HTMLInputElement>)
-              }
-              getOptionLabel={(option) => option.nombre} // Muestra el nombre en la lista
+              onChange={handleAutocompleteChange("generoEstudianteId")}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
             />
           </Grid>
 
+          {/* Campo Fecha de Nacimiento */}
           <Grid item xs={12} sm={3}>
             <CustomDatePicker
               label="Fecha de Nacimiento"
@@ -343,6 +368,8 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               maxDate={maxDateActual}
             />
           </Grid>
+
+          {/* Campo Edad (calculado) */}
           <Grid item xs={12} sm={2}>
             <CustomTextField
               label="Edad"
@@ -355,23 +382,20 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               }}
             />
           </Grid>
+
           {/* Campo País de Nacimiento */}
           <Grid item xs={12} sm={4}>
             <CustomAutocomplete
               label="País de Nacimiento"
               name="paisNacimiento"
               required
-              options={paises.map((pais) => pais.id)}
-              value={formData.paisNacimiento || ""}
-              onChange={(value) => {
-                handleChange({
-                  target: { name: "paisNacimiento", value: value ?? "" },
-                } as React.ChangeEvent<HTMLInputElement>);
-                cargarDepartamentos(value ?? "");
-              }}
-              getOptionLabel={(option) =>
-                paises.find((p) => p.id === option)?.nombre || ""
+              options={paises}
+              value={
+                paises.find((pais) => pais.id === formData.paisNacimiento) ||
+                null
               }
+              onChange={handleAutocompleteChange("paisNacimiento")}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
             />
           </Grid>
 
@@ -381,20 +405,14 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               label="Departamento de Nacimiento"
               name="departamentoNacimiento"
               required
-              options={departamentos.map((dep) => dep.id)}
-              value={formData.departamentoNacimiento || ""}
-              onChange={(value) => {
-                handleChange({
-                  target: {
-                    name: "departamentoNacimiento",
-                    value: value ?? "",
-                  },
-                } as React.ChangeEvent<HTMLInputElement>);
-                cargarCiudades(value ?? "");
-              }}
-              getOptionLabel={(option) =>
-                departamentos.find((d) => d.id === option)?.nombre || ""
+              options={departamentos}
+              value={
+                departamentos.find(
+                  (dep) => dep.id === formData.departamentoNacimiento
+                ) || null
               }
+              onChange={handleAutocompleteChange("departamentoNacimiento")}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
               disabled={!formData.paisNacimiento}
             />
           </Grid>
@@ -405,16 +423,14 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               label="Municipio de Nacimiento"
               name="municipioNacimiento"
               required
-              options={ciudades.map((ciudad) => ciudad.id)}
-              value={formData.municipioNacimiento || ""}
-              onChange={(value) =>
-                handleChange({
-                  target: { name: "municipioNacimiento", value: value ?? "" },
-                } as React.ChangeEvent<HTMLInputElement>)
+              options={ciudades}
+              value={
+                ciudades.find(
+                  (ciudad) => ciudad.id === formData.municipioNacimiento
+                ) || null
               }
-              getOptionLabel={(option) =>
-                ciudades.find((c) => c.id === option)?.nombre || ""
-              }
+              onChange={handleAutocompleteChange("municipioNacimiento")}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
               disabled={!formData.departamentoNacimiento}
             />
           </Grid>

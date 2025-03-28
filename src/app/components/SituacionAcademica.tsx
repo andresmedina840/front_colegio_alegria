@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -7,12 +9,17 @@ import {
 import React from "react";
 import CustomAutocomplete from "./personalizados/CustomAutocomplete";
 
+type OptionType = {
+  id: string;
+  nombre: string;
+};
+
 type SituacionAcademicaProps = {
   formData: Record<string, string>;
   handleChange: (
     e: React.ChangeEvent<{ name?: string; value: unknown }>
   ) => void;
-  siNo: string[];
+  siNo: OptionType[];
 };
 
 const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
@@ -20,16 +27,28 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
   handleChange,
   siNo,
 }) => {
-  // Determinar si debemos deshabilitar los demás campos
   const disableOtrosCampos = formData.capacidadesExceptionalesNoAplica === "NO";
+
+  const handleAutocompleteChange = (fieldName: string) => (
+    _: React.SyntheticEvent,
+    value: OptionType | null
+  ) => {
+    handleChange({
+      target: { 
+        name: fieldName, 
+        value: value ? value.id : "" 
+      },
+    } as React.ChangeEvent<HTMLInputElement>);
+  };
+
+  const getCurrentValue = (fieldName: string) => {
+    return siNo.find(option => option.id === formData[fieldName]) || null;
+  };
+
   return (
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
       <CardContent>
-        <Typography
-          variant="h6"
-          align="left"
-          sx={{ fontWeight: "bold", mb: 3 }}
-        >
+        <Typography variant="h6" align="left" sx={{ fontWeight: "bold", mb: 3 }}>
           Situación académica
         </Typography>
         <Grid container spacing={2}>
@@ -38,13 +57,9 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
               label="No estudio en la vigencia anterior"
               name="situacionAcademicaNoEstudioVigenciaAnterior"
               options={siNo}
-              value={formData.situacionAcademicaNoEstudioVigenciaAnterior || ""}
-              onChange={(value) =>
-                handleChange({
-                  target: { name: "situacionAcademicaNoEstudioVigenciaAnterior", value: value ?? "" },
-                } as React.ChangeEvent<HTMLInputElement>)
-              }
-              getOptionLabel={(option) => option}
+              value={getCurrentValue("situacionAcademicaNoEstudioVigenciaAnterior")}
+              onChange={handleAutocompleteChange("situacionAcademicaNoEstudioVigenciaAnterior")}
+              getOptionLabel={(option: OptionType) => option.nombre}
             />
           </Grid>
 
@@ -53,13 +68,9 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
               label="Aprobó"
               name="situacionAcademicaAprobo"
               options={siNo}
-              value={formData.situacionAcademicaAprobo || ""}
-              onChange={(value) =>
-                handleChange({
-                  target: { name: "situacionAcademicaAprobo", value: value ?? "" },
-                } as React.ChangeEvent<HTMLInputElement>)
-              }
-              getOptionLabel={(option) => option}
+              value={getCurrentValue("situacionAcademicaAprobo")}
+              onChange={handleAutocompleteChange("situacionAcademicaAprobo")}
+              getOptionLabel={(option: OptionType) => option.nombre}
               disabled={disableOtrosCampos}
             />
           </Grid>
@@ -69,13 +80,9 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
               label="Reprobó"
               name="situcionAcademicaReprobo"
               options={siNo}
-              value={formData.situcionAcademicaReprobo || ""}
-              onChange={(value) =>
-                handleChange({
-                  target: { name: "situcionAcademicaReprobo", value: value ?? "" },
-                } as React.ChangeEvent<HTMLInputElement>)
-              }
-              getOptionLabel={(option) => option}
+              value={getCurrentValue("situcionAcademicaReprobo")}
+              onChange={handleAutocompleteChange("situcionAcademicaReprobo")}
+              getOptionLabel={(option: OptionType) => option.nombre}
               disabled={disableOtrosCampos}
             />
           </Grid>
@@ -85,13 +92,9 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
               label="Pendiente de logros"
               name="situacionAcademicaPendienteLogros"
               options={siNo}
-              value={formData.situacionAcademicaPendienteLogros || ""}
-              onChange={(value) =>
-                handleChange({
-                  target: { name: "situacionAcademicaPendienteLogros", value: value ?? "" },
-                } as React.ChangeEvent<HTMLInputElement>)
-              }
-              getOptionLabel={(option) => option}
+              value={getCurrentValue("situacionAcademicaPendienteLogros")}
+              onChange={handleAutocompleteChange("situacionAcademicaPendienteLogros")}
+              getOptionLabel={(option: OptionType) => option.nombre}
               disabled={disableOtrosCampos}
             />
           </Grid>
@@ -101,13 +104,9 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
               label="Viene de otra I.E."
               name="situacionAcademicaVieneOtraIE"
               options={siNo}
-              value={formData.situacionAcademicaVieneOtraIE || ""}
-              onChange={(value) =>
-                handleChange({
-                  target: { name: "situacionAcademicaVieneOtraIE", value: value ?? "" },
-                } as React.ChangeEvent<HTMLInputElement>)
-              }
-              getOptionLabel={(option) => option}
+              value={getCurrentValue("situacionAcademicaVieneOtraIE")}
+              onChange={handleAutocompleteChange("situacionAcademicaVieneOtraIE")}
+              getOptionLabel={(option: OptionType) => option.nombre}
               disabled={disableOtrosCampos}
             />
           </Grid>
@@ -117,13 +116,9 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
               label="Ingresa por primera vez a la I.E."
               name="situcionAcademicaIngresaPrimeraVezIE"
               options={siNo}
-              value={formData.situcionAcademicaIngresaPrimeraVezIE || ""}
-              onChange={(value) =>
-                handleChange({
-                  target: { name: "situcionAcademicaIngresaPrimeraVezIE", value: value ?? "" },
-                } as React.ChangeEvent<HTMLInputElement>)
-              }
-              getOptionLabel={(option) => option}
+              value={getCurrentValue("situcionAcademicaIngresaPrimeraVezIE")}
+              onChange={handleAutocompleteChange("situcionAcademicaIngresaPrimeraVezIE")}
+              getOptionLabel={(option: OptionType) => option.nombre}
               disabled={disableOtrosCampos}
             />
           </Grid>
@@ -133,13 +128,9 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
               label="No culminó estudios"
               name="situcionAcademicaNoCulminoEstudios"
               options={siNo}
-              value={formData.situcionAcademicaNoCulminoEstudios || ""}
-              onChange={(value) =>
-                handleChange({
-                  target: { name: "situcionAcademicaNoCulminoEstudios", value: value ?? "" },
-                } as React.ChangeEvent<HTMLInputElement>)
-              }
-              getOptionLabel={(option) => option}
+              value={getCurrentValue("situcionAcademicaNoCulminoEstudios")}
+              onChange={handleAutocompleteChange("situcionAcademicaNoCulminoEstudios")}
+              getOptionLabel={(option: OptionType) => option.nombre}
               disabled={disableOtrosCampos}
             />
           </Grid>

@@ -1,3 +1,5 @@
+"use client";
+
 import { Grid, Typography } from "@mui/material";
 import React from "react";
 import CustomTextField from "../components/personalizados/CustomTextField";
@@ -23,6 +25,20 @@ const ParentForm: React.FC<ParentFormProps> = ({
   handleChange,
   tiposIdentificacion,
 }) => {
+  const handleAutocompleteChange = (
+    fieldName: string
+  ) => (
+    _: React.SyntheticEvent,
+    value: OpcionSelect | null
+  ) => {
+    handleChange({
+      target: {
+        name: fieldName,
+        value: value?.id || "",
+      },
+    } as React.ChangeEvent<HTMLInputElement>);
+  };
+
   return (
     <>
       <Typography variant="h5" align="left" sx={{ fontWeight: "bold", mb: 3 }}>
@@ -36,18 +52,11 @@ const ParentForm: React.FC<ParentFormProps> = ({
             options={tiposIdentificacion}
             required
             value={
-              (tiposIdentificacion as OpcionSelect[]).find(
+              tiposIdentificacion.find(
                 (tipo) => tipo.id === formData[`tipoIdentificacion${title}Id`]
               ) || null
             }
-            onChange={(value: OpcionSelect | null) => {
-              handleChange({
-                target: {
-                  name: `tipoIdentificacion${title}Id`,
-                  value: value?.id || "",
-                },
-              } as React.ChangeEvent<HTMLInputElement>);
-            }}
+            onChange={handleAutocompleteChange(`tipoIdentificacion${title}Id`)}
             getOptionLabel={(option: OpcionSelect) => option.nombre}
           />
         </Grid>
@@ -92,6 +101,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             }}
           />
         </Grid>
+        
         <Grid item xs={12} sm={3}>
           <CustomTextField
             fullWidth
@@ -114,6 +124,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             }}
           />
         </Grid>
+        
         <Grid item xs={12} sm={3}>
           <CustomTextField
             fullWidth
@@ -136,6 +147,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             }}
           />
         </Grid>
+        
         <Grid item xs={12} sm={3}>
           <CustomTextField
             fullWidth
