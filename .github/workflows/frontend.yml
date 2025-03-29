@@ -25,29 +25,30 @@ jobs:
             set -e
             echo "🔄 Iniciando despliegue del frontend..."
             
-            # Configurar swap temporal
-            sudo fallocate -l 2G /swapfile
-            sudo chmod 600 /swapfile
-            sudo mkswap /swapfile
-            sudo swapon /swapfile
-            
             cd /root/apps/colegio
             
-            # Clonar/actualizar repositorio
+            # Clonar el repositorio si no existe
             if [ ! -d "front_colegio_alegria" ]; then
               git clone https://github.com/andresmedina840/front_colegio_alegria.git
             fi
             
             cd front_colegio_alegria
-            git reset --hard HEAD
-            git clean -fd
-            git pull origin main
+            git fetch --all
+            LOCAL_COMMIT=$(git rev-parse HEAD)
+            REMOTE_COMMIT=$(git rev-parse origin/main)
             
-            # Reconstruir y desplegar
-            docker-compose -f ../docker-compose.yml build frontend
-            docker-compose -f ../docker-compose.yml up -d --no-deps frontend
-            
-            # Limpieza
-            docker system prune -af --volumes
-            sudo swapoff /swapfile && sudo rm /swapfile
-            echo "✅ Frontend desplegado con éxito"
+            if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
+              echo "🔄 Se detectaron cambios, actualizando..."
+              git reset --hard origin/main
+              git pull origin main
+              
+              # Reconstruir y desplegar solo si hay cambios
+              docker-compose -f ../docker-compose.yml build frontend
+              docker-compose -f ../docker-compose.yml up -d --no-deps frontend
+
+              # Limpiar recursos innecesarios
+              docker system prune -af --volumes
+              echo "✅ Frontend desplegado con éxito"
+            else
+              echo "✅ No hay cambios en el frontend, omitiendo despliegue."
+            fi

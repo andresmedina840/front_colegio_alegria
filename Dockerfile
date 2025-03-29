@@ -6,8 +6,8 @@ WORKDIR /app
 # Copiar solo lo necesario para instalar dependencias
 COPY package.json package-lock.json ./
 
-# Instalación limpia y cache optimizada
-RUN npm ci --prefer-offline --no-audit --progress=false
+# Instalación limpia y reproducible
+RUN npm ci --progress=false
 
 # Copiar el resto de los archivos
 COPY . .
@@ -21,12 +21,14 @@ FROM node:18-alpine
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV PORT=3000
 
 # Copiar solo lo necesario desde la etapa de construcción
-COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/package*.json ./ 
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/next.config.js ./next.config.js
 
 # Limpieza de cache innecesaria
 RUN npm cache clean --force
