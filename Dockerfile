@@ -1,32 +1,32 @@
-# 🛠️ Etapa de construcción
-FROM node:18-alpine AS builder
+# Etapa de construcción
+FROM node:18-alpine AS build
 
+# Establece el directorio de trabajo en /app
 WORKDIR /app
 
-# Copiar solo lo necesario para instalar dependencias
-COPY package.json package-lock.json ./
-RUN npm ci --progress=false
+# Copia los archivos de package.json y package-lock.json a /app
+COPY package*.json ./
 
-# Copiar el resto de los archivos
+# Instala las dependencias
+RUN npm install --force
+
+# Copia el resto de los archivos al directorio de trabajo en el contenedor
 COPY . .
+
+# Construye la aplicación Next.js
 RUN npm run build
 
-# 🚀 Etapa de producción
-FROM node:18-alpine
+# Etapa de producción
+FROM node:18-alpine AS production
+
+# Establece el directorio de trabajo en /app
 WORKDIR /app
 
-ENV NODE_ENV=production
-ENV PORT=3000
+# Copia el resultado de la compilación desde la etapa de construcción
+COPY --from=build /app /app
 
-COPY --from=builder /app/package*.json ./ 
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/next.config.js ./
-
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1
-
+# Exponer el puerto 3000
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# Comando de inicio del contenedor para ejecutar la aplicación Next.js en producción
+CMD ["npm", "run", "start"]
