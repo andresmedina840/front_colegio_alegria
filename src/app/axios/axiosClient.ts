@@ -1,57 +1,74 @@
-import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosError, AxiosResponse, AxiosHeaders } from "axios";
 
 interface UserData {
   token: string;
-  // Agrega aquí otros campos que tengas en dataUser
+  id?: number;
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  role?: string;
 }
 
 const axiosClient: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND ? `${process.env.NEXT_PUBLIC_BACKEND}/v1/api` : "",
+  baseURL: process.env.NEXT_PUBLIC_BACKEND 
+    ? `${process.env.NEXT_PUBLIC_BACKEND}/v1/api` 
+    : "http://localhost:8080/v1/api",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Interceptor de solicitud corregido
+// Request interceptor
 axiosClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     if (typeof window !== "undefined") {
-      const userData = sessionStorage.getItem("dataUser");
+      const userData = sessionStorage.getItem("userData");
       
       if (userData) {
         try {
           const parsedData: UserData = JSON.parse(userData);
           if (parsedData.token) {
-            // Usamos headers común en lugar de AxiosHeaders
-            config.headers = config.headers || {};
-            config.headers.Authorization = `Bearer ${parsedData.token}`;
+            // Solución 1: Usar AxiosHeaders
+            const headers = new AxiosHeaders();
+            headers.set("Authorization", `Bearer ${parsedData.token}`);
+            config.headers = headers;
+            
+            // Solución alternativa (menos tipo-safe pero funciona):
+            // config.headers = {
+            //   ...config.headers,
+            //   Authorization: `Bearer ${parsedData.token}`,
+            // } as AxiosHeaders;
           }
         } catch (error) {
           console.error("Error parsing user data:", error);
-          sessionStorage.removeItem("dataUser");
+          sessionStorage.removeItem("userData");
         }
       }
     }
     return config;
   },
-  (error: AxiosError) => {
-    return Promise.reject(error);
-  }
+  (error: AxiosError) => Promise.reject(error)
 );
 
-// Interceptor de respuesta (sin cambios necesarios)
+// Response interceptor
 axiosClient.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: AxiosError) => {
-    if (typeof window !== "undefined" && error.response?.status === 401) {
-      sessionStorage.removeItem("dataUser");
-      window.location.href = "/login";
+    if (typeof window !== "undefined") {
+      if (error.response?.status === 401) {
+        sessionStorage.removeItem("userData");
+        window.location.href = "/login?sessionExpired=true";
+      }
+      
+      if (error.response?.status === 403) {
+        window.location.href = "/unauthorized";
+      }
     }
-    
-    const errorMessage = (error.response?.data as { message?: string })?.message || 
-                        error.message || 
-                        "Error de conexión";
+
+    const errorData = error.response?.data as { message?: string };
+    const errorMessage = errorData?.message || error.message || "Error de conexión";
     
     return Promise.reject(new Error(errorMessage));
   }
