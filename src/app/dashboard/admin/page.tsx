@@ -12,6 +12,14 @@ import {
 } from "@mui/material";
 import axiosClient from "../../axios/axiosClient";
 
+interface Grado {
+  id: number;
+  nombre: string;
+  numeroMaximoEstudiantes: number;
+  profesoraNombre: string;
+  totalEstudiantes: number;
+}
+
 const Dashboard = () => {
   const currentUserRole = "ADMIN";
 
@@ -62,7 +70,7 @@ const Dashboard = () => {
         const gradosData = resGrados.data.data;
 
         const gradosConEstudiantes = await Promise.all(
-          gradosData.map(async (grado: any) => {
+          gradosData.map(async (grado: Grado) => {
             const resCount = await axiosClient.get(
               `/alumnos/count/grado/${grado.id}`,
               {
@@ -120,7 +128,6 @@ const Dashboard = () => {
               {renderStatCard("Total de Profesoras", data.totalProfesoras)}
             </Grid>
 
-
             {/* Cards por curso */}
             <Grid item xs={12}>
               <Typography variant="h5" gutterBottom>
@@ -135,7 +142,7 @@ const Dashboard = () => {
                 wrap="nowrap"
                 sx={{ width: "max-content", minWidth: "100%" }}
               >
-                {grados.map((grado) => (
+                {grados.map((grado: Grado) => (
                   <Grid item key={grado.id}>
                     <Card sx={{ width: 240, minHeight: 120 }}>
                       <CardContent>

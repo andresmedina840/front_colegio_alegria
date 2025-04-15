@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import LoginForm from '../components/LoginForm';
 
 export default function LoginPage() {
@@ -15,7 +16,9 @@ export default function LoginPage() {
         backgroundColor: '#f5f5f5',
       }}
     >
-      <LoginForm />
+      <Suspense fallback={<div>Cargando login...</div>}>
+        <LoginForm />
+      </Suspense>
     </main>
   );
 }
