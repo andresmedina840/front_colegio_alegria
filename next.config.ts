@@ -9,9 +9,24 @@ dotenv.config({
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+
+  // Configuración para el despliegue en Docker
+  output: 'standalone',
+
+  // Configura el directorio de salida (opcional)
+  distDir: process.env.NODE_ENV === 'production' ? '.next' : '.next-dev',
+
   env: {
     NEXT_PUBLIC_BACKEND: process.env.NEXT_PUBLIC_BACKEND,
   },
+
+  // Configuración experimental actualizada para Next.js 15
+  experimental: {
+    // Puedes agregar otras opciones experimentales aquí
+  },
+
+  // Configuración para el tracing de archivos (moderna)
+  outputFileTracing: true
 };
 
 export default nextConfig;
