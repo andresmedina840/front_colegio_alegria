@@ -25,8 +25,6 @@ const nextConfig: NextConfig = {
     // Puedes agregar otras opciones experimentales aquí
   },
 
-  // Configuración para el tracing de archivos (moderna)
-  outputFileTracing: true
 };
 
 export default nextConfig;
