@@ -22,13 +22,10 @@ const CustomTextField = ({
   slotProps = {},
   ...props
 }: CustomTextFieldProps) => {
-  const [internalValue, setInternalValue] = useState<string>(String(propValue || ""));
   const [displayValue, setDisplayValue] = useState<string>(String(propValue || ""));
 
   useEffect(() => {
-    const stringValue = String(propValue || "");
-    setInternalValue(stringValue);
-    setDisplayValue(stringValue);
+    setDisplayValue(String(propValue || ""));
   }, [propValue]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +39,6 @@ const CustomTextField = ({
 
     if (uppercase) newValue = newValue.toUpperCase();
 
-    setInternalValue(newValue);
     setDisplayValue(newValue);
     onValueChange?.(newValue);
     onChange?.({
@@ -72,7 +68,7 @@ const CustomTextField = ({
         },
         htmlInput: {
           ...htmlInputProps,
-          maxLength, // Esto ahora funciona correctamente
+          maxLength,
           spellCheck: false,
           "data-ms-editor": "false",
           style: {
