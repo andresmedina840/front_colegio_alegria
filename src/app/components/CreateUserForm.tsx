@@ -234,7 +234,7 @@ const CreateUserForm = () => {
       </Typography>
 
       <Grid container spacing={2} sx={{ maxWidth: 1200, margin: "auto" }}>
-        <Grid item xs={12} sm={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <CustomAutocomplete
             label="Tipo de Identificación"
             name="tipoIdentificacionId"
@@ -246,7 +246,7 @@ const CreateUserForm = () => {
           />
         </Grid>
 
-        <Grid item xs={12} sm={2}>
+        <Grid size={{ xs: 12, md: 2 }}>
           <CustomTextField
             label="Número Identificación"
             value={formData.numeroIdentificacion}
@@ -270,7 +270,7 @@ const CreateUserForm = () => {
           { name: "primerApellidoEstudiante", label: "Primer Apellido Estudiante", required: true },
           { name: "segundoApellidoEstudiante", label: "Segundo Apellido Estudiante" },
         ].map((field) => (
-          <Grid item xs={12} sm={3} key={field.name}>
+          <Grid size={{ xs: 12, md: 3 }} key={field.name}>
             <CustomTextField
               label={field.label}
               value={formData[field.name as keyof FormValues]}
@@ -292,7 +292,7 @@ const CreateUserForm = () => {
           </Grid>
         ))}
 
-        <Grid item xs={12} sm={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <CustomTextField
             label="Fecha de Nacimiento"
             type="date"
@@ -302,7 +302,7 @@ const CreateUserForm = () => {
           />
         </Grid>
 
-        <Grid item xs={12} sm={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <CustomTextField
             label="Edad"
             value={edadCalculada}
@@ -325,7 +325,7 @@ const CreateUserForm = () => {
           />
         </Grid>
 
-        <Grid item xs={12} sm={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <CustomAutocomplete
             label="País"
             name="pais"
@@ -337,7 +337,7 @@ const CreateUserForm = () => {
           />
         </Grid>
 
-        <Grid item xs={12} sm={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <CustomAutocomplete
             label="Departamento"
             name="departamento"
@@ -350,7 +350,7 @@ const CreateUserForm = () => {
           />
         </Grid>
 
-        <Grid item xs={12} sm={5}>
+        <Grid size={{ xs: 12, md: 5 }}>
           <CustomAutocomplete
             label="Ciudad"
             name="ciudad"
@@ -363,7 +363,7 @@ const CreateUserForm = () => {
           />
         </Grid>
 
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             label="Dirección Completa"
             value={formData.direccionCompleta}
@@ -382,7 +382,7 @@ const CreateUserForm = () => {
           />
         </Grid>
 
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             label="Email"
             value={formData.email}
@@ -400,7 +400,7 @@ const CreateUserForm = () => {
           />
         </Grid>
 
-        <Grid item xs={12} sm={3}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             label="Usuario de Telegram"
             value={formData.usuarioTelegram}
@@ -418,7 +418,7 @@ const CreateUserForm = () => {
           />
         </Grid>
 
-        <Grid item xs={12} sm={3}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             label="Nombre de Usuario"
             value={formData.username}
@@ -436,7 +436,7 @@ const CreateUserForm = () => {
           />
         </Grid>
 
-        <Grid item xs={12} sm={2}>
+        <Grid size={{ xs: 12, md: 2 }}>
           <CustomTextField
             label="No. celular principal *"
             value={formData.numeroCelular1}
@@ -477,7 +477,7 @@ const CreateUserForm = () => {
           />
         </Grid>
 
-        <Grid item xs={12} sm={2}>
+        <Grid size={{ xs: 12, md: 2 }}>
           <CustomTextField
             label="No. celular secundario"
             value={formData.numeroCelular2}
@@ -519,7 +519,7 @@ const CreateUserForm = () => {
           />
         </Grid>
 
-        <Grid item xs={12} sm={2}>
+        <Grid size={{ xs: 12, md: 2 }}>
           <CustomAutocomplete
             label="Rol"
             name="rol"
@@ -532,7 +532,7 @@ const CreateUserForm = () => {
         </Grid>
 
         {/* Campo de Contraseña */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             label="Contraseña"
             name="password"
@@ -567,7 +567,7 @@ const CreateUserForm = () => {
         </Grid>
 
         {/* Campo de Confirmación de Contraseña */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             label="Confirmar Contraseña"
             name="confirmPassword"

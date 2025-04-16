@@ -6,74 +6,78 @@ import React, { useState, useEffect } from "react";
 type CustomTextFieldProps = TextFieldProps & {
   uppercase?: boolean;
   onValueChange?: (value: string) => void;
+  showCharCount?: boolean;
+  maxLength?: number;
   htmlInputProps?: React.InputHTMLAttributes<HTMLInputElement>;
 };
 
-/**
- * Componente CustomTextField mejorado con:
- * - Manejo eficiente de estado interno
- * - Soporte para transformación a mayúsculas
- * - Compatibilidad con las propiedades HTML estándar
- * - Optimización de rendimiento
- */
 const CustomTextField = ({
   uppercase = false,
   onValueChange,
   onChange,
   value: propValue = "",
+  showCharCount = false,
+  maxLength,
   htmlInputProps = {},
   slotProps = {},
   ...props
 }: CustomTextFieldProps) => {
-  // Estado interno para manejar el valor
-  const [internalValue, setInternalValue] = useState(propValue);
+  const [internalValue, setInternalValue] = useState<string>(String(propValue || ""));
+  const [displayValue, setDisplayValue] = useState<string>(String(propValue || ""));
 
-  // Sincronización con el valor de las props
   useEffect(() => {
-    setInternalValue(propValue);
+    const stringValue = String(propValue || "");
+    setInternalValue(stringValue);
+    setDisplayValue(stringValue);
   }, [propValue]);
 
-  /**
-   * Maneja el cambio en el input
-   * @param e - Evento de cambio del input
-   */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let newValue = e.target.value;
-    // Transformar a mayúsculas si está habilitado
+    
+    // Aplicar límite de caracteres
+    const lengthLimit = maxLength || htmlInputProps.maxLength;
+    if (lengthLimit && newValue.length > lengthLimit) {
+      newValue = newValue.slice(0, lengthLimit);
+    }
+
     if (uppercase) newValue = newValue.toUpperCase();
 
-    // Actualizar estado y llamar callbacks
     setInternalValue(newValue);
+    setDisplayValue(newValue);
     onValueChange?.(newValue);
     onChange?.({
       ...e,
       target: { ...e.target, value: newValue },
-    } as React.ChangeEvent<HTMLInputElement>);
+    });
   };
 
-  // Estilo para transformación de texto
-  const textTransformStyle = uppercase ? { textTransform: 'uppercase' as const } : {};
+  // Calcular helperText
+  const charCountText = showCharCount && maxLength 
+    ? `${displayValue.length} / ${maxLength} caracteres` 
+    : props.helperText;
 
   return (
     <TextField
       {...props}
-      value={internalValue}
+      value={displayValue}
       onChange={handleChange}
       variant="outlined"
       fullWidth
+      helperText={charCountText}
       slotProps={{
         ...slotProps,
-        input: {
-          ...slotProps.input,
-          // Propiedades específicas del slot input de MUI
+        inputLabel: {
+          ...slotProps.inputLabel,
+          shrink: true,
         },
         htmlInput: {
           ...htmlInputProps,
-          spellCheck: false, // Deshabilita el corrector ortográfico
-          "data-ms-editor": "false", // Evita el editor de MS
+          maxLength, // Esto ahora funciona correctamente
+          spellCheck: false,
+          "data-ms-editor": "false",
           style: {
             ...htmlInputProps.style,
-            ...textTransformStyle, // Aplica transformación de texto
+            ...(uppercase ? { textTransform: 'uppercase' } : {}),
           },
         },
       }}

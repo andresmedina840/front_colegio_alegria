@@ -155,7 +155,7 @@ const CreateStudentForm = () => {
 
       <EnrollmentInfoForm formData={formData} handleChange={handleChange} />
 
-      {/*<StudentInfoForm
+      <StudentInfoForm
         formData={formData}
         handleChange={handleChange}
         grados={grados}
@@ -285,7 +285,7 @@ const CreateStudentForm = () => {
             </Grid>
           </Grid>
         </CardContent>
-      </Card>*/}
+      </Card>
 
       <Button
         variant="contained"

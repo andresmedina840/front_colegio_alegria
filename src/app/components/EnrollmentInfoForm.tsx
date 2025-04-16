@@ -33,13 +33,14 @@ const EnrollmentInfoForm: React.FC<EnrollmentInfoFormProps> = ({
         value: newValue ? formatDateToISO(newValue.toDate()) : "",
       },
     } as unknown as React.ChangeEvent<{ name?: string; value: unknown }>;
-    
+
     handleChange(event);
   };
 
-  const formattedDateValue = formData.fechaMatricula && dayjs(formData.fechaMatricula).isValid()
-    ? dayjs(formData.fechaMatricula)
-    : null;
+  const formattedDateValue =
+    formData.fechaMatricula && dayjs(formData.fechaMatricula).isValid()
+      ? dayjs(formData.fechaMatricula)
+      : null;
 
   return (
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
@@ -51,20 +52,13 @@ const EnrollmentInfoForm: React.FC<EnrollmentInfoFormProps> = ({
               name="numeroMatricula"
               uppercase
               variant="outlined"
-              value={formData.numeroMatricula || ""}
+              value={formData.numeroMatricula} // Puede ser string, null o undefined
               onChange={handleChange}
-              helperText={`${(formData.numeroMatricula || "").length} / 26 caracteres`}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 26,
-                  suppressHydrationWarning: true,
-                  spellCheck: false,
-                  "data-ms-editor": "false"
-                },
-              }}
+              maxLength={26}
+              showCharCount={true}
             />
           </Grid>
-          
+
           {isMounted && (
             <Grid size={{ xs: 12, md: 6 }}>
               <DatePicker
@@ -79,7 +73,7 @@ const EnrollmentInfoForm: React.FC<EnrollmentInfoFormProps> = ({
                     inputProps: {
                       suppressHydrationWarning: true,
                       spellCheck: false,
-                      "data-ms-editor": "false"
+                      "data-ms-editor": "false",
                     } as React.InputHTMLAttributes<HTMLInputElement>,
                   },
                 }}

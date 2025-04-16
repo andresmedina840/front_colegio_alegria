@@ -19,7 +19,7 @@ const EmergencyContactForm: React.FC<EmergencyContactFormProps> = ({
         Contacto de Emergencia
       </Typography>
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             fullWidth
             label="Primer Nombre"
@@ -30,7 +30,7 @@ const EmergencyContactForm: React.FC<EmergencyContactFormProps> = ({
             inputProps={{ maxLength: 26 }}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             fullWidth
             label="Segundo Nombre"
@@ -41,7 +41,7 @@ const EmergencyContactForm: React.FC<EmergencyContactFormProps> = ({
             inputProps={{ maxLength: 26 }}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             fullWidth
             label="Primer Apellido"
@@ -52,7 +52,7 @@ const EmergencyContactForm: React.FC<EmergencyContactFormProps> = ({
             inputProps={{ maxLength: 26 }}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             fullWidth
             label="Segundo Apellido"
@@ -63,7 +63,7 @@ const EmergencyContactForm: React.FC<EmergencyContactFormProps> = ({
             inputProps={{ maxLength: 26 }}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             fullWidth
             label="Teléfono"
@@ -73,7 +73,7 @@ const EmergencyContactForm: React.FC<EmergencyContactFormProps> = ({
             inputProps={{ maxLength: 15 }}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             fullWidth
             label="Parentesco"

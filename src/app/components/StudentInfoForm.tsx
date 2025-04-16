@@ -57,12 +57,10 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
   if (!isMounted) return null;
 
   const commonTextFieldProps = {
-    slotProps: {
-      htmlInput: {
-        suppressHydrationWarning: true,
-        spellCheck: false,
-        "data-ms-editor": "false",
-      },
+    inputProps: {
+      suppressHydrationWarning: true,
+      spellCheck: false,
+      "data-ms-editor": "false",
     },
   };
 
@@ -86,7 +84,6 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
         },
       } as React.ChangeEvent<HTMLInputElement>);
 
-      // Lógica específica para el campo gradoId
       if (fieldName === "gradoId" && newValue) {
         setLoadingPension(true);
         api
@@ -114,7 +111,6 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
         } as React.ChangeEvent<HTMLInputElement>);
       }
 
-      // Lógica específica para campos de ubicación
       if (fieldName === "paisNacimiento") {
         cargarDepartamentos(newValue);
       } else if (fieldName === "departamentoNacimiento") {
@@ -143,7 +139,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
         </Typography>
         <Grid container spacing={2}>
           {/* Campo Tipo Identificación */}
-          <Grid size={{ xs: 12, md: 5 }}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <CustomAutocomplete
               label="Tipo Identificación Estudiante"
               name="tipoIdentificacionEstudianteId"
@@ -162,53 +158,41 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Campo Número Identificación */}
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <CustomTextField
               label="Número Identificación Estudiante"
               name="numeroIdentificacionEstudiante"
               required
               value={formData.numeroIdentificacionEstudiante || ""}
               onChange={handleChange}
-              helperText={`${
-                (formData.numeroIdentificacionEstudiante || "").length
-              } / 12 caracteres`}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 12,
-                  ...commonTextFieldProps.slotProps.htmlInput,
-                },
-              }}
+              maxLength={26}
+              showCharCount={true}
             />
           </Grid>
 
           {/* Campos de Nombres y Apellidos */}
           {[
-            "primerNombreEstudiante",
-            "segundoNombreEstudiante",
-            "primerApellidoEstudiante",
-            "segundoApellidoEstudiante",
-          ].map((field, index) => (
-            <Grid size={{ xs: 12, sm: index < 2 ? 3 : 4 }} key={field}>
+            { field: "primerNombreEstudiante", label: "Primer Nombre Estudiante" },
+            { field: "segundoNombreEstudiante", label: "Segundo Nombre Estudiante" },
+            { field: "primerApellidoEstudiante", label: "Primer Apellido Estudiante" },
+            { field: "segundoApellidoEstudiante", label: "Segundo Apellido Estudiante" },
+          ].map(({ field, label }) => (
+            <Grid size={{ xs: 12, md: 6 }} key={field}>
               <CustomTextField
-                label={field.replace(/([A-Z])/g, " $1").trim()}
+                label={label}
                 name={field}
                 variant="outlined"
                 uppercase
                 value={formData[field] || ""}
                 onChange={handleChange}
-                helperText={`${(formData[field] || "").length} / 26 caracteres`}
-                slotProps={{
-                  htmlInput: {
-                    maxLength: 26,
-                    ...commonTextFieldProps.slotProps.htmlInput,
-                  },
-                }}
+                maxLength={26}
+                showCharCount={true}
               />
             </Grid>
           ))}
 
           {/* Campo Sede */}
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <CustomTextField
               label="Sede para donde se matrícula"
               name="sedeMatricula"
@@ -216,20 +200,13 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               uppercase
               value={formData.sedeMatricula || ""}
               onChange={handleChange}
-              helperText={`${
-                (formData.sedeMatricula || "").length
-              } / 50 caracteres`}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 50,
-                  ...commonTextFieldProps.slotProps.htmlInput,
-                },
-              }}
+              maxLength={26}
+              showCharCount={true}
             />
           </Grid>
 
           {/* Campo Grado */}
-          <Grid size={{ xs: 12, md: 3 }}>
+          <Grid size={{ xs: 12, md: 4}}>
             <CustomAutocomplete
               label="Grado a matricular"
               name="gradoId"
@@ -252,7 +229,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Campo Jornada Escolar */}
-          <Grid size={{ xs: 12, md: 3 }}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <CustomAutocomplete
               label="Jornada Escolar"
               options={jornadaEscolar.map((jornada) => ({
@@ -272,7 +249,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Campo Institución Educativa Anterior */}
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 12, md: 8}}>
             <CustomTextField
               label="Institución Educativa anterior (si aplica)"
               name="institucionEducativaAnterior"
@@ -280,15 +257,8 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               uppercase
               value={formData.institucionEducativaAnterior || ""}
               onChange={handleChange}
-              helperText={`${
-                (formData.institucionEducativaAnterior || "").length
-              } / 50 caracteres`}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 50,
-                  ...commonTextFieldProps.slotProps.htmlInput,
-                },
-              }}
+              maxLength={26}
+              showCharCount={true}
             />
           </Grid>
 
@@ -309,7 +279,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Campo Año Último Grado Cursado */}
-          <Grid size={{ xs: 12, md: 3 }}>
+          <Grid size={{ xs: 12, md: 2 }}>
             <CustomTextField
               label="Año del último grado cursado"
               name="ultimoAnioCursado"
@@ -319,17 +289,15 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               helperText={`${
                 (formData.ultimoAnioCursado || "").length
               } / 4 caracteres`}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 4,
-                  ...commonTextFieldProps.slotProps.htmlInput,
-                },
+              inputProps={{
+                maxLength: 4,
+                ...commonTextFieldProps.inputProps,
               }}
             />
           </Grid>
 
           {/* Campo Género */}
-          <Grid size={{ xs: 12, md: 3 }}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <CustomAutocomplete
               label="Género"
               name="generoEstudianteId"
@@ -370,15 +338,15 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Campo Edad (calculado) */}
-          <Grid size={{ xs: 12, md: 2}}>
+          <Grid size={{ xs: 12, md: 2 }}>
             <CustomTextField
               label="Edad"
               name="edad"
               variant="outlined"
               value={formData.edad || ""}
-              slotProps={{
-                input: { readOnly: true },
-                htmlInput: commonTextFieldProps.slotProps.htmlInput,
+              inputProps={{
+                readOnly: true,
+                ...commonTextFieldProps.inputProps,
               }}
             />
           </Grid>
