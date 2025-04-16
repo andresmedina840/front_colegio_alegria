@@ -73,7 +73,7 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
         </Typography>
         <Grid container spacing={2}>
           {formFields.map((field) => (
-            <Grid item xs={12} sm={3} key={field.name}>
+            <Grid size={{ xs: 12, md: 3 }} key={field.name}>
               <CustomTextField
                 label={field.label}
                 name={field.name}
@@ -86,7 +86,7 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
             </Grid>
           ))}
 
-          <Grid item xs={12} sm={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <CustomAutocomplete
               name="estrato"
               options={estratosOptions}

@@ -52,7 +52,7 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
           Situación académica
         </Typography>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <CustomAutocomplete
               label="No estudio en la vigencia anterior"
               name="situacionAcademicaNoEstudioVigenciaAnterior"
@@ -63,7 +63,7 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
             />
           </Grid>
 
-          <Grid item xs={12} sm={2}>
+          <Grid size={{ xs: 12, md: 2 }}>
             <CustomAutocomplete
               label="Aprobó"
               name="situacionAcademicaAprobo"
@@ -75,7 +75,7 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
             />
           </Grid>
 
-          <Grid item xs={12} sm={2}>
+          <Grid size={{ xs: 12, md: 2 }}>
             <CustomAutocomplete
               label="Reprobó"
               name="situcionAcademicaReprobo"
@@ -87,7 +87,7 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
             />
           </Grid>
 
-          <Grid item xs={12} sm={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <CustomAutocomplete
               label="Pendiente de logros"
               name="situacionAcademicaPendienteLogros"
@@ -99,7 +99,7 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
             />
           </Grid>
 
-          <Grid item xs={12} sm={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <CustomAutocomplete
               label="Viene de otra I.E."
               name="situacionAcademicaVieneOtraIE"
@@ -111,7 +111,7 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
             />
           </Grid>
 
-          <Grid item xs={12} sm={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <CustomAutocomplete
               label="Ingresa por primera vez a la I.E."
               name="situcionAcademicaIngresaPrimeraVezIE"
@@ -123,7 +123,7 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
             />
           </Grid>
 
-          <Grid item xs={12} sm={3}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <CustomAutocomplete
               label="No culminó estudios"
               name="situcionAcademicaNoCulminoEstudios"

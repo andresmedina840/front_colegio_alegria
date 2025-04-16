@@ -45,10 +45,11 @@ const EnrollmentInfoForm: React.FC<EnrollmentInfoFormProps> = ({
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
       <CardContent>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <CustomTextField
               label="No. Matricula"
               name="numeroMatricula"
+              uppercase
               variant="outlined"
               value={formData.numeroMatricula || ""}
               onChange={handleChange}
@@ -65,7 +66,7 @@ const EnrollmentInfoForm: React.FC<EnrollmentInfoFormProps> = ({
           </Grid>
           
           {isMounted && (
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <DatePicker
                 label="Fecha de matrícula"
                 value={formattedDateValue}

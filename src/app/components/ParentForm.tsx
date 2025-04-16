@@ -25,19 +25,16 @@ const ParentForm: React.FC<ParentFormProps> = ({
   handleChange,
   tiposIdentificacion,
 }) => {
-  const handleAutocompleteChange = (
-    fieldName: string
-  ) => (
-    _: React.SyntheticEvent,
-    value: OpcionSelect | null
-  ) => {
-    handleChange({
-      target: {
-        name: fieldName,
-        value: value?.id || "",
-      },
-    } as React.ChangeEvent<HTMLInputElement>);
-  };
+  const handleAutocompleteChange =
+    (fieldName: string) =>
+    (_: React.SyntheticEvent, value: OpcionSelect | null) => {
+      handleChange({
+        target: {
+          name: fieldName,
+          value: value?.id || "",
+        },
+      } as React.ChangeEvent<HTMLInputElement>);
+    };
 
   return (
     <>
@@ -45,7 +42,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
         {title}
       </Typography>
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={5}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomAutocomplete
             label={`Tipo Identificación ${title}`}
             name={`tipoIdentificacion${title}Id`}
@@ -61,11 +58,12 @@ const ParentForm: React.FC<ParentFormProps> = ({
           />
         </Grid>
 
-        <Grid item xs={12} sm={4}>
+        <Grid size={{ xs: 12, md: 6}}>
           <CustomTextField
             label={`Número Identificación ${title}`}
             name={`numeroIdentificacion${title}`}
             required
+            uppercase
             value={formData[`numeroIdentificacion${title}`] || ""}
             onChange={handleChange}
             helperText={`${
@@ -75,11 +73,14 @@ const ParentForm: React.FC<ParentFormProps> = ({
               htmlInput: {
                 maxLength: 12,
               },
+              inputLabel: {
+                shrink: true,
+              },
             }}
           />
         </Grid>
 
-        <Grid item xs={12} sm={3}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             fullWidth
             label={`Primer Nombre ${title}`}
@@ -101,8 +102,8 @@ const ParentForm: React.FC<ParentFormProps> = ({
             }}
           />
         </Grid>
-        
-        <Grid item xs={12} sm={3}>
+
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             fullWidth
             label={`Segundo Nombre ${title}`}
@@ -124,8 +125,8 @@ const ParentForm: React.FC<ParentFormProps> = ({
             }}
           />
         </Grid>
-        
-        <Grid item xs={12} sm={3}>
+
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             fullWidth
             label={`Primer Apellido ${title}`}
@@ -147,8 +148,8 @@ const ParentForm: React.FC<ParentFormProps> = ({
             }}
           />
         </Grid>
-        
-        <Grid item xs={12} sm={3}>
+
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             fullWidth
             label={`Segundo Apellido ${title}`}

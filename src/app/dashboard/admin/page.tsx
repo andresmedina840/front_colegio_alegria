@@ -29,15 +29,7 @@ const Dashboard = () => {
     totalProfesoras: null,
   });
 
-  const [grados, setGrados] = useState<
-    {
-      id: number;
-      nombre: string;
-      numeroMaximoEstudiantes: number;
-      profesoraNombre: string;
-      totalEstudiantes: number;
-    }[]
-  >([]);
+  const [grados, setGrados] = useState<Grado[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -121,30 +113,33 @@ const Dashboard = () => {
 
         {currentUserRole === "ADMIN" ? (
           <Grid container spacing={3}>
-            <Grid item xs={12} sm={2} md={2}>
+            <Grid size={{ xs: 12, sm: 2, md: 2 }}>
               {renderStatCard("Total de Alumnos", data.totalAlumnos)}
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
               {renderStatCard("Total de Profesoras", data.totalProfesoras)}
             </Grid>
 
-            {/* Cards por curso */}
-            <Grid item xs={12}>
+            {/* Sección de Cursos */}
+            <Grid size={{ xs: 12 }}>
               <Typography variant="h5" gutterBottom>
                 Cursos
               </Typography>
             </Grid>
 
-            <Grid item xs={12} sx={{ overflowX: "auto" }}>
+            <Grid size={{ xs: 12 }} sx={{ overflowX: "auto" }}>
               <Grid
                 container
                 spacing={2}
-                wrap="nowrap"
-                sx={{ width: "max-content", minWidth: "100%" }}
+                sx={{
+                  flexWrap: "nowrap",
+                  width: "max-content",
+                  minWidth: "100%",
+                }}
               >
                 {grados.map((grado: Grado) => (
-                  <Grid item key={grado.id}>
-                    <Card sx={{ width: 240, minHeight: 120 }}>
+                  <Grid key={grado.id} size={{ xs: 12 }} sx={{ minWidth: 240 }}>
+                    <Card sx={{ minHeight: 120 }}>
                       <CardContent>
                         <Typography variant="h6" fontSize={18} fontWeight={600}>
                           {grado.nombre}

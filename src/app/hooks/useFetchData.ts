@@ -1,10 +1,11 @@
+// hooks/useFetchData.ts
 import { useEffect, useState } from "react";
 import api from "../axios/axiosClient";
 
-type OpcionSelect = {
+export interface OpcionSelect {
   id: string;
   nombre: string;
-};
+}
 
 const useFetchData = () => {
   const [tiposIdentificacion, setTiposIdentificacion] = useState<OpcionSelect[]>([]);
@@ -15,19 +16,30 @@ const useFetchData = () => {
   const [ciudades, setCiudades] = useState<OpcionSelect[]>([]);
 
   useEffect(() => {
-    const fetchData = async (url: string, setter: React.Dispatch<React.SetStateAction<OpcionSelect[]>>) => {
+    const fetchData = async () => {
       try {
-        const response = await api.get<OpcionSelect[]>(url);
-        setter(response.data);
+        const [
+          tiposRes,
+          estratoRes,
+          gradosRes,
+          paisesRes,
+        ] = await Promise.all([
+          api.get("/tipo-identificacion/tiposDeIdentificacion"),
+          api.get("/estratoEconomico/listaEstratoEconomico"),
+          api.get("/grados/listaGrados"), // ← requiere token Bearer
+          api.get("/ubicacion/paises"),
+        ]);
+
+        setTiposIdentificacion(tiposRes.data);
+        setEstratoEconomico(estratoRes.data);
+        setGrados(gradosRes.data.data); // Asegúrate del formato
+        setPaises(paisesRes.data);
       } catch (error) {
-        console.error(`Error al cargar ${url}: `, error);
+        console.error("Error cargando datos generales:", error);
       }
     };
 
-    fetchData("/estratoEconomico/listaEstratoEconomico", setEstratoEconomico);
-    fetchData("/grados/listaGrados", setGrados);
-    fetchData("/tipo-identificacion/tiposDeIdentificacion", setTiposIdentificacion);
-    fetchData("/ubicacion/paises", setPaises);
+    fetchData();
   }, []);
 
   return {

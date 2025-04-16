@@ -183,7 +183,7 @@ const LoginForm = () => {
         />
 
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <TextField
               label="Usuario"
               fullWidth
@@ -196,7 +196,7 @@ const LoginForm = () => {
               inputProps={{ maxLength: 30 }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <TextField
               label="Contraseña"
               type={showPassword ? "text" : "password"}

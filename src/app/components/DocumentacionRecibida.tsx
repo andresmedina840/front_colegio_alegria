@@ -67,7 +67,7 @@ const DocumentacionRecibida: React.FC<DocumentacionRecibidaProps> = ({
             ) || null;
 
             return (
-              <Grid item xs={12} sm={3} key={doc}>
+              <Grid size={{ xs: 12, md: 3 }} key={doc}>
                 <CustomAutocomplete
                   name={fieldName}
                   label={doc.replace(/([A-Z])/g, " $1").trim()}

@@ -155,7 +155,7 @@ const CreateStudentForm = () => {
 
       <EnrollmentInfoForm formData={formData} handleChange={handleChange} />
 
-      <StudentInfoForm
+      {/*<StudentInfoForm
         formData={formData}
         handleChange={handleChange}
         grados={grados}
@@ -217,7 +217,7 @@ const CreateStudentForm = () => {
             />
           </Box>
           <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12} sm={12}>
+            <Grid size={{ xs: 12, md: 12 }}>
               <CustomAutocomplete
                 label="Autorización para contacto de emergencia"
                 name="autorizacionCoctactoEmergencia"
@@ -242,7 +242,7 @@ const CreateStudentForm = () => {
               </Box>
             )}
 
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <CustomAutocomplete
                 label="Autorizo para uso de imagen (Fotografía/videos)"
                 name="autorizacionImagen"
@@ -257,7 +257,7 @@ const CreateStudentForm = () => {
               />
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <CustomAutocomplete
                 label="Declaración de veracidad de la información"
                 name="veracidadInformacion"
@@ -272,7 +272,7 @@ const CreateStudentForm = () => {
               />
             </Grid>
 
-            <Grid item xs={12} sm={12}>
+            <Grid size={{ xs: 12, md: 12 }}>
               <Typography
                 variant="h5"
                 align="justify"
@@ -285,7 +285,7 @@ const CreateStudentForm = () => {
             </Grid>
           </Grid>
         </CardContent>
-      </Card>
+      </Card>*/}
 
       <Button
         variant="contained"

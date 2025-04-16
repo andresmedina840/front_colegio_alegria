@@ -143,7 +143,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
         </Typography>
         <Grid container spacing={2}>
           {/* Campo Tipo Identificación */}
-          <Grid item xs={12} sm={5}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <CustomAutocomplete
               label="Tipo Identificación Estudiante"
               name="tipoIdentificacionEstudianteId"
@@ -162,7 +162,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Campo Número Identificación */}
-          <Grid item xs={12} sm={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <CustomTextField
               label="Número Identificación Estudiante"
               name="numeroIdentificacionEstudiante"
@@ -188,7 +188,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
             "primerApellidoEstudiante",
             "segundoApellidoEstudiante",
           ].map((field, index) => (
-            <Grid item xs={12} sm={index < 2 ? 3 : 4} key={field}>
+            <Grid size={{ xs: 12, sm: index < 2 ? 3 : 4 }} key={field}>
               <CustomTextField
                 label={field.replace(/([A-Z])/g, " $1").trim()}
                 name={field}
@@ -208,7 +208,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           ))}
 
           {/* Campo Sede */}
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <CustomTextField
               label="Sede para donde se matrícula"
               name="sedeMatricula"
@@ -229,7 +229,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Campo Grado */}
-          <Grid item xs={12} sm={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <CustomAutocomplete
               label="Grado a matricular"
               name="gradoId"
@@ -252,7 +252,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Campo Jornada Escolar */}
-          <Grid item xs={12} sm={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <CustomAutocomplete
               label="Jornada Escolar"
               options={jornadaEscolar.map((jornada) => ({
@@ -272,7 +272,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Campo Institución Educativa Anterior */}
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <CustomTextField
               label="Institución Educativa anterior (si aplica)"
               name="institucionEducativaAnterior"
@@ -293,7 +293,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Campo Último Grado Cursado */}
-          <Grid item xs={12} sm={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <CustomAutocomplete
               label="Último Grado Cursado"
               name="ultimoGradoCursado"
@@ -309,7 +309,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Campo Año Último Grado Cursado */}
-          <Grid item xs={12} sm={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <CustomTextField
               label="Año del último grado cursado"
               name="ultimoAnioCursado"
@@ -329,7 +329,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Campo Género */}
-          <Grid item xs={12} sm={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <CustomAutocomplete
               label="Género"
               name="generoEstudianteId"
@@ -345,7 +345,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Campo Fecha de Nacimiento */}
-          <Grid item xs={12} sm={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <CustomDatePicker
               label="Fecha de Nacimiento"
               name="fechaNacimiento"
@@ -370,7 +370,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Campo Edad (calculado) */}
-          <Grid item xs={12} sm={2}>
+          <Grid size={{ xs: 12, md: 2}}>
             <CustomTextField
               label="Edad"
               name="edad"
@@ -384,7 +384,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Campo País de Nacimiento */}
-          <Grid item xs={12} sm={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <CustomAutocomplete
               label="País de Nacimiento"
               name="paisNacimiento"
@@ -400,7 +400,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Campo Departamento de Nacimiento */}
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <CustomAutocomplete
               label="Departamento de Nacimiento"
               name="departamentoNacimiento"
@@ -418,7 +418,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Campo Municipio de Nacimiento */}
-          <Grid item xs={12} sm={5}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <CustomAutocomplete
               label="Municipio de Nacimiento"
               name="municipioNacimiento"
