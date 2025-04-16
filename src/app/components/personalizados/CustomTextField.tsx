@@ -1,84 +1,82 @@
+// src/app/components/personalizados/CustomTextField.tsx
 'use client';
 
 import { TextField, TextFieldProps } from "@mui/material";
-import React, { useState, useEffect } from "react";
+import React, { memo, useCallback } from "react";
+import { FormField } from "../../types/formTypes";
 
-type CustomTextFieldProps = TextFieldProps & {
+interface CustomTextFieldProps extends Omit<TextFieldProps, 'onChange' | 'slotProps'> {
   uppercase?: boolean;
-  onValueChange?: (value: string) => void;
   showCharCount?: boolean;
   maxLength?: number;
-  htmlInputProps?: React.InputHTMLAttributes<HTMLInputElement>;
-};
+  updateField?: (field: FormField, value: string) => void;
+  name?: FormField;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
 
-const CustomTextField = ({
+const CustomTextField = memo(function CustomTextField({
   uppercase = false,
-  onValueChange,
-  onChange,
-  value: propValue = "",
   showCharCount = false,
   maxLength,
-  htmlInputProps = {},
-  slotProps = {},
+  updateField,
+  name,
+  value,
+  onChange,
+  helperText,
   ...props
-}: CustomTextFieldProps) => {
-  const [displayValue, setDisplayValue] = useState<string>(String(propValue || ""));
-
-  useEffect(() => {
-    setDisplayValue(String(propValue || ""));
-  }, [propValue]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+}: CustomTextFieldProps) {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     let newValue = e.target.value;
-    
-    // Aplicar límite de caracteres
-    const lengthLimit = maxLength || htmlInputProps.maxLength;
-    if (lengthLimit && newValue.length > lengthLimit) {
-      newValue = newValue.slice(0, lengthLimit);
+
+    if (maxLength && newValue.length > maxLength) {
+      newValue = newValue.slice(0, maxLength);
     }
 
     if (uppercase) newValue = newValue.toUpperCase();
 
-    setDisplayValue(newValue);
-    onValueChange?.(newValue);
-    onChange?.({
-      ...e,
-      target: { ...e.target, value: newValue },
-    });
-  };
+    if (onChange) {
+      onChange({
+        ...e,
+        target: { ...e.target, value: newValue },
+      } as React.ChangeEvent<HTMLInputElement>);
+    }
 
-  // Calcular helperText
-  const charCountText = showCharCount && maxLength 
-    ? `${displayValue.length} / ${maxLength} caracteres` 
-    : props.helperText;
+    if (name && updateField) {
+      updateField(name, newValue);
+    }
+  }, [maxLength, uppercase, onChange, name, updateField]);
+
+  const charCountText = showCharCount && maxLength
+    ? `${String(value).length} / ${maxLength} caracteres`
+    : helperText;
+
+  // Configuración de slotProps con tipado correcto
+  const slotProps: TextFieldProps['slotProps'] = {
+    inputLabel: {
+      shrink: true,
+      style: { pointerEvents: 'auto' } as React.CSSProperties
+    },
+    htmlInput: {
+      maxLength,
+      spellCheck: false,
+      "data-ms-editor": "false",
+      style: uppercase ? { textTransform: "uppercase" } : {},
+    }
+  };
 
   return (
     <TextField
       {...props}
-      value={displayValue}
+      name={name}
+      value={value || ""}
       onChange={handleChange}
       variant="outlined"
       fullWidth
       helperText={charCountText}
-      slotProps={{
-        ...slotProps,
-        inputLabel: {
-          ...slotProps.inputLabel,
-          shrink: true,
-        },
-        htmlInput: {
-          ...htmlInputProps,
-          maxLength,
-          spellCheck: false,
-          "data-ms-editor": "false",
-          style: {
-            ...htmlInputProps.style,
-            ...(uppercase ? { textTransform: 'uppercase' } : {}),
-          },
-        },
-      }}
+      slotProps={slotProps}
     />
   );
-};
+});
 
-export default React.memo(CustomTextField);
+export default CustomTextField;

@@ -6,7 +6,6 @@ import { useSnackbar } from "notistack";
 import {
   Box,
   Button,
-  TextField,
   Typography,
   Link,
   IconButton,
@@ -17,6 +16,7 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Image from "next/image";
 import api from "../axios/axiosClient";
+import CustomTextField from "../components/personalizados/CustomTextField";
 
 interface LoginFormData {
   username: string;
@@ -38,7 +38,7 @@ const LoginForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { enqueueSnackbar } = useSnackbar();
-  
+
   const [formData, setFormData] = useState<LoginFormData>({
     username: "",
     password: "",
@@ -46,20 +46,17 @@ const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Mostrar mensaje si la sesión expiró
   useEffect(() => {
     if (searchParams.get("sessionExpired") === "true") {
       enqueueSnackbar("Tu sesión ha expirado, por favor inicia sesión nuevamente", {
         variant: "warning",
       });
-      // Limpiar el parámetro de la URL
       router.replace("/login");
     }
   }, [searchParams, enqueueSnackbar, router]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const handleChange = (field: keyof LoginFormData) => (value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleLogin = async () => {
@@ -69,11 +66,10 @@ const LoginForm = () => {
     }
 
     setIsLoading(true);
-    
+
     try {
       const { data } = await api.post<AuthResponse>("/auth/login", formData);
-      
-      // Guardar todos los datos del usuario
+
       const userData = {
         token: data.token,
         id: data.id,
@@ -86,13 +82,12 @@ const LoginForm = () => {
 
       sessionStorage.setItem("userData", JSON.stringify(userData));
 
-      enqueueSnackbar(data.message || "Inicio de sesión exitoso", { 
+      enqueueSnackbar(data.message || "Inicio de sesión exitoso", {
         variant: "success",
         autoHideDuration: 2000,
       });
 
-      // Redirigir según el rol
-      switch(data.rol?.toUpperCase()) {
+      switch (data.rol?.toUpperCase()) {
         case "ADMIN":
           router.push("/dashboard/admin");
           break;
@@ -105,13 +100,11 @@ const LoginForm = () => {
         default:
           router.push("/dashboard");
       }
-
     } catch (error: unknown) {
       let errorMessage = "Error al iniciar sesión";
 
       if (error instanceof Error) {
-        // Traducir mensajes comunes
-        switch(error.message) {
+        switch (error.message) {
           case "Bad credentials":
             errorMessage = "Usuario o contraseña incorrectos";
             break;
@@ -126,7 +119,7 @@ const LoginForm = () => {
         }
       }
 
-      enqueueSnackbar(errorMessage, { 
+      enqueueSnackbar(errorMessage, {
         variant: "error",
         persist: errorMessage.includes("Error de conexión"),
       });
@@ -184,35 +177,31 @@ const LoginForm = () => {
 
         <Grid container spacing={2}>
           <Grid size={{ xs: 12 }}>
-            <TextField
+            <CustomTextField
               label="Usuario"
-              fullWidth
-              variant="outlined"
               name="username"
               value={formData.username}
-              onChange={handleChange}
+              onValueChange={handleChange("username")}
               disabled={isLoading}
-              helperText={`${formData.username.length} / 30 caracteres`}
-              inputProps={{ maxLength: 30 }}
+              maxLength={30}
+              showCharCount
             />
           </Grid>
           <Grid size={{ xs: 12 }}>
-            <TextField
+            <CustomTextField
               label="Contraseña"
-              type={showPassword ? "text" : "password"}
-              fullWidth
-              variant="outlined"
               name="password"
+              type={showPassword ? "text" : "password"}
               value={formData.password}
-              onChange={handleChange}
+              onValueChange={handleChange("password")}
               disabled={isLoading}
-              helperText={`${formData.password.length} / 20 caracteres`}
-              inputProps={{ maxLength: 20 }}
+              maxLength={20}
+              showCharCount
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton 
-                      onClick={() => setShowPassword(!showPassword)} 
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
                       edge="end"
                       disabled={isLoading}
                     >

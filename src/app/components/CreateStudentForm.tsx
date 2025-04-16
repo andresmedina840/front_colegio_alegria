@@ -1,6 +1,7 @@
+// src/components/CreateStudentForm.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Typography,
@@ -11,8 +12,8 @@ import {
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import api from "../axios/axiosClient";
-import initialFormData from "../estudiantes/initialFormData";
-import useFetchData from "../hooks/useFetchData";
+import { useFormState } from "../hooks/useFormState";
+import { OpcionSelect } from "../types";
 import EnrollmentInfoForm from "./EnrollmentInfoForm";
 import StudentInfoForm from "./StudentInfoForm";
 import HealthAffiliationForm from "./HealthAffiliationForm";
@@ -22,34 +23,26 @@ import DocumentacionRecibida from "./DocumentacionRecibida";
 import ParentForm from "./ParentForm";
 import EmergencyContactForm from "./EmergencyContactForm";
 import CustomAutocomplete from "./personalizados/CustomAutocomplete";
+import { FormDataType, FormField } from "../types/formTypes";
+import initialFormData from "../estudiantes/initialFormData";
 
 const siNo: OpcionSelect[] = [
   { id: "SI", nombre: "SI" },
   { id: "NO", nombre: "NO" },
 ];
 
-// Definir el tipo para opciones select
-type OpcionSelect = {
-  id: string;
-  nombre: string;
-};
-
 const CreateStudentForm = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const {
-    tiposIdentificacion,
-    estratoEconomico,
-    grados,
-    paises,
-    departamentos,
-    ciudades,
-    setDepartamentos,
-    setCiudades,
-  } = useFetchData();
-
-  const [formData, setFormData] = useState(initialFormData);
+  const { formData, updateField, updateFields } = useFormState();
   const [generos, setGeneros] = useState<OpcionSelect[]>([]);
+  const [departamentos, setDepartamentos] = useState<OpcionSelect[]>([]);
+  const [ciudades, setCiudades] = useState<OpcionSelect[]>([]);
+  const [paises, setPaises] = useState<OpcionSelect[]>([]);
+  const [grados, setGrados] = useState<OpcionSelect[]>([]);
+  const [tiposIdentificacion, setTiposIdentificacion] = useState<OpcionSelect[]>([]);
+  const jornadaEscolar = ["Mañana", "Tarde", "Completa"];
 
+  // Cargar géneros
   useEffect(() => {
     const fetchGeneros = async () => {
       try {
@@ -62,18 +55,23 @@ const CreateStudentForm = () => {
     fetchGeneros();
   }, []);
 
-  const cargarDepartamentos = async (paisId: string) => {
+  // Funciones optimizadas con useCallback
+  const cargarDepartamentos = useCallback(async (paisId: string) => {
     if (!paisId) {
       setDepartamentos([]);
       setCiudades([]);
+      updateFields({
+        paisNacimiento: "",
+        departamentoNacimiento: "",
+        municipioNacimiento: "",
+      });
       return;
     }
-    setFormData((prevData) => ({
-      ...prevData,
-      paisNacimiento: paisId,
-      departamentoNacimiento: "",
-      municipioNacimiento: "",
-    }));
+    
+    updateField("paisNacimiento", paisId);
+    updateField("departamentoNacimiento", "");
+    updateField("municipioNacimiento", "");
+
     try {
       const response = await api.get(`/ubicacion/departamentos/${paisId}`);
       setDepartamentos(response.data);
@@ -81,48 +79,34 @@ const CreateStudentForm = () => {
     } catch (error) {
       console.error("Error al cargar departamentos:", error);
     }
-  };
+  }, [updateField, updateFields]);
 
-  const cargarCiudades = async (departamentoId: string) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      departamentoNacimiento: departamentoId,
-      municipioNacimiento: "",
-    }));
+  const cargarCiudades = useCallback(async (departamentoId: string) => {
+    updateField("departamentoNacimiento", departamentoId);
+    updateField("municipioNacimiento", "");
+
     try {
       const response = await api.get(`/ubicacion/ciudades/${departamentoId}`);
       setCiudades(response.data);
     } catch (error) {
       console.error("Error al cargar ciudades:", error);
     }
-  };
+  }, [updateField]);
 
-  const handleChange = (
-    e: React.ChangeEvent<{ name?: string; value: unknown }>
-  ) => {
-    const { name, value } = e.target;
-    if (name) {
-      setFormData((prevData) => ({ ...prevData, [name]: value }));
-    }
-  };
-
-  const handleAutocompleteChange = (fieldName: string) => (
+  const handleAutocompleteChange = useCallback((fieldName: FormField) => (
     _: React.SyntheticEvent,
     value: OpcionSelect | null
   ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [fieldName]: value ? value.id : "",
-    }));
-  };
+    updateField(fieldName, value ? value.id : "");
+  }, [updateField]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     try {
       await api.post("/alumnos", formData);
       enqueueSnackbar("Estudiante registrado con éxito", {
         variant: "success",
       });
-      setFormData(initialFormData);
+      updateFields(initialFormData);
     } catch (error: unknown) {
       if (error instanceof Error) {
         enqueueSnackbar(error.message || "Error al registrar el estudiante", {
@@ -132,160 +116,61 @@ const CreateStudentForm = () => {
         enqueueSnackbar("Error desconocido", { variant: "error" });
       }
     }
-  };
+  }, [formData, enqueueSnackbar, updateFields]);
 
   return (
-    <Box
-      sx={{
-        maxWidth: "100%",
-        margin: "auto",
-        mt: 4,
-        backgroundColor: "white",
-        borderRadius: 2,
-        boxShadow: 3,
-      }}
-    >
-      <Typography
-        variant="h4"
-        align="center"
-        sx={{ fontWeight: "bold", mb: 3 }}
-      >
+    <Box sx={{
+      maxWidth: "100%",
+      margin: "auto",
+      mt: 4,
+      backgroundColor: "white",
+      borderRadius: 2,
+      boxShadow: 3,
+    }}>
+      <Typography variant="h4" align="center" sx={{ fontWeight: "bold", mb: 3 }}>
         Registro de Estudiante
       </Typography>
 
-      <EnrollmentInfoForm formData={formData} handleChange={handleChange} />
+      <EnrollmentInfoForm formData={formData} updateField={updateField} />
 
       <StudentInfoForm
         formData={formData}
-        handleChange={handleChange}
-        grados={grados}
-        jornadaEscolar={["Mañana", "Tarde", "Completa"]}
+        updateField={updateField}
         generos={generos}
-        paises={paises}
         departamentos={departamentos}
         ciudades={ciudades}
         cargarDepartamentos={cargarDepartamentos}
         cargarCiudades={cargarCiudades}
+        grados={grados}
+        jornadaEscolar={jornadaEscolar}
+        paises={paises}
         tiposIdentificacion={tiposIdentificacion}
       />
 
-      <HealthAffiliationForm
+      {/*<HealthAffiliationForm
         formData={formData}
-        handleChange={handleChange}
-        estratoEconomico={estratoEconomico.map((tipo) => tipo.nombre)}
+        updateField={updateField}
       />
 
       <CondicionesEspeciales
         formData={formData}
-        handleChange={handleChange}
-        siNo={siNo.map((item) => item.id)}
+        updateField={updateField}
       />
+
       <SituacionAcademica
         formData={formData}
-        handleChange={handleChange}
-        siNo={siNo}
+        updateField={updateField}
       />
+
       <DocumentacionRecibida
         formData={formData}
-        handleChange={handleChange}
-        siNo={siNo}
+        updateField={updateField}
       />
 
-      <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
-        <CardContent>
-          <Typography
-            variant="h5"
-            align="left"
-            sx={{ fontWeight: "bold", mb: 3 }}
-          >
-            Información Familiar
-          </Typography>
-
-          <ParentForm
-            title="Padre"
-            formData={formData}
-            handleChange={handleChange}
-            tiposIdentificacion={tiposIdentificacion}
-          />
-
-          <Box sx={{ mt: 2 }}>
-            <ParentForm
-              title="Madre"
-              formData={formData}
-              handleChange={handleChange}
-              tiposIdentificacion={tiposIdentificacion}
-            />
-          </Box>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid size={{ xs: 12, md: 12 }}>
-              <CustomAutocomplete
-                label="Autorización para contacto de emergencia"
-                name="autorizacionCoctactoEmergencia"
-                options={siNo}
-                value={
-                  siNo.find(
-                    (option) =>
-                      option.id === formData.autorizacionCoctactoEmergencia
-                  ) || null
-                }
-                onChange={handleAutocompleteChange("autorizacionCoctactoEmergencia")}
-                getOptionLabel={(option) => option.nombre}
-              />
-            </Grid>
-
-            {formData.autorizacionCoctactoEmergencia === "SI" && (
-              <Box sx={{ mt: 2, ml: 2 }}>
-                <EmergencyContactForm
-                  formData={formData}
-                  handleChange={handleChange}
-                />
-              </Box>
-            )}
-
-            <Grid size={{ xs: 12, md: 6 }}>
-              <CustomAutocomplete
-                label="Autorizo para uso de imagen (Fotografía/videos)"
-                name="autorizacionImagen"
-                options={siNo}
-                value={
-                  siNo.find(
-                    (option) => option.id === formData.autorizacionImagen
-                  ) || null
-                }
-                onChange={handleAutocompleteChange("autorizacionImagen")}
-                getOptionLabel={(option) => option.nombre}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12, md: 6 }}>
-              <CustomAutocomplete
-                label="Declaración de veracidad de la información"
-                name="veracidadInformacion"
-                options={siNo}
-                value={
-                  siNo.find(
-                    (option) => option.id === formData.veracidadInformacion
-                  ) || null
-                }
-                onChange={handleAutocompleteChange("veracidadInformacion")}
-                getOptionLabel={(option) => option.nombre}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12, md: 12 }}>
-              <Typography
-                variant="h5"
-                align="justify"
-                sx={{ fontWeight: "bold", mb: 3 }}
-              >
-                Con mi firma y con la de mi padre, madre o acudiente, nos
-                comprometemos a cumplir con lo establecido en el Manual de
-                Convivencia del Colegio Alegria del Norte.
-              </Typography>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+      <ParentForm
+        formData={formData}
+        updateField={updateField}
+      />*/}
 
       <Button
         variant="contained"

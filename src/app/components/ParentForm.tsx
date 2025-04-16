@@ -58,7 +58,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
           />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6}}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             label={`Número Identificación ${title}`}
             name={`numeroIdentificacion${title}`}
@@ -66,17 +66,8 @@ const ParentForm: React.FC<ParentFormProps> = ({
             uppercase
             value={formData[`numeroIdentificacion${title}`] || ""}
             onChange={handleChange}
-            helperText={`${
-              (formData[`numeroIdentificacion${title}`] || "").length
-            } / 12 caracteres`}
-            slotProps={{
-              htmlInput: {
-                maxLength: 12,
-              },
-              inputLabel: {
-                shrink: true,
-              },
-            }}
+            maxLength={12}
+            showCharCount
           />
         </Grid>
 
@@ -89,17 +80,8 @@ const ParentForm: React.FC<ParentFormProps> = ({
             uppercase
             value={formData[`primerNombre${title}`] || ""}
             onChange={handleChange}
-            helperText={`${
-              formData[`primerNombre${title}`]?.length || 0
-            } / 26 caracteres`}
-            slotProps={{
-              htmlInput: {
-                maxLength: 26,
-              },
-              inputLabel: {
-                shrink: true,
-              },
-            }}
+            maxLength={26}
+            showCharCount
           />
         </Grid>
 
@@ -112,17 +94,8 @@ const ParentForm: React.FC<ParentFormProps> = ({
             uppercase
             value={formData[`segundoNombre${title}`] || ""}
             onChange={handleChange}
-            helperText={`${
-              formData[`segundoNombre${title}`]?.length || 0
-            } / 26 caracteres`}
-            slotProps={{
-              htmlInput: {
-                maxLength: 26,
-              },
-              inputLabel: {
-                shrink: true,
-              },
-            }}
+            maxLength={26}
+            showCharCount
           />
         </Grid>
 
@@ -135,17 +108,8 @@ const ParentForm: React.FC<ParentFormProps> = ({
             uppercase
             value={formData[`primerApellido${title}`] || ""}
             onChange={handleChange}
-            helperText={`${
-              formData[`primerApellido${title}`]?.length || 0
-            } / 26 caracteres`}
-            slotProps={{
-              htmlInput: {
-                maxLength: 26,
-              },
-              inputLabel: {
-                shrink: true,
-              },
-            }}
+            maxLength={26}
+            showCharCount
           />
         </Grid>
 
@@ -158,17 +122,8 @@ const ParentForm: React.FC<ParentFormProps> = ({
             uppercase
             value={formData[`segundoApellido${title}`] || ""}
             onChange={handleChange}
-            helperText={`${
-              formData[`segundoApellido${title}`]?.length || 0
-            } / 26 caracteres`}
-            slotProps={{
-              htmlInput: {
-                maxLength: 26,
-              },
-              inputLabel: {
-                shrink: true,
-              },
-            }}
+            maxLength={26}
+            showCharCount
           />
         </Grid>
       </Grid>

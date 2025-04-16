@@ -1,45 +1,46 @@
-// CustomDatePicker.tsx (Versión actualizada)
+// src/app/components/personalizados/CustomDatePicker.tsx
 "use client";
 
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs, { Dayjs } from "dayjs";
 import React from "react";
+import { FormField } from "../../types/formTypes";
 
-type CustomDatePickerProps = {
+interface CustomDatePickerProps {
   label: string;
-  value: string | null;
-  onChange: (value: string | null, name: string) => void; // Modificado para incluir nombre
-  name: string; // Nuevo prop
+  name: FormField;
+  value: string;
+  onChange: (value: string | null, name: FormField) => void;
   maxDate?: string;
-  error?: boolean;
-  helperText?: string;
-};
+  minDate?: string;
+  disabled?: boolean;
+}
 
 const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   label,
+  name,
   value,
   onChange,
-  name,
   maxDate,
-  error,
-  helperText,
+  minDate,
+  disabled = false,
 }) => {
-  const handleDateChange = (date: Dayjs | null) => {
-    const formattedDate = date?.format("YYYY-MM-DD") || null;
-    onChange(formattedDate, name); // Pasamos el nombre del campo
+  const handleChange = (date: Dayjs | null) => {
+    const formattedDate = date?.isValid() ? date.format("YYYY-MM-DD") : null;
+    onChange(formattedDate, name);
   };
 
   return (
     <DatePicker
       label={label}
       value={value ? dayjs(value) : null}
-      onChange={handleDateChange}
+      onChange={handleChange}
       maxDate={maxDate ? dayjs(maxDate) : undefined}
+      minDate={minDate ? dayjs(minDate) : undefined}
+      disabled={disabled}
       slotProps={{
         textField: {
           fullWidth: true,
-          error,
-          helperText,
           InputLabelProps: { shrink: true },
         },
       }}

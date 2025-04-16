@@ -26,8 +26,8 @@ const EmergencyContactForm: React.FC<EmergencyContactFormProps> = ({
             name="primerNombreEmergencia"
             value={formData.primerNombreEmergencia || ""}
             onChange={handleChange}
-            helperText={`${(formData.primerNombreEmergencia || "").length} / 26 caracteres`}
-            inputProps={{ maxLength: 26 }}
+            maxLength={26}
+            showCharCount
           />
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
@@ -37,8 +37,8 @@ const EmergencyContactForm: React.FC<EmergencyContactFormProps> = ({
             name="segundoNombreEmergencia"
             value={formData.segundoNombreEmergencia || ""}
             onChange={handleChange}
-            helperText={`${(formData.segundoNombreEmergencia || "").length} / 26 caracteres`}
-            inputProps={{ maxLength: 26 }}
+            maxLength={26}
+            showCharCount
           />
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
@@ -48,8 +48,8 @@ const EmergencyContactForm: React.FC<EmergencyContactFormProps> = ({
             name="primerApellidoEmergencia"
             value={formData.primerApellidoEmergencia || ""}
             onChange={handleChange}
-            helperText={`${(formData.primerApellidoEmergencia || "").length} / 26 caracteres`}
-            inputProps={{ maxLength: 26 }}
+            maxLength={26}
+            showCharCount
           />
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
@@ -59,8 +59,8 @@ const EmergencyContactForm: React.FC<EmergencyContactFormProps> = ({
             name="segundoApellidoEmergencia"
             value={formData.segundoApellidoEmergencia || ""}
             onChange={handleChange}
-            helperText={`${(formData.segundoApellidoEmergencia || "").length} / 26 caracteres`}
-            inputProps={{ maxLength: 26 }}
+            maxLength={26}
+            showCharCount
           />
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
@@ -69,8 +69,8 @@ const EmergencyContactForm: React.FC<EmergencyContactFormProps> = ({
             label="Teléfono"
             name="telefonoEmergencia"
             value={formData.telefonoEmergencia || ""}
-            onChange={handleChange}
-            inputProps={{ maxLength: 15 }}
+            maxLength={10}
+            showCharCount
           />
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
@@ -79,8 +79,8 @@ const EmergencyContactForm: React.FC<EmergencyContactFormProps> = ({
             label="Parentesco"
             name="parentescoEmergencia"
             value={formData.parentescoEmergencia || ""}
-            onChange={handleChange}
-            inputProps={{ maxLength: 30 }}
+            maxLength={26}
+            showCharCount
           />
         </Grid>
       </Grid>

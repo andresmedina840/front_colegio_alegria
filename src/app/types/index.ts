@@ -1,3 +1,4 @@
+// src/app/types/index.ts
 export type UserRole = "ADMIN" | "PROFESOR" | "PADRE";
 
 export interface GradoAcademico {
@@ -41,4 +42,9 @@ export interface MenuItem {
   route: string;
   roles: string[];
   icon: string;
+}
+
+export interface OpcionSelect {
+  id: string;
+  nombre: string;
 }

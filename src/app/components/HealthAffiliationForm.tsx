@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  Grid,
-  Typography,
-} from "@mui/material";
+import { Card, CardContent, Grid, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import CustomTextField from "./personalizados/CustomTextField";
 import CustomAutocomplete from "./personalizados/CustomAutocomplete";
@@ -30,7 +25,7 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
   const [estratosOptions, setEstratosOptions] = useState<OptionType[]>(() => {
     return estratoEconomico.map((estrato) => ({
       id: estrato,
-      nombre: estrato
+      nombre: estrato,
     }));
   });
 
@@ -38,7 +33,7 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
     setEstratosOptions(
       estratoEconomico.map((estrato) => ({
         id: estrato,
-        nombre: estrato
+        nombre: estrato,
       }))
     );
   }, [estratoEconomico]);
@@ -54,9 +49,9 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
 
   const handleEstratoChange = (_: unknown, newValue: OptionType | null) => {
     handleChange({
-      target: { 
-        name: "estrato", 
-        value: newValue?.nombre || "" 
+      target: {
+        name: "estrato",
+        value: newValue?.nombre || "",
       },
     } as React.ChangeEvent<{ name?: string; value: unknown }>);
   };
@@ -68,20 +63,24 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
   return (
     <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
       <CardContent>
-        <Typography variant="h5" align="left" sx={{ fontWeight: "bold", mb: 3 }}>
+        <Typography
+          variant="h5"
+          align="left"
+          sx={{ fontWeight: "bold", mb: 3 }}
+        >
           Afiliación al sistema de salud
         </Typography>
         <Grid container spacing={2}>
           {formFields.map((field) => (
             <Grid size={{ xs: 12, md: 4 }} key={field.name}>
               <CustomTextField
+                uppercase
                 label={field.label}
                 name={field.name}
                 value={formData[field.name] || ""}
                 onChange={handleChange}
-                helperText={`${(formData[field.name] || "").length} / ${field.maxLength} caracteres`}
-                inputProps={{ maxLength: field.maxLength }}
-                uppercase
+                maxLength={30}
+                showCharCount
               />
             </Grid>
           ))}
