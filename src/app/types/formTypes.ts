@@ -52,6 +52,33 @@ export interface FormDataType {
   documentacionRecibidaPagoSalvo: string;
   documentacionRecibidaRegistroVacunacion: string;
   documentacionRecibidaExamenSerologia: string;
+  discapacidad: string;
+  capacidadesExceptionalesNoAplica: string;
+  primerNombreEmergencia: string;
+  segundoNombreEmergencia: string;
+  primerApellidoEmergencia: string;
+  segundoApellidoEmergencia: string;
+  telefonoEmergencia: string;
+  parentescoEmergencia: string;
+
+  // Discapacidades
+  noAplica: string;
+  sorderaProfunda: string;
+  hipoacusiaBajaVision: string;
+  bajaVisionDiagnosticada: string;
+  paralisisCerebral: string;
+  autismo: string;
+  deficienciaCognitiva: string;
+  sindromeDown: string;
+  multiple: string;
+
+  // Capacidades excepcionales
+  capacidad_excepcional: string;
+  superdotado: string;
+  talentoCientifico: string;
+  talentoTecnologico: string;
+  talentoSubjetivo: string;
+  noAplicaCapacidad: string;
 }
 
 export type FormField = keyof FormDataType;

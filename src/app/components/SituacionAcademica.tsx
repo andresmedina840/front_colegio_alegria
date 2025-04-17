@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import CustomAutocomplete from "./personalizados/CustomAutocomplete";
+import { FormDataType } from "../types/formTypes";
 
 type OptionType = {
   id: string;
@@ -15,7 +16,7 @@ type OptionType = {
 };
 
 type SituacionAcademicaProps = {
-  formData: Record<string, string>;
+  formData: FormDataType;
   handleChange: (
     e: React.ChangeEvent<{ name?: string; value: unknown }>
   ) => void;
@@ -42,7 +43,7 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
   };
 
   const getCurrentValue = (fieldName: string) => {
-    return siNo.find(option => option.id === formData[fieldName]) || null;
+    return siNo.find(option => option.id === formData[fieldName as keyof FormDataType]) || null;
   };
 
   return (

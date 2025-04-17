@@ -88,7 +88,9 @@ const CreateUserForm = () => {
   const [paises, setPaises] = useState<OpcionSelect[]>([]);
   const [departamentos, setDepartamentos] = useState<OpcionSelect[]>([]);
   const [ciudades, setCiudades] = useState<OpcionSelect[]>([]);
-  const [tiposIdentificacion, setTiposIdentificacion] = useState<OpcionSelect[]>([]);
+  const [tiposIdentificacion, setTiposIdentificacion] = useState<
+    OpcionSelect[]
+  >([]);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [edadCalculada, setEdadCalculada] = useState<string>("");
@@ -107,9 +109,12 @@ const CreateUserForm = () => {
       setTiposIdentificacion(tiposRes.data);
     } catch (error) {
       const err = error as ApiError;
-      enqueueSnackbar(err.response?.data?.message || "Error cargando datos iniciales", { 
-        variant: "error" 
-      });
+      enqueueSnackbar(
+        err.response?.data?.message || "Error cargando datos iniciales",
+        {
+          variant: "error",
+        }
+      );
     }
   }, [enqueueSnackbar]);
 
@@ -120,12 +125,15 @@ const CreateUserForm = () => {
         `/ubicacion/departamentos/${formData.pais.id}`
       );
       setDepartamentos(response.data);
-      setFormData(prev => ({ ...prev, departamento: null, ciudad: null }));
+      setFormData((prev) => ({ ...prev, departamento: null, ciudad: null }));
     } catch (error) {
       const err = error as ApiError;
-      enqueueSnackbar(err.response?.data?.message || "Error cargando departamentos", { 
-        variant: "error" 
-      });
+      enqueueSnackbar(
+        err.response?.data?.message || "Error cargando departamentos",
+        {
+          variant: "error",
+        }
+      );
     }
   }, [formData.pais?.id, enqueueSnackbar]);
 
@@ -136,12 +144,15 @@ const CreateUserForm = () => {
         `/ubicacion/ciudades/${formData.departamento.id}`
       );
       setCiudades(response.data);
-      setFormData(prev => ({ ...prev, ciudad: null }));
+      setFormData((prev) => ({ ...prev, ciudad: null }));
     } catch (error) {
       const err = error as ApiError;
-      enqueueSnackbar(err.response?.data?.message || "Error cargando ciudades", { 
-        variant: "error" 
-      });
+      enqueueSnackbar(
+        err.response?.data?.message || "Error cargando ciudades",
+        {
+          variant: "error",
+        }
+      );
     }
   }, [formData.departamento?.id, enqueueSnackbar]);
 
@@ -181,7 +192,7 @@ const CreateUserForm = () => {
   }, [calculateAge]);
 
   const handleChange = (name: keyof FormValues, value: unknown) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
       ...(name === "pais" && { departamento: null, ciudad: null }),
@@ -205,10 +216,9 @@ const CreateUserForm = () => {
       router.push("/login");
     } catch (error) {
       const err = error as ApiError;
-      enqueueSnackbar(
-        err.response?.data?.message || "Error creando usuario",
-        { variant: "error" }
-      );
+      enqueueSnackbar(err.response?.data?.message || "Error creando usuario", {
+        variant: "error",
+      });
     }
   };
 
@@ -254,43 +264,52 @@ const CreateUserForm = () => {
               const newValue = e.target.value.slice(0, 15);
               handleChange("numeroIdentificacion", newValue);
             }}
-            helperText={`${formData.numeroIdentificacion.length} / 15 caracteres`}
-            slotProps={{
-              htmlInput: {
-                maxLength: 15,
-              },
-            }}
+            maxLength={15}
+            showCharCount
             required
           />
         </Grid>
 
         {[
-          { name: "primerNombreEstudiante", label: "Primer Nombre Estudiante", required: true },
-          { name: "segundoNombreEstudiante", label: "Segundo Nombre Estudiante" },
-          { name: "primerApellidoEstudiante", label: "Primer Apellido Estudiante", required: true },
-          { name: "segundoApellidoEstudiante", label: "Segundo Apellido Estudiante" },
-        ].map((field) => (
-          <Grid size={{ xs: 12, md: 3 }} key={field.name}>
-            <CustomTextField
-              label={field.label}
-              value={formData[field.name as keyof FormValues]}
-              onChange={(e) => {
-                const newValue = e.target.value.slice(0, 20);
-                handleChange(field.name as keyof FormValues, newValue);
-              }}
-              helperText={`${
-                (formData[field.name as keyof FormValues] as string).length
-              } / 20 caracteres`}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 20,
-                },
-              }}
-              required={field.required}
-              uppercase
-            />
-          </Grid>
-        ))}
+          {
+            name: "primerNombreEstudiante",
+            label: "Primer Nombre Estudiante",
+            required: true,
+          },
+          {
+            name: "segundoNombreEstudiante",
+            label: "Segundo Nombre Estudiante",
+          },
+          {
+            name: "primerApellidoEstudiante",
+            label: "Primer Apellido Estudiante",
+            required: true,
+          },
+          {
+            name: "segundoApellidoEstudiante",
+            label: "Segundo Apellido Estudiante",
+          },
+        ].map((field) => {
+          const value = formData[field.name as keyof FormValues];
+          const safeValue = typeof value === "string" ? value : "";
+
+          return (
+            <Grid size={{ xs: 12, md: 3 }} key={field.name}>
+              <CustomTextField
+                label={field.label}
+                value={safeValue}
+                onChange={(e) => {
+                  const newValue = e.target.value.slice(0, 20);
+                  handleChange(field.name as keyof FormValues, newValue);
+                }}
+                maxLength={20}
+                showCharCount
+                required={field.required}
+                uppercase
+              />
+            </Grid>
+          );
+        })}
 
         <Grid size={{ xs: 12, md: 3 }}>
           <CustomTextField
@@ -310,14 +329,13 @@ const CreateUserForm = () => {
               input: {
                 readOnly: true,
                 style: {
-                  color: "#666",
+                  color: "#888",
                   fontStyle: "italic",
                   cursor: "not-allowed",
                 },
               },
             }}
             sx={{
-              mt: 0,
               "& .MuiInputBase-root": {
                 backgroundColor: "#f5f5f5",
               },
@@ -371,12 +389,8 @@ const CreateUserForm = () => {
               const newValue = e.target.value.slice(0, 50);
               handleChange("direccionCompleta", newValue);
             }}
-            helperText={`${formData.direccionCompleta.length} / 50 caracteres`}
-            slotProps={{
-              htmlInput: {
-                maxLength: 50,
-              },
-            }}
+            maxLength={50}
+            showCharCount
             required
             uppercase
           />
@@ -390,12 +404,8 @@ const CreateUserForm = () => {
               const newValue = e.target.value.slice(0, 50);
               handleChange("email", newValue);
             }}
-            helperText={`${formData.email.length} / 50 caracteres`}
-            slotProps={{
-              htmlInput: {
-                maxLength: 50,
-              },
-            }}
+            maxLength={50}
+            showCharCount
             required
           />
         </Grid>
@@ -408,12 +418,8 @@ const CreateUserForm = () => {
               const newValue = e.target.value.slice(0, 30);
               handleChange("usuarioTelegram", newValue);
             }}
-            helperText={`${formData.usuarioTelegram.length} / 30 caracteres`}
-            slotProps={{
-              htmlInput: {
-                maxLength: 30,
-              },
-            }}
+            maxLength={30}
+            showCharCount
             required
           />
         </Grid>
@@ -426,12 +432,8 @@ const CreateUserForm = () => {
               const newValue = e.target.value.slice(0, 25);
               handleChange("username", newValue);
             }}
-            helperText={`${formData.username.length} / 25 caracteres`}
-            slotProps={{
-              htmlInput: {
-                maxLength: 25,
-              },
-            }}
+            maxLength={25}
+            showCharCount
             required
           />
         </Grid>

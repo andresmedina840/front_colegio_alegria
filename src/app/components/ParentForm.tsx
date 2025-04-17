@@ -4,6 +4,7 @@ import { Grid, Typography } from "@mui/material";
 import React from "react";
 import CustomTextField from "../components/personalizados/CustomTextField";
 import CustomAutocomplete from "../components/personalizados/CustomAutocomplete";
+import { FormDataType } from "../types/formTypes";
 
 type OpcionSelect = {
   id: string | number;
@@ -11,30 +12,26 @@ type OpcionSelect = {
 };
 
 type ParentFormProps = {
-  title: string;
-  formData: Record<string, string>;
-  handleChange: (
-    e: React.ChangeEvent<{ name?: string; value: unknown }>
-  ) => void;
+  title: "Padre" | "Madre";
+  formData: FormDataType;
+  updateField: (field: keyof FormDataType, value: string) => void;
   tiposIdentificacion: OpcionSelect[];
 };
 
 const ParentForm: React.FC<ParentFormProps> = ({
   title,
   formData,
-  handleChange,
+  updateField,
   tiposIdentificacion,
 }) => {
-  const handleAutocompleteChange =
-    (fieldName: string) =>
-    (_: React.SyntheticEvent, value: OpcionSelect | null) => {
-      handleChange({
-        target: {
-          name: fieldName,
-          value: value?.id || "",
-        },
-      } as React.ChangeEvent<HTMLInputElement>);
-    };
+  const field = (key: string) => `${key}${title}` as keyof FormDataType;
+
+  const handleAutocompleteChange = (fieldName: keyof FormDataType) => (
+    _: React.SyntheticEvent,
+    value: OpcionSelect | null
+  ) => {
+    updateField(fieldName, value?.id.toString() || "");
+  };
 
   return (
     <>
@@ -45,15 +42,15 @@ const ParentForm: React.FC<ParentFormProps> = ({
         <Grid size={{ xs: 12, md: 6 }}>
           <CustomAutocomplete
             label={`Tipo Identificación ${title}`}
-            name={`tipoIdentificacion${title}Id`}
+            name={field("tipoIdentificacion")}
             options={tiposIdentificacion}
             required
             value={
               tiposIdentificacion.find(
-                (tipo) => tipo.id === formData[`tipoIdentificacion${title}Id`]
+                (tipo) => tipo.id === formData[field("tipoIdentificacion")]
               ) || null
             }
-            onChange={handleAutocompleteChange(`tipoIdentificacion${title}Id`)}
+            onChange={handleAutocompleteChange(field("tipoIdentificacion"))}
             getOptionLabel={(option: OpcionSelect) => option.nombre}
           />
         </Grid>
@@ -61,11 +58,16 @@ const ParentForm: React.FC<ParentFormProps> = ({
         <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField
             label={`Número Identificación ${title}`}
-            name={`numeroIdentificacion${title}`}
+            name={field("numeroIdentificacion")}
             required
             uppercase
-            value={formData[`numeroIdentificacion${title}`] || ""}
-            onChange={handleChange}
+            value={formData[field("numeroIdentificacion")]}
+            onChange={(e) =>
+              updateField(
+                field("numeroIdentificacion"),
+                e.target.value
+              )
+            }
             maxLength={12}
             showCharCount
           />
@@ -75,11 +77,13 @@ const ParentForm: React.FC<ParentFormProps> = ({
           <CustomTextField
             fullWidth
             label={`Primer Nombre ${title}`}
-            name={`primerNombre${title}`}
+            name={field("primerNombre")}
             variant="outlined"
             uppercase
-            value={formData[`primerNombre${title}`] || ""}
-            onChange={handleChange}
+            value={formData[field("primerNombre")]}
+            onChange={(e) =>
+              updateField(field("primerNombre"), e.target.value)
+            }
             maxLength={26}
             showCharCount
           />
@@ -89,11 +93,13 @@ const ParentForm: React.FC<ParentFormProps> = ({
           <CustomTextField
             fullWidth
             label={`Segundo Nombre ${title}`}
-            name={`segundoNombre${title}`}
+            name={field("segundoNombre")}
             variant="outlined"
             uppercase
-            value={formData[`segundoNombre${title}`] || ""}
-            onChange={handleChange}
+            value={formData[field("segundoNombre")]}
+            onChange={(e) =>
+              updateField(field("segundoNombre"), e.target.value)
+            }
             maxLength={26}
             showCharCount
           />
@@ -103,11 +109,13 @@ const ParentForm: React.FC<ParentFormProps> = ({
           <CustomTextField
             fullWidth
             label={`Primer Apellido ${title}`}
-            name={`primerApellido${title}`}
+            name={field("primerApellido")}
             variant="outlined"
             uppercase
-            value={formData[`primerApellido${title}`] || ""}
-            onChange={handleChange}
+            value={formData[field("primerApellido")]}
+            onChange={(e) =>
+              updateField(field("primerApellido"), e.target.value)
+            }
             maxLength={26}
             showCharCount
           />
@@ -117,11 +125,13 @@ const ParentForm: React.FC<ParentFormProps> = ({
           <CustomTextField
             fullWidth
             label={`Segundo Apellido ${title}`}
-            name={`segundoApellido${title}`}
+            name={field("segundoApellido")}
             variant="outlined"
             uppercase
-            value={formData[`segundoApellido${title}`] || ""}
-            onChange={handleChange}
+            value={formData[field("segundoApellido")]}
+            onChange={(e) =>
+              updateField(field("segundoApellido"), e.target.value)
+            }
             maxLength={26}
             showCharCount
           />

@@ -47,4 +47,5 @@ export interface MenuItem {
 export interface OpcionSelect {
   id: string;
   nombre: string;
+  [key: string]: unknown;
 }

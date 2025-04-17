@@ -338,7 +338,7 @@ const PaginaBoletin = () => {
                   <TableCell sx={{ textAlign: "center" }}>
                     <CustomTextField
                       type="number"
-                      value={materia.intensidadHoraria}
+                      value={materia.intensidadHoraria.toString()}
                       onChange={(e) =>
                         handleChangeMateria(
                           index,
@@ -363,7 +363,7 @@ const PaginaBoletin = () => {
                   <TableCell sx={{ textAlign: "center" }}>
                     <CustomTextField
                       type="number"
-                      value={materia.fallas}
+                      value={materia.fallas.toString()}
                       onChange={(e) =>
                         handleChangeMateria(
                           index,
@@ -388,7 +388,7 @@ const PaginaBoletin = () => {
                   <TableCell sx={{ textAlign: "center" }}>
                     <CustomTextField
                       type="number"
-                      value={materia.valoracion}
+                      value={materia.valoracion.toString()}
                       onChange={(e) => {
                         const value = Math.min(
                           5,

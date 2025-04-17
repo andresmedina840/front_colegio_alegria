@@ -1,4 +1,3 @@
-// src/app/components/EnrollmentInfoForm.tsx
 "use client";
 
 import { Card, CardContent, Grid } from "@mui/material";
@@ -14,72 +13,80 @@ type EnrollmentInfoFormProps = {
   updateField: (field: FormField, value: string) => void;
 };
 
-const EnrollmentInfoForm: React.FC<EnrollmentInfoFormProps> = React.memo(
-  ({ formData, updateField }) => {
-    const [maxDate, setMaxDate] = useState("");
-    const [isMounted, setIsMounted] = useState(false);
+// ✅ Separar la definición del componente
+const EnrollmentInfoFormComponent: React.FC<EnrollmentInfoFormProps> = ({
+  formData,
+  updateField,
+}) => {
+  const [maxDate, setMaxDate] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
 
-    useEffect(() => {
-      setMaxDate(getCurrentDateISO());
-      setIsMounted(true);
-    }, []);
+  useEffect(() => {
+    setMaxDate(getCurrentDateISO());
+    setIsMounted(true);
+  }, []);
 
-    const handleDateChange = (newValue: dayjs.Dayjs | null) => {
-      updateField(
-        "fechaMatricula",
-        newValue ? formatDateToISO(newValue.toDate()) : ""
-      );
-    };
+  const handleDateChange = (newValue: dayjs.Dayjs | null) => {
+    updateField(
+      "fechaMatricula",
+      newValue ? formatDateToISO(newValue.toDate()) : ""
+    );
+  };
 
-    const formattedDateValue =
-      formData.fechaMatricula && dayjs(formData.fechaMatricula).isValid()
-        ? dayjs(formData.fechaMatricula)
-        : null;
+  const formattedDateValue =
+    formData.fechaMatricula && dayjs(formData.fechaMatricula).isValid()
+      ? dayjs(formData.fechaMatricula)
+      : null;
 
-    return (
-      <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
-        <CardContent>
-          <Grid container spacing={2}>
+  return (
+    <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
+      <CardContent>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, sm: 2, md: 6 }}>
+            <CustomTextField
+              name={"numeroMatricula" as FormField}
+              value={formData.numeroMatricula}
+              updateField={updateField}
+              label="No. Matrícula"
+              uppercase
+              maxLength={26}
+              showCharCount
+            />
+          </Grid>
+
+          {isMounted && (
             <Grid size={{ xs: 12, sm: 2, md: 6 }}>
-              <CustomTextField
-                label="No. Matrícula"
-                name="numeroMatricula"
-                value={formData.numeroMatricula}
-                updateField={updateField}
-                uppercase
-                maxLength={26}
-                showCharCount
+              <DatePicker
+                label="Fecha de matrícula"
+                value={formattedDateValue}
+                onChange={handleDateChange}
+                maxDate={dayjs(maxDate)}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    InputLabelProps: { shrink: true },
+                    inputProps: {
+                      suppressHydrationWarning: true,
+                      spellCheck: false,
+                      "data-ms-editor": "false",
+                    },
+                  },
+                }}
+                format="DD/MM/YYYY"
+                timezone="UTC"
               />
             </Grid>
+          )}
+        </Grid>
+      </CardContent>
+    </Card>
+  );
+};
 
-            {isMounted && (
-              <Grid size={{ xs: 12, sm: 2, md: 6 }}>
-                <DatePicker
-                  label="Fecha de matrícula"
-                  value={formattedDateValue}
-                  onChange={handleDateChange}
-                  maxDate={dayjs(maxDate)}
-                  slotProps={{
-                    textField: {
-                      fullWidth: true,
-                      InputLabelProps: { shrink: true },
-                      inputProps: {
-                        suppressHydrationWarning: true,
-                        spellCheck: false,
-                        "data-ms-editor": "false",
-                      },
-                    },
-                  }}
-                  format="DD/MM/YYYY"
-                  timezone="UTC"
-                />
-              </Grid>
-            )}
-          </Grid>
-        </CardContent>
-      </Card>
-    );
-  }
-);
+// ✅ Asignar displayName explícito
+EnrollmentInfoFormComponent.displayName = "EnrollmentInfoForm";
+
+// ✅ Aplicar memo y exportar
+const EnrollmentInfoForm = React.memo(EnrollmentInfoFormComponent);
 
 export default EnrollmentInfoForm;

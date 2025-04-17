@@ -8,47 +8,47 @@ import {
 } from "@mui/material";
 import React from "react";
 import CustomAutocomplete from "./personalizados/CustomAutocomplete";
+import { FormDataType } from "../types/formTypes";
 
 type OptionType = {
   id: string;
   nombre: string;
 };
 
-type DocumentacionRecibidaProps = {
-  formData: Record<string, string>;
-  handleChange: (
-    e: React.ChangeEvent<{ name?: string; value: unknown }>
-  ) => void;
+interface DocumentacionRecibidaProps {
+  formData: FormDataType;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   siNo: OptionType[];
-};
+}
+
+// Campos estrictamente definidos como claves válidas de FormDataType
+const documentFields: (keyof FormDataType)[] = [
+  "documentacionRecibidaRegistroCivil",
+  "documentacionRecibidaCertificadosEstudios",
+  "documentacionRecibidaCertificadoVinculado",
+  "documentacionRecibidaSistemaSocial",
+  "documentacionRecibidaFotos",
+  "documentacionRecibidaEntidadAseguradora",
+  "documentacionRecibidaSeguroEstudiantil",
+  "documentacionRecibidaCertificadoEstratoSocioeconomico",
+  "documentacionRecibidaPagoSalvo",
+  "documentacionRecibidaRegistroVacunacion",
+  "documentacionRecibidaExamenSerologia",
+];
 
 const DocumentacionRecibida: React.FC<DocumentacionRecibidaProps> = ({
   formData,
   handleChange,
   siNo,
 }) => {
-  const documentFields = [
-    "RegistroCivil",
-    "CertificadosEstudios",
-    "CertificadoVinculado",
-    "SistemaSocial",
-    "Fotos",
-    "EntidadAseguradora",
-    "SeguroEstudiantil",
-    "CertificadoEstratoSocioeconomico",
-    "PagoSalvo",
-    "RegistroVacunacion",
-    "ExamenSerologia",
-  ];
-
-  const handleAutocompleteChange = (fieldName: string) => (
+  const handleAutocompleteChange = (fieldName: keyof FormDataType) => (
     _: React.SyntheticEvent,
     value: OptionType | null
   ) => {
     handleChange({
-      target: { 
-        name: fieldName, 
-        value: value ? value.id : "" 
+      target: {
+        name: fieldName,
+        value: value ? value.id : "",
       },
     } as React.ChangeEvent<HTMLInputElement>);
   };
@@ -60,17 +60,17 @@ const DocumentacionRecibida: React.FC<DocumentacionRecibidaProps> = ({
           Documentación Recibida
         </Typography>
         <Grid container spacing={2}>
-          {documentFields.map((doc) => {
-            const fieldName = `documentacionRecibida${doc}`;
+          {documentFields.map((fieldName) => {
+            const label = fieldName.replace("documentacionRecibida", "").replace(/([A-Z])/g, " $1").trim();
             const selectedOption = siNo.find(
               option => option.id === formData[fieldName]
             ) || null;
 
             return (
-              <Grid size={{ xs: 12, md: 3 }} key={doc}>
+              <Grid key={fieldName} size={{ xs: 12, md: 3 }}>
                 <CustomAutocomplete
                   name={fieldName}
-                  label={doc.replace(/([A-Z])/g, " $1").trim()}
+                  label={label}
                   options={siNo}
                   value={selectedOption}
                   onChange={handleAutocompleteChange(fieldName)}

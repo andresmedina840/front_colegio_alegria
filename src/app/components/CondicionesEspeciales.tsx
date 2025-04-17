@@ -1,10 +1,13 @@
 import { Card, CardContent, Typography } from "@mui/material";
-import Discapacidades from "./Discapacidades";
+import Discapacidades from "../components/Discapacidades";
 import CapacidadesExcepcionales from "./CapacidadesExcepcionales";
+import { FormDataType } from "../types/formTypes";
 
 interface CondicionesEspecialesProps {
-  formData: Record<string, string>;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  formData: FormDataType;
+  handleChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void;
   siNo: string[];
 }
 
@@ -13,15 +16,40 @@ const CondicionesEspeciales: React.FC<CondicionesEspecialesProps> = ({
   handleChange,
   siNo,
 }) => {
+  const handleAutocompleteChange = (name: string, value: string) => {
+    handleChange({
+      target: {
+        name,
+        value,
+      },
+    } as React.ChangeEvent<HTMLInputElement>);
+  };
+
   return (
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
       <CardContent>
-        <Typography variant="h6" align="left" sx={{ fontWeight: "bold", mb: 3 }}>
+        <Typography
+          variant="h6"
+          align="left"
+          sx={{ fontWeight: "bold", mb: 3 }}
+        >
           Condiciones Especiales del Estudiante
         </Typography>
 
-        <Discapacidades formData={formData} handleChange={handleChange} siNo={siNo} />
-        <CapacidadesExcepcionales formData={formData} handleChange={handleChange} siNo={siNo} />
+        <Discapacidades
+          formData={formData}
+          handleAutocompleteChange={(name, value) =>
+            handleChange({
+              target: { name, value },
+            } as React.ChangeEvent<HTMLInputElement>)
+          }
+          siNo={siNo}
+        />
+        <CapacidadesExcepcionales
+          formData={formData}
+          handleAutocompleteChange={handleAutocompleteChange}
+          siNo={siNo}
+        />
       </CardContent>
     </Card>
   );

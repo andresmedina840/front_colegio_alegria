@@ -1,82 +1,129 @@
-// src/app/components/personalizados/CustomTextField.tsx
-'use client';
+"use client";
 
 import { TextField, TextFieldProps } from "@mui/material";
 import React, { memo, useCallback } from "react";
-import { FormField } from "../../types/formTypes";
 
-interface CustomTextFieldProps extends Omit<TextFieldProps, 'onChange' | 'slotProps'> {
+export interface CustomTextFieldProps<TField extends string = string>
+  extends Omit<TextFieldProps, "onChange"> {
+  /**
+   * Convierte el valor del input a mayúsculas automáticamente.
+   */
   uppercase?: boolean;
+
+  /**
+   * Muestra contador de caracteres si `maxLength` está definido.
+   */
   showCharCount?: boolean;
+
+  /**
+   * Limita el número máximo de caracteres.
+   */
   maxLength?: number;
-  updateField?: (field: FormField, value: string) => void;
-  name?: FormField;
+
+  /**
+   * Método opcional para actualizar el campo desde el componente padre.
+   */
+  updateField?: (field: TField, value: string) => void;
+
+  /**
+   * Alternativa a `updateField`, útil si no se necesita `name`.
+   */
+  onValueChange?: (value: string) => void;
+
+  /**
+   * Nombre del campo (clave del objeto de estado en el padre).
+   */
+  name?: TField;
+
+  /**
+   * Valor del input.
+   */
   value?: string;
+
+  /**
+   * Manejador de cambio (puede ser usado junto con `updateField`).
+   */
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const CustomTextField = memo(function CustomTextField({
+function CustomTextFieldComponent<TField extends string = string>({
   uppercase = false,
   showCharCount = false,
   maxLength,
   updateField,
+  onValueChange,
   name,
   value,
   onChange,
   helperText,
+  slotProps: externalSlotProps = {},
   ...props
-}: CustomTextFieldProps) {
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    let newValue = e.target.value;
+}: CustomTextFieldProps<TField>) {
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      let newValue = e.target.value;
 
-    if (maxLength && newValue.length > maxLength) {
-      newValue = newValue.slice(0, maxLength);
-    }
+      if (maxLength && newValue.length > maxLength) {
+        newValue = newValue.slice(0, maxLength);
+      }
 
-    if (uppercase) newValue = newValue.toUpperCase();
+      if (uppercase) {
+        newValue = newValue.toUpperCase();
+      }
 
-    if (onChange) {
-      onChange({
-        ...e,
-        target: { ...e.target, value: newValue },
-      } as React.ChangeEvent<HTMLInputElement>);
-    }
+      if (onChange) {
+        onChange({
+          ...e,
+          target: { ...e.target, value: newValue },
+        } as React.ChangeEvent<HTMLInputElement>);
+      }
 
-    if (name && updateField) {
-      updateField(name, newValue);
-    }
-  }, [maxLength, uppercase, onChange, name, updateField]);
+      if (onValueChange) {
+        onValueChange(newValue);
+      }
 
-  const charCountText = showCharCount && maxLength
-    ? `${String(value).length} / ${maxLength} caracteres`
-    : helperText;
+      if (name && updateField) {
+        updateField(name, newValue);
+      }
+    },
+    [maxLength, uppercase, onChange, onValueChange, name, updateField]
+  );
 
-  // Configuración de slotProps con tipado correcto
-  const slotProps: TextFieldProps['slotProps'] = {
+  const charCountText =
+    showCharCount && maxLength
+      ? `${String(value ?? "").length} / ${maxLength} caracteres`
+      : helperText;
+
+  const mergedSlotProps: TextFieldProps["slotProps"] = {
+    ...externalSlotProps,
     inputLabel: {
       shrink: true,
-      style: { pointerEvents: 'auto' } as React.CSSProperties
+      style: { pointerEvents: "auto" },
+      ...externalSlotProps?.inputLabel,
     },
     htmlInput: {
       maxLength,
       spellCheck: false,
       "data-ms-editor": "false",
       style: uppercase ? { textTransform: "uppercase" } : {},
-    }
+      ...externalSlotProps?.htmlInput,
+    },
   };
 
   return (
     <TextField
       {...props}
       name={name}
-      value={value || ""}
+      value={value ?? ""}
       onChange={handleChange}
       variant="outlined"
       fullWidth
       helperText={charCountText}
-      slotProps={slotProps}
+      slotProps={mergedSlotProps}
     />
   );
-});
+}
+
+const CustomTextField = memo(CustomTextFieldComponent) as typeof CustomTextFieldComponent;
 
 export default CustomTextField;

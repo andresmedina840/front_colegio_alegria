@@ -39,8 +39,47 @@ const CreateStudentForm = () => {
   const [ciudades, setCiudades] = useState<OpcionSelect[]>([]);
   const [paises, setPaises] = useState<OpcionSelect[]>([]);
   const [grados, setGrados] = useState<OpcionSelect[]>([]);
-  const [tiposIdentificacion, setTiposIdentificacion] = useState<OpcionSelect[]>([]);
+
+  const [tiposIdentificacion, setTiposIdentificacion] = useState<
+    OpcionSelect[]
+  >([]);
+  const [estratosEconomico, setEstratosEconomico] = useState<OpcionSelect[]>(
+    []
+  );
   const jornadaEscolar = ["Mañana", "Tarde", "Completa"];
+
+  // Cargar tipos de identificación
+  useEffect(() => {
+    const fetchTiposIdentificacion = async () => {
+      try {
+        const response = await api.get(
+          "/tipo-identificacion/tiposDeIdentificacion"
+        );
+        setTiposIdentificacion(response.data);
+      } catch (error) {
+        console.error("Error al obtener tipos de identificación:", error);
+      }
+    };
+    fetchTiposIdentificacion();
+  }, []);
+
+  // Cargar estratos economicos
+  useEffect(() => {
+    const fetchEstratosEconomicos = async () => {
+      try {
+        const response = await api.get(
+          "/estratoEconomico/listaEstratoEconomico"
+        );
+        setEstratosEconomico(response.data);
+      } catch (error) {
+        console.error(
+          "Error al obtener el listado de estratos economicos:",
+          error
+        );
+      }
+    };
+    fetchEstratosEconomicos();
+  }, []);
 
   // Cargar géneros
   useEffect(() => {
@@ -55,50 +94,92 @@ const CreateStudentForm = () => {
     fetchGeneros();
   }, []);
 
+  // Cargar Paises
+  useEffect(() => {
+    const fetchPaises = async () => {
+      try {
+        const response = await api.get(
+          "/ubicacion/paises"
+        );
+        setPaises(response.data);
+      } catch (error) {
+        console.error("Error al obtener la lista de paises", error);
+      }
+    };
+    fetchPaises();
+  }, []);
+
+  // Cargar Grados
+  useEffect(() => {
+    const fetchGrados = async () => {
+      try {
+        const response = await api.get(
+          "/grados/listaGrados"
+        );
+        setGrados(response.data);
+      } catch (error) {
+        console.error("Error al obtener la lista de grados:", error);
+      }
+    };
+    fetchGrados();
+  }, []);
+
   // Funciones optimizadas con useCallback
-  const cargarDepartamentos = useCallback(async (paisId: string) => {
-    if (!paisId) {
-      setDepartamentos([]);
-      setCiudades([]);
-      updateFields({
-        paisNacimiento: "",
-        departamentoNacimiento: "",
-        municipioNacimiento: "",
-      });
-      return;
-    }
-    
-    updateField("paisNacimiento", paisId);
-    updateField("departamentoNacimiento", "");
-    updateField("municipioNacimiento", "");
+  const cargarDepartamentos = useCallback(
+    async (paisId: string) => {
+      if (!paisId) {
+        setDepartamentos([]);
+        setCiudades([]);
+        updateFields({
+          paisNacimiento: "",
+          departamentoNacimiento: "",
+          municipioNacimiento: "",
+        });
+        return;
+      }
 
-    try {
-      const response = await api.get(`/ubicacion/departamentos/${paisId}`);
-      setDepartamentos(response.data);
-      setCiudades([]);
-    } catch (error) {
-      console.error("Error al cargar departamentos:", error);
-    }
-  }, [updateField, updateFields]);
+      updateField("paisNacimiento", paisId);
+      updateField("departamentoNacimiento", "");
+      updateField("municipioNacimiento", "");
 
-  const cargarCiudades = useCallback(async (departamentoId: string) => {
-    updateField("departamentoNacimiento", departamentoId);
-    updateField("municipioNacimiento", "");
+      try {
+        const response = await api.get(`/ubicacion/departamentos/${paisId}`);
+        setDepartamentos(response.data);
+        setCiudades([]);
+      } catch (error) {
+        console.error("Error al cargar departamentos:", error);
+      }
+    },
+    [updateField, updateFields]
+  );
 
-    try {
-      const response = await api.get(`/ubicacion/ciudades/${departamentoId}`);
-      setCiudades(response.data);
-    } catch (error) {
-      console.error("Error al cargar ciudades:", error);
-    }
-  }, [updateField]);
+  const cargarCiudades = useCallback(
+    async (departamentoId: string) => {
+      updateField("departamentoNacimiento", departamentoId);
+      updateField("municipioNacimiento", "");
 
-  const handleAutocompleteChange = useCallback((fieldName: FormField) => (
-    _: React.SyntheticEvent,
-    value: OpcionSelect | null
-  ) => {
-    updateField(fieldName, value ? value.id : "");
-  }, [updateField]);
+      try {
+        const response = await api.get(`/ubicacion/ciudades/${departamentoId}`);
+        setCiudades(response.data);
+      } catch (error) {
+        console.error("Error al cargar ciudades:", error);
+      }
+    },
+    [updateField]
+  );
+
+  const handleAutocompleteChange = useCallback(
+    (fieldName: FormField) =>
+      (_: React.SyntheticEvent, value: OpcionSelect | null) => {
+        updateField(fieldName, value ? value.id : "");
+      },
+    [updateField]
+  );
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    updateField(name as keyof FormDataType, value);
+  };
 
   const handleSubmit = useCallback(async () => {
     try {
@@ -119,15 +200,21 @@ const CreateStudentForm = () => {
   }, [formData, enqueueSnackbar, updateFields]);
 
   return (
-    <Box sx={{
-      maxWidth: "100%",
-      margin: "auto",
-      mt: 4,
-      backgroundColor: "white",
-      borderRadius: 2,
-      boxShadow: 3,
-    }}>
-      <Typography variant="h4" align="center" sx={{ fontWeight: "bold", mb: 3 }}>
+    <Box
+      sx={{
+        maxWidth: "100%",
+        margin: "auto",
+        mt: 4,
+        backgroundColor: "white",
+        borderRadius: 2,
+        boxShadow: 3,
+      }}
+    >
+      <Typography
+        variant="h4"
+        align="center"
+        sx={{ fontWeight: "bold", mb: 3 }}
+      >
         Registro de Estudiante
       </Typography>
 
@@ -147,30 +234,136 @@ const CreateStudentForm = () => {
         tiposIdentificacion={tiposIdentificacion}
       />
 
-      {/*<HealthAffiliationForm
+      <HealthAffiliationForm
         formData={formData}
         updateField={updateField}
+        estratoEconomico={estratosEconomico}
       />
 
       <CondicionesEspeciales
         formData={formData}
-        updateField={updateField}
+        handleChange={(e) =>
+          updateField(e.target.name as keyof FormDataType, e.target.value)
+        }
+        siNo={siNo.map((opt) => opt.nombre)}
       />
 
       <SituacionAcademica
         formData={formData}
-        updateField={updateField}
+        handleChange={(e) => {
+          const target = e.target as HTMLInputElement;
+          updateField(target.name as keyof FormDataType, target.value);
+        }}
+        siNo={siNo}
       />
 
       <DocumentacionRecibida
         formData={formData}
-        updateField={updateField}
+        handleChange={(e) => {
+          const target = e.target as HTMLInputElement;
+          updateField(target.name as keyof FormDataType, target.value);
+        }}
+        siNo={siNo}
       />
 
-      <ParentForm
-        formData={formData}
-        updateField={updateField}
-      />*/}
+      <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
+        <CardContent>
+          <Typography
+            variant="h5"
+            align="left"
+            sx={{ fontWeight: "bold", mb: 3 }}
+          >
+            Información Familiar
+          </Typography>
+
+          <ParentForm
+            title="Padre"
+            formData={formData}
+            updateField={updateField}
+            tiposIdentificacion={tiposIdentificacion}
+          />
+
+          <Box sx={{ mt: 2 }}>
+            <ParentForm
+              title="Madre"
+              formData={formData}
+              updateField={updateField}
+              tiposIdentificacion={tiposIdentificacion}
+            />
+          </Box>
+
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid size={{ xs: 12, sm: 12, md: 6 }}>
+              <CustomAutocomplete
+                label="Autorización para contacto de emergencia"
+                name="autorizacionCoctactoEmergencia"
+                options={siNo}
+                value={
+                  siNo.find(
+                    (option) =>
+                      option.id === formData.autorizacionCoctactoEmergencia
+                  ) || null
+                }
+                onChange={handleAutocompleteChange(
+                  "autorizacionCoctactoEmergencia"
+                )}
+                getOptionLabel={(option) => option.nombre}
+              />
+            </Grid>
+
+            {formData.autorizacionCoctactoEmergencia === "SI" && (
+              <Box sx={{ mt: 2, ml: 2 }}>
+                <EmergencyContactForm
+                  formData={formData}
+                  handleChange={handleChange}
+                />
+              </Box>
+            )}
+
+            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+              <CustomAutocomplete
+                label="Autorizo para uso de imagen (Fotografía/videos)"
+                name="autorizacionImagen"
+                options={siNo}
+                value={
+                  siNo.find(
+                    (option) => option.id === formData.autorizacionImagen
+                  ) || null
+                }
+                onChange={handleAutocompleteChange("autorizacionImagen")}
+                getOptionLabel={(option) => option.nombre}
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+              <CustomAutocomplete
+                label="Declaración de veracidad de la información"
+                name="veracidadInformacion"
+                options={siNo}
+                value={
+                  siNo.find(
+                    (option) => option.id === formData.veracidadInformacion
+                  ) || null
+                }
+                onChange={handleAutocompleteChange("veracidadInformacion")}
+                getOptionLabel={(option) => option.nombre}
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 12, md: 12 }}>
+              <Typography
+                variant="h5"
+                align="justify"
+                sx={{ fontWeight: "bold", mb: 3 }}
+              >
+                Con mi firma y con la de mi padre, madre o acudiente, nos
+                comprometemos a cumplir con lo establecido en el Manual de
+                Convivencia del Colegio Alegria del Norte.
+              </Typography>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
 
       <Button
         variant="contained"

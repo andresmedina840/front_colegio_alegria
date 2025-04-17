@@ -1,64 +1,52 @@
+// src/app/components/HealthAffiliationForm.tsx
+"use client";
+
 import { Card, CardContent, Grid, Typography } from "@mui/material";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import CustomTextField from "./personalizados/CustomTextField";
 import CustomAutocomplete from "./personalizados/CustomAutocomplete";
-
-interface OptionType {
-  id: string;
-  nombre: string;
-  [key: string]: unknown;
-}
+import { FormDataType, FormField } from "../types/formTypes";
+import { OpcionSelect } from "../types";
 
 interface HealthAffiliationFormProps {
-  formData: Record<string, string>;
-  handleChange: (
-    e: React.ChangeEvent<{ name?: string; value: unknown }>
-  ) => void;
-  estratoEconomico: string[];
+  formData: FormDataType;
+  updateField: (field: FormField, value: string) => void;
+  estratoEconomico: OpcionSelect[];
 }
 
 const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
   formData,
-  handleChange,
+  updateField,
   estratoEconomico,
 }) => {
-  const [estratosOptions, setEstratosOptions] = useState<OptionType[]>(() => {
-    return estratoEconomico.map((estrato) => ({
-      id: estrato,
-      nombre: estrato,
-    }));
-  });
-
-  useEffect(() => {
-    setEstratosOptions(
-      estratoEconomico.map((estrato) => ({
-        id: estrato,
-        nombre: estrato,
-      }))
-    );
-  }, [estratoEconomico]);
-
   const formFields = [
-    { label: "Tipo de Sangre y RH", name: "tipoSangre", maxLength: 5 },
-    { label: "Eps Afiliado", name: "epsAfiliado", maxLength: 45 },
-    { label: "IPS Asignada", name: "ipsAsignada", maxLength: 55 },
-    { label: "ARS Afiliado", name: "arsAfiliado", maxLength: 55 },
-    { label: "Nro Carnet SISBEN", name: "nroCarnetSisben", maxLength: 20 },
-    { label: "Nivel de SISBEN", name: "nivelSisben", maxLength: 5 },
+    {
+      label: "Tipo de Sangre y RH",
+      name: "tipoSangre" as FormField,
+      maxLength: 5,
+    },
+    { label: "Eps Afiliado", name: "epsAfiliado" as FormField, maxLength: 45 },
+    { label: "IPS Asignada", name: "ipsAsignada" as FormField, maxLength: 55 },
+    { label: "ARS Afiliado", name: "arsAfiliado" as FormField, maxLength: 55 },
+    {
+      label: "Nro Carnet SISBEN",
+      name: "nroCarnetSisben" as FormField,
+      maxLength: 20,
+    },
+    {
+      label: "Nivel de SISBEN",
+      name: "nivelSisben" as FormField,
+      maxLength: 5,
+    },
   ];
 
-  const handleEstratoChange = (_: unknown, newValue: OptionType | null) => {
-    handleChange({
-      target: {
-        name: "estrato",
-        value: newValue?.nombre || "",
-      },
-    } as React.ChangeEvent<{ name?: string; value: unknown }>);
+  const handleEstratoChange = (_: unknown, newValue: OpcionSelect | null) => {
+    updateField("estrato", newValue?.nombre || "");
   };
 
-  const currentEstratoValue = estratoEconomico.includes(formData.estrato)
-    ? { id: formData.estrato, nombre: formData.estrato }
-    : null;
+  const currentEstratoValue =
+    estratoEconomico.find((option) => option.nombre === formData.estrato) ||
+    null;
 
   return (
     <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
@@ -72,23 +60,23 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
         </Typography>
         <Grid container spacing={2}>
           {formFields.map((field) => (
-            <Grid size={{ xs: 12, md: 4 }} key={field.name}>
+            <Grid size={{ xs: 12, sm: 2, md: 6 }} key={field.name}>
               <CustomTextField
                 uppercase
                 label={field.label}
                 name={field.name}
                 value={formData[field.name] || ""}
-                onChange={handleChange}
-                maxLength={30}
+                updateField={updateField}
+                maxLength={field.maxLength}
                 showCharCount
               />
             </Grid>
           ))}
 
-          <Grid size={{ xs: 12, md: 4 }}>
-            <CustomAutocomplete
+          <Grid size={{ xs: 12, sm: 2, md: 6 }}>
+            <CustomAutocomplete<OpcionSelect>
               name="estrato"
-              options={estratosOptions}
+              options={estratoEconomico}
               value={currentEstratoValue}
               onChange={handleEstratoChange}
               label="Estrato económico"
