@@ -317,7 +317,8 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               required
               options={grados}
               value={
-                grados.find((grado) => grado.id === formData.gradoId) || null
+                grados.find((grado) => grado.id === String(formData.gradoId)) || null
+
               }
               onChange={handleAutocompleteChange("gradoId")}
               getOptionLabel={(option: OpcionSelect) => option.nombre}

@@ -44,7 +44,7 @@ const initialFormData = {
   numeroIdentificacionMadre: "",
   autorizacionImagen: "",
   veracidadInformacion: "",
-  autorizacionCoctactoEmergencia: "",
+  autorizacionContactoEmergencia: "",
   documentacionRecibidaRegistroCivil: "",
   documentacionRecibidaCertificadosEstudios: "",
   documentacionRecibidaFotos: "",

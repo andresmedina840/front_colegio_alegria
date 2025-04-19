@@ -1,7 +1,6 @@
-// src/components/CreateStudentForm.tsx
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import {
   Box,
   Typography,
@@ -9,6 +8,7 @@ import {
   Card,
   CardContent,
   Grid,
+  CircularProgress,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import api from "../axios/axiosClient";
@@ -25,6 +25,8 @@ import EmergencyContactForm from "./EmergencyContactForm";
 import CustomAutocomplete from "./personalizados/CustomAutocomplete";
 import { FormDataType, FormField } from "../types/formTypes";
 import initialFormData from "../estudiantes/initialFormData";
+import { useCatalogosForm } from "../hooks/useCatalogosForm";
+import Image from 'next/image'
 
 const siNo: OpcionSelect[] = [
   { id: "SI", nombre: "SI" },
@@ -34,97 +36,20 @@ const siNo: OpcionSelect[] = [
 const CreateStudentForm = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { formData, updateField, updateFields } = useFormState();
-  const [generos, setGeneros] = useState<OpcionSelect[]>([]);
+
+  const {
+    grados,
+    generos,
+    paises,
+    tiposIdentificacion,
+    estratosEconomico,
+    loading,
+  } = useCatalogosForm();
+
   const [departamentos, setDepartamentos] = useState<OpcionSelect[]>([]);
   const [ciudades, setCiudades] = useState<OpcionSelect[]>([]);
-  const [paises, setPaises] = useState<OpcionSelect[]>([]);
-  const [grados, setGrados] = useState<OpcionSelect[]>([]);
-
-  const [tiposIdentificacion, setTiposIdentificacion] = useState<
-    OpcionSelect[]
-  >([]);
-  const [estratosEconomico, setEstratosEconomico] = useState<OpcionSelect[]>(
-    []
-  );
   const jornadaEscolar = ["Mañana", "Tarde", "Completa"];
 
-  // Cargar tipos de identificación
-  useEffect(() => {
-    const fetchTiposIdentificacion = async () => {
-      try {
-        const response = await api.get(
-          "/tipo-identificacion/tiposDeIdentificacion"
-        );
-        setTiposIdentificacion(response.data);
-      } catch (error) {
-        console.error("Error al obtener tipos de identificación:", error);
-      }
-    };
-    fetchTiposIdentificacion();
-  }, []);
-
-  // Cargar estratos economicos
-  useEffect(() => {
-    const fetchEstratosEconomicos = async () => {
-      try {
-        const response = await api.get(
-          "/estratoEconomico/listaEstratoEconomico"
-        );
-        setEstratosEconomico(response.data);
-      } catch (error) {
-        console.error(
-          "Error al obtener el listado de estratos economicos:",
-          error
-        );
-      }
-    };
-    fetchEstratosEconomicos();
-  }, []);
-
-  // Cargar géneros
-  useEffect(() => {
-    const fetchGeneros = async () => {
-      try {
-        const response = await api.get("/generos");
-        setGeneros(response.data);
-      } catch (error) {
-        console.error("Error al obtener géneros:", error);
-      }
-    };
-    fetchGeneros();
-  }, []);
-
-  // Cargar Paises
-  useEffect(() => {
-    const fetchPaises = async () => {
-      try {
-        const response = await api.get(
-          "/ubicacion/paises"
-        );
-        setPaises(response.data);
-      } catch (error) {
-        console.error("Error al obtener la lista de paises", error);
-      }
-    };
-    fetchPaises();
-  }, []);
-
-  // Cargar Grados
-  useEffect(() => {
-    const fetchGrados = async () => {
-      try {
-        const response = await api.get(
-          "/grados/listaGrados"
-        );
-        setGrados(response.data);
-      } catch (error) {
-        console.error("Error al obtener la lista de grados:", error);
-      }
-    };
-    fetchGrados();
-  }, []);
-
-  // Funciones optimizadas con useCallback
   const cargarDepartamentos = useCallback(
     async (paisId: string) => {
       if (!paisId) {
@@ -176,9 +101,18 @@ const CreateStudentForm = () => {
     [updateField]
   );
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e:
+      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+      | {
+          target: {
+            name: string;
+            value: string | number | boolean | null | undefined;
+          };
+        }
+  ) => {
     const { name, value } = e.target;
-    updateField(name as keyof FormDataType, value);
+    updateField(name as keyof FormDataType, String(value));
   };
 
   const handleSubmit = useCallback(async () => {
@@ -189,15 +123,38 @@ const CreateStudentForm = () => {
       });
       updateFields(initialFormData);
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        enqueueSnackbar(error.message || "Error al registrar el estudiante", {
-          variant: "error",
-        });
-      } else {
-        enqueueSnackbar("Error desconocido", { variant: "error" });
-      }
+      const msg = error instanceof Error ? error.message : "Error desconocido";
+      enqueueSnackbar(msg, { variant: "error" });
     }
   }, [formData, enqueueSnackbar, updateFields]);
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          width: "100%",
+          height: "80vh",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 2,
+        }}
+      >
+        <Image src="/logo.png" alt="Logo" width={100} height={100} />
+
+        <Typography variant="h6" fontWeight="bold" color="text.secondary">
+          Cargando datos del formulario de Estudiantes...
+        </Typography>
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+          <CircularProgress size={30} color="primary" />
+          <Typography variant="body2" color="text.secondary">
+            Por favor espera
+          </Typography>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -243,26 +200,33 @@ const CreateStudentForm = () => {
       <CondicionesEspeciales
         formData={formData}
         handleChange={(e) =>
-          updateField(e.target.name as keyof FormDataType, e.target.value)
+          updateField(
+            e.target.name as keyof FormDataType,
+            String(e.target.value)
+          )
         }
         siNo={siNo.map((opt) => opt.nombre)}
       />
 
       <SituacionAcademica
         formData={formData}
-        handleChange={(e) => {
-          const target = e.target as HTMLInputElement;
-          updateField(target.name as keyof FormDataType, target.value);
-        }}
+        handleChange={(e) =>
+          updateField(
+            e.target.name as keyof FormDataType,
+            String(e.target.value)
+          )
+        }
         siNo={siNo}
       />
 
       <DocumentacionRecibida
         formData={formData}
-        handleChange={(e) => {
-          const target = e.target as HTMLInputElement;
-          updateField(target.name as keyof FormDataType, target.value);
-        }}
+        handleChange={(e) =>
+          updateField(
+            e.target.name as keyof FormDataType,
+            String(e.target.value)
+          )
+        }
         siNo={siNo}
       />
 
@@ -293,25 +257,24 @@ const CreateStudentForm = () => {
           </Box>
 
           <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid size={{ xs: 12, sm: 12, md: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
               <CustomAutocomplete
                 label="Autorización para contacto de emergencia"
-                name="autorizacionCoctactoEmergencia"
+                name="autorizacionContactoEmergencia"
                 options={siNo}
                 value={
                   siNo.find(
-                    (option) =>
-                      option.id === formData.autorizacionCoctactoEmergencia
+                    (opt) => opt.id === formData.autorizacionContactoEmergencia
                   ) || null
                 }
                 onChange={handleAutocompleteChange(
-                  "autorizacionCoctactoEmergencia"
+                  "autorizacionContactoEmergencia"
                 )}
                 getOptionLabel={(option) => option.nombre}
               />
             </Grid>
 
-            {formData.autorizacionCoctactoEmergencia === "SI" && (
+            {formData.autorizacionContactoEmergencia === "SI" && (
               <Box sx={{ mt: 2, ml: 2 }}>
                 <EmergencyContactForm
                   formData={formData}
@@ -326,9 +289,8 @@ const CreateStudentForm = () => {
                 name="autorizacionImagen"
                 options={siNo}
                 value={
-                  siNo.find(
-                    (option) => option.id === formData.autorizacionImagen
-                  ) || null
+                  siNo.find((opt) => opt.id === formData.autorizacionImagen) ||
+                  null
                 }
                 onChange={handleAutocompleteChange("autorizacionImagen")}
                 getOptionLabel={(option) => option.nombre}
@@ -342,7 +304,7 @@ const CreateStudentForm = () => {
                 options={siNo}
                 value={
                   siNo.find(
-                    (option) => option.id === formData.veracidadInformacion
+                    (opt) => opt.id === formData.veracidadInformacion
                   ) || null
                 }
                 onChange={handleAutocompleteChange("veracidadInformacion")}

@@ -40,7 +40,7 @@ export interface FormDataType {
   numeroIdentificacionMadre: string;
   autorizacionImagen: string;
   veracidadInformacion: string;
-  autorizacionCoctactoEmergencia: string;
+  autorizacionContactoEmergencia: string;
   documentacionRecibidaRegistroCivil: string;
   documentacionRecibidaCertificadosEstudios: string;
   documentacionRecibidaFotos: string;
@@ -79,6 +79,8 @@ export interface FormDataType {
   talentoTecnologico: string;
   talentoSubjetivo: string;
   noAplicaCapacidad: string;
+
+
 }
 
 export type FormField = keyof FormDataType;
