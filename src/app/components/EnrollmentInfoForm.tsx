@@ -37,6 +37,7 @@ const EnrollmentInfoFormComponent: React.FC = () => {
               <CustomDatePicker
                 name="fechaMatricula"
                 label="Fecha de matrícula"
+                required
                 maxDate={maxDate}
                 helperText={errors.fechaMatricula?.message}
               />

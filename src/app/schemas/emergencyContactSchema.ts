@@ -2,9 +2,9 @@
 import * as yup from "yup";
 
 export const emergencyContactSchema = yup.object({
-  primerNombreEmergencia: yup.string().required("Este campo es obligatorio"),
+  primerNombreEmergencia: yup.string(),
   segundoNombreEmergencia: yup.string(),
-  primerApellidoEmergencia: yup.string().required("Este campo es obligatorio"),
+  primerApellidoEmergencia: yup.string(),
   segundoApellidoEmergencia: yup.string(),
   telefonoEmergencia: yup
     .string()

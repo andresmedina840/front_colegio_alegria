@@ -2,27 +2,32 @@ import * as yup from "yup";
 import { FormDataType } from "../types/formTypes";
 
 export const studentInfoSchema: yup.ObjectSchema<FormDataType> = yup.object({
-  numeroMatricula: yup.string().required("Número de matrícula requerido"),
+  //EnrollmentInfoForm
+  numeroMatricula: yup.string().defined(),
   fechaMatricula: yup.string().required("Fecha de matrícula requerida"),
-  tipoIdentificacionEstudianteId: yup.string().required(),
-  numeroIdentificacionEstudiante: yup.string().required(),
-  primerNombreEstudiante: yup.string().required(),
+
+  //StudentInfoForm
+  tipoIdentificacionEstudianteId: yup.string().required("Tipo de identificación estudiante requerido"),
+  numeroIdentificacionEstudiante: yup.string().required("Número de identificación estudiante requerido"),
+  primerNombreEstudiante: yup.string().required("Primer nombre estudiante requerido"),
   segundoNombreEstudiante: yup.string().defined(),
-  primerApellidoEstudiante: yup.string().required(),
+  primerApellidoEstudiante: yup.string().required("Primer apellido estudiante requerido"),
   segundoApellidoEstudiante: yup.string().defined(),
-  sedeMatricula: yup.string().defined(),
-  gradoId: yup.string().required(),
+  generoEstudianteId: yup.string().required("Género estudiante requerido"),
+  fechaNacimiento: yup.string().required("Fecha de nacimiento estudiante requerida"),
+  paisNacimiento: yup.string().required("País de nacimiento estudiante requerido"),
+  departamentoNacimiento: yup.string().required("Departamento de nacimiento estudiante requerido"),
+  municipioNacimiento: yup.string().required("Municipio de nacimiento estudiante requerido"),
+  sedeMatricula: yup.string().required("Sede de matrícula requerida"),
+  gradoId: yup.string().required("Grado estudiante requerido"),
   pensionId: yup.string().defined(),
-  jornada: yup.string().required(),
+  jornada: yup.string().required("Jornada escolar requerida"),
   institucionEducativaAnterior: yup.string().defined(),
   ultimoGradoCursado: yup.string().defined(),
   ultimoAnioCursado: yup.string().defined(),
-  generoEstudianteId: yup.string().required(),
-  fechaNacimiento: yup.string().required(),
   edad: yup.string().defined(),
-  paisNacimiento: yup.string().required(),
-  departamentoNacimiento: yup.string().required(),
-  municipioNacimiento: yup.string().required(),
+ 
+  //HealthAffiliationForm
   tipoSangre: yup.string().defined(),
   epsAfiliado: yup.string().defined(),
   ipsAsignada: yup.string().defined(),
@@ -30,6 +35,8 @@ export const studentInfoSchema: yup.ObjectSchema<FormDataType> = yup.object({
   nroCarnetSisben: yup.string().defined(),
   nivelSisben: yup.string().defined(),
   estrato: yup.string().defined(),
+
+  //HealthAffiliationForm
   numeroIdentificacionPadre: yup.string().defined(),
   primerNombrePadre: yup.string().defined(),
   segundoNombrePadre: yup.string().defined(),
@@ -40,8 +47,8 @@ export const studentInfoSchema: yup.ObjectSchema<FormDataType> = yup.object({
   primerApellidoMadre: yup.string().defined(),
   segundoApellidoMadre: yup.string().defined(),
   numeroIdentificacionMadre: yup.string().defined(),
-  autorizacionImagen: yup.string().required(),
-  veracidadInformacion: yup.string().required(),
+  
+
   autorizacionContactoEmergencia: yup.string().required(),
   documentacionRecibidaRegistroCivil: yup.string().defined(),
   documentacionRecibidaCertificadosEstudios: yup.string().defined(),
@@ -77,4 +84,10 @@ export const studentInfoSchema: yup.ObjectSchema<FormDataType> = yup.object({
   talentoTecnologico: yup.string().defined(),
   talentoSubjetivo: yup.string().defined(),
   noAplicaCapacidad: yup.string().defined(),
+
+  //Autorizacion de Imganes
+  autorizacionImagen: yup.string().defined(),
+
+  //Declaracion de veracidad de la informacion
+  veracidadInformacion: yup.string().defined(),
 });
