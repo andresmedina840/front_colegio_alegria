@@ -21,7 +21,7 @@ const EnrollmentInfoFormComponent: React.FC = () => {
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
       <CardContent>
         <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 2, md: 6 }}>
+          {/*<Grid size={{ xs: 12, sm: 2, md: 6 }}>
             <CustomTextField
               name="numeroMatricula"
               label="No. Matrícula"
@@ -30,7 +30,7 @@ const EnrollmentInfoFormComponent: React.FC = () => {
               uppercase
               helperText={errors.numeroMatricula?.message}
             />
-          </Grid>
+          </Grid>*/}
 
           {isMounted && (
             <Grid size={{ xs: 12, sm: 2, md: 6 }}>
