@@ -49,7 +49,7 @@ export const studentInfoSchema: yup.ObjectSchema<FormDataType> = yup.object({
   numeroIdentificacionMadre: yup.string().defined(),
   
 
-  autorizacionContactoEmergencia: yup.string().required(),
+  autorizacionContactoEmergencia: yup.string().defined(),
   documentacionRecibidaRegistroCivil: yup.string().defined(),
   documentacionRecibidaCertificadosEstudios: yup.string().defined(),
   documentacionRecibidaFotos: yup.string().defined(),
