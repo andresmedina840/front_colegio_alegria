@@ -147,9 +147,8 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
             <CustomTextField
               label="Número Identificación Estudiante *"
               name="numeroIdentificacionEstudiante"
-              maxLength={26}
+              maxLength={11}
               showCharCount
-              helperText={errors.numeroIdentificacionEstudiante?.message}
             />
           </Grid>
 
@@ -178,6 +177,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
             <CustomAutocomplete
               label="Género *"
               name="generoEstudianteId"
+              required
               options={generos}
               value={
                 generos.find((g) => g.id === formData.generoEstudianteId) || null
