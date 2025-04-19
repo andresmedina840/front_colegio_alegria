@@ -1,6 +1,6 @@
 "use client";
 
-import CreateUserForm from "../components/CreateUserForm";
+//import CreateUserForm from "../components/CreateUserForm";
 
 export default function RegisterPage() {
   return (
@@ -15,7 +15,7 @@ export default function RegisterPage() {
         backgroundColor: "#f5f5f5",
       }}
     >
-      <CreateUserForm />
+      {/*<CreateUserForm />*/}
     </main>
   );
 }

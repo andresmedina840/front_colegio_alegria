@@ -1,52 +1,82 @@
 // src/app/components/personalizados/CustomDatePicker.tsx
 "use client";
 
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { DatePicker, DatePickerProps } from "@mui/x-date-pickers/DatePicker";
+import {
+  Controller,
+  useFormContext,
+  FieldValues,
+  Path,
+  RegisterOptions,
+} from "react-hook-form";
 import dayjs, { Dayjs } from "dayjs";
 import React from "react";
-import { FormField } from "../../types/formTypes";
 
-interface CustomDatePickerProps {
+type CustomDatePickerProps<T extends FieldValues> = {
+  name: Path<T>;
   label: string;
-  name: FormField;
-  value: string;
-  onChange: (value: string | null, name: FormField) => void;
-  maxDate?: string;
-  minDate?: string;
+  required?: boolean;
   disabled?: boolean;
-}
+  helperText?: string;
+  rules?: Omit<
+    RegisterOptions<T, Path<T>>,
+    "disabled" | "valueAsNumber" | "valueAsDate" | "setValueAs"
+  >;
+  minDate?: string | Dayjs;
+  maxDate?: string | Dayjs;
+} & Omit<DatePickerProps<Dayjs>, "value" | "onChange" | "renderInput">;
 
-const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
-  label,
+function CustomDatePicker<T extends FieldValues>({
   name,
-  value,
-  onChange,
-  maxDate,
-  minDate,
+  label,
+  required = false,
   disabled = false,
-}) => {
-  const handleChange = (date: Dayjs | null) => {
-    const formattedDate = date?.isValid() ? date.format("YYYY-MM-DD") : null;
-    onChange(formattedDate, name);
-  };
+  helperText,
+  rules,
+  minDate,
+  maxDate,
+  ...props
+}: CustomDatePickerProps<T>) {
+  const { control } = useFormContext<T>();
+
+  const parseDate = (date?: string | Dayjs) =>
+    typeof date === "string" ? dayjs(date) : date;
 
   return (
-    <DatePicker
-      label={label}
-      value={value ? dayjs(value) : null}
-      onChange={handleChange}
-      maxDate={maxDate ? dayjs(maxDate) : undefined}
-      minDate={minDate ? dayjs(minDate) : undefined}
-      disabled={disabled}
-      slotProps={{
-        textField: {
-          fullWidth: true,
-          InputLabelProps: { shrink: true },
-        },
-      }}
-      format="DD/MM/YYYY"
+    <Controller
+      name={name}
+      control={control}
+      rules={rules}
+      render={({ field: { onChange, value }, fieldState: { error } }) => (
+        <DatePicker
+          value={value ? dayjs(value) : null}
+          onChange={(newValue) => {
+            const formattedDate = newValue?.isValid()
+              ? newValue.format("YYYY-MM-DD")
+              : "";
+            onChange(formattedDate);
+          }}
+          format="DD/MM/YYYY"
+          disabled={disabled}
+          minDate={parseDate(minDate)}
+          maxDate={parseDate(maxDate)}
+          slotProps={{
+            textField: {
+              label,
+              required,
+              name,
+              error: !!error,
+              helperText: error?.message || helperText,
+              fullWidth: true,
+              variant: "outlined",
+              InputLabelProps: { shrink: true },
+            },
+          }}
+          {...props}
+        />
+      )}
     />
   );
-};
+}
 
 export default CustomDatePicker;

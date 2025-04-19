@@ -12,11 +12,11 @@ import {
   InputAdornment,
   CircularProgress,
   Grid,
+  TextField,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Image from "next/image";
 import api from "../axios/axiosClient";
-import CustomTextField from "../components/personalizados/CustomTextField";
 
 interface LoginFormData {
   username: string;
@@ -48,9 +48,12 @@ const LoginForm = () => {
 
   useEffect(() => {
     if (searchParams.get("sessionExpired") === "true") {
-      enqueueSnackbar("Tu sesión ha expirado, por favor inicia sesión nuevamente", {
-        variant: "warning",
-      });
+      enqueueSnackbar(
+        "Tu sesión ha expirado, por favor inicia sesión nuevamente",
+        {
+          variant: "warning",
+        }
+      );
       router.replace("/login");
     }
   }, [searchParams, enqueueSnackbar, router]);
@@ -61,7 +64,9 @@ const LoginForm = () => {
 
   const handleLogin = async () => {
     if (!formData.username || !formData.password) {
-      enqueueSnackbar("Por favor completa todos los campos", { variant: "warning" });
+      enqueueSnackbar("Por favor completa todos los campos", {
+        variant: "warning",
+      });
       return;
     }
 
@@ -177,26 +182,28 @@ const LoginForm = () => {
 
         <Grid container spacing={2}>
           <Grid size={{ xs: 12 }}>
-            <CustomTextField
+            <TextField
               label="Usuario"
               name="username"
               value={formData.username}
-              onValueChange={handleChange("username")}
+              onChange={(e) => handleChange("username")(e.target.value)}
               disabled={isLoading}
-              maxLength={30}
-              showCharCount
+              fullWidth
+              inputProps={{ maxLength: 30 }}
+              helperText={`${formData.username.length} / 30 caracteres`}
             />
           </Grid>
           <Grid size={{ xs: 12 }}>
-            <CustomTextField
+            <TextField
               label="Contraseña"
               name="password"
               type={showPassword ? "text" : "password"}
               value={formData.password}
-              onValueChange={handleChange("password")}
+              onChange={(e) => handleChange("password")(e.target.value)}
               disabled={isLoading}
-              maxLength={20}
-              showCharCount
+              fullWidth
+              inputProps={{ maxLength: 20 }}
+              helperText={`${formData.password.length} / 20 caracteres`}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -220,7 +227,9 @@ const LoginForm = () => {
           sx={{ mt: 3, py: 1.5 }}
           onClick={handleLogin}
           disabled={isLoading}
-          startIcon={isLoading && <CircularProgress size={20} color="inherit" />}
+          startIcon={
+            isLoading && <CircularProgress size={20} color="inherit" />
+          }
         >
           {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
         </Button>

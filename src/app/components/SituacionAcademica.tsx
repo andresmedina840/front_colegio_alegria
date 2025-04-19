@@ -18,7 +18,12 @@ type OptionType = {
 type SituacionAcademicaProps = {
   formData: FormDataType;
   handleChange: (
-    e: React.ChangeEvent<{ name?: string; value: unknown }>
+    e: {
+      target: {
+        name: string;
+        value: string | number | boolean | null | undefined;
+      };
+    }
   ) => void;
   siNo: OptionType[];
 };
@@ -35,15 +40,17 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
     value: OptionType | null
   ) => {
     handleChange({
-      target: { 
-        name: fieldName, 
-        value: value ? value.id : "" 
+      target: {
+        name: fieldName,
+        value: value ? value.id : "",
       },
-    } as React.ChangeEvent<HTMLInputElement>);
+    });
   };
 
   const getCurrentValue = (fieldName: string) => {
-    return siNo.find(option => option.id === formData[fieldName as keyof FormDataType]) || null;
+    return siNo.find(
+      (option) => option.id === formData[fieldName as keyof FormDataType]
+    ) || null;
   };
 
   return (
@@ -55,11 +62,13 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 4 }}>
             <CustomAutocomplete
-              label="No estudio en la vigencia anterior"
+              label="No estudió en la vigencia anterior"
               name="situacionAcademicaNoEstudioVigenciaAnterior"
               options={siNo}
               value={getCurrentValue("situacionAcademicaNoEstudioVigenciaAnterior")}
-              onChange={handleAutocompleteChange("situacionAcademicaNoEstudioVigenciaAnterior")}
+              onChange={handleAutocompleteChange(
+                "situacionAcademicaNoEstudioVigenciaAnterior"
+              )}
               getOptionLabel={(option: OptionType) => option.nombre}
             />
           </Grid>

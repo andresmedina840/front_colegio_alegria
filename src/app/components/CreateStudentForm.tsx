@@ -12,7 +12,9 @@ import {
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import api from "../axios/axiosClient";
-import { useFormState } from "../hooks/useFormState";
+import { useForm, FormProvider } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { studentInfoSchema } from "../schemas/studentInfoSchema";
 import { OpcionSelect } from "../types";
 import EnrollmentInfoForm from "./EnrollmentInfoForm";
 import StudentInfoForm from "./StudentInfoForm";
@@ -35,7 +37,29 @@ const siNo: OpcionSelect[] = [
 
 const CreateStudentForm = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const { formData, updateField, updateFields } = useFormState();
+  const methods = useForm<FormDataType>({
+    resolver: yupResolver(studentInfoSchema),
+    defaultValues: initialFormData,
+  });
+
+  const { handleSubmit, reset, watch, setValue } = methods;
+  const formData = watch();
+
+  const updateField = useCallback(
+    (field: keyof FormDataType, value: string) => {
+      setValue(field, value);
+    },
+    [setValue]
+  );
+
+  const updateFields = useCallback(
+    (fields: Partial<FormDataType>) => {
+      Object.entries(fields).forEach(([key, value]) => {
+        setValue(key as keyof FormDataType, value ?? "");
+      });
+    },
+    [setValue]
+  );
 
   const {
     grados,
@@ -115,18 +139,18 @@ const CreateStudentForm = () => {
     updateField(name as keyof FormDataType, String(value));
   };
 
-  const handleSubmit = useCallback(async () => {
+  const onSubmit = async (data: FormDataType) => {
     try {
-      await api.post("/alumnos", formData);
+      await api.post("/alumnos", data);
       enqueueSnackbar("Estudiante registrado con éxito", {
         variant: "success",
       });
-      updateFields(initialFormData);
+      reset(initialFormData);
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : "Error desconocido";
       enqueueSnackbar(msg, { variant: "error" });
     }
-  }, [formData, enqueueSnackbar, updateFields]);
+  };
 
   if (loading) {
     return (
@@ -164,186 +188,165 @@ const CreateStudentForm = () => {
   }
 
   return (
-    <Box
-      sx={{
-        maxWidth: "100%",
-        margin: "auto",
-        mt: 4,
-        backgroundColor: "white",
-        borderRadius: 2,
-        boxShadow: 3,
-      }}
-    >
-      <Typography
-        variant="h4"
-        align="center"
-        sx={{ fontWeight: "bold", mb: 3 }}
+    <FormProvider {...methods}>
+      <Box
+        sx={{
+          maxWidth: "100%",
+          margin: "auto",
+          mt: 4,
+          backgroundColor: "white",
+          borderRadius: 2,
+          boxShadow: 3,
+        }}
       >
-        Registro de Estudiante
-      </Typography>
+        <Typography
+          variant="h4"
+          align="center"
+          sx={{ fontWeight: "bold", mb: 3 }}
+        >
+          Registro de Estudiante
+        </Typography>
 
-      <EnrollmentInfoForm formData={formData} updateField={updateField} />
+        <EnrollmentInfoForm />
 
-      <StudentInfoForm
-        formData={formData}
-        updateField={updateField}
-        generos={generos}
-        departamentos={departamentos}
-        ciudades={ciudades}
-        cargarDepartamentos={cargarDepartamentos}
-        cargarCiudades={cargarCiudades}
-        grados={grados}
-        jornadaEscolar={jornadaEscolar}
-        paises={paises}
-        tiposIdentificacion={tiposIdentificacion}
-      />
+        <StudentInfoForm
+          generos={generos}
+          departamentos={departamentos}
+          ciudades={ciudades}
+          cargarDepartamentos={cargarDepartamentos}
+          cargarCiudades={cargarCiudades}
+          grados={grados}
+          jornadaEscolar={jornadaEscolar}
+          paises={paises}
+          tiposIdentificacion={tiposIdentificacion}
+        />
 
-      <HealthAffiliationForm
-        formData={formData}
-        updateField={updateField}
-        estratoEconomico={estratosEconomico}
-      />
+        <HealthAffiliationForm
+          updateField={updateField}
+          estratoEconomico={estratosEconomico}
+        />
 
-      <CondicionesEspeciales
-        formData={formData}
-        handleChange={(e) =>
-          updateField(
-            e.target.name as keyof FormDataType,
-            String(e.target.value)
-          )
-        }
-        siNo={siNo.map((opt) => opt.nombre)}
-      />
+        <CondicionesEspeciales
+          formData={formData}
+          handleChange={handleChange}
+          siNo={siNo.map((opt) => opt.nombre)}
+        />
 
-      <SituacionAcademica
-        formData={formData}
-        handleChange={(e) =>
-          updateField(
-            e.target.name as keyof FormDataType,
-            String(e.target.value)
-          )
-        }
-        siNo={siNo}
-      />
+        <SituacionAcademica
+          formData={formData}
+          handleChange={handleChange}
+          siNo={siNo}
+        />
 
-      <DocumentacionRecibida
-        formData={formData}
-        handleChange={(e) =>
-          updateField(
-            e.target.name as keyof FormDataType,
-            String(e.target.value)
-          )
-        }
-        siNo={siNo}
-      />
+        <DocumentacionRecibida
+          formData={formData}
+          handleChange={handleChange}
+          siNo={siNo}
+        />
 
-      <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
-        <CardContent>
-          <Typography
-            variant="h5"
-            align="left"
-            sx={{ fontWeight: "bold", mb: 3 }}
-          >
-            Información Familiar
-          </Typography>
+        <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
+          <CardContent>
+            <Typography
+              variant="h5"
+              align="left"
+              sx={{ fontWeight: "bold", mb: 3 }}
+            >
+              Información Familiar
+            </Typography>
 
-          <ParentForm
-            title="Padre"
-            formData={formData}
-            updateField={updateField}
-            tiposIdentificacion={tiposIdentificacion}
-          />
-
-          <Box sx={{ mt: 2 }}>
             <ParentForm
-              title="Madre"
-              formData={formData}
-              updateField={updateField}
+              title="Padre"
               tiposIdentificacion={tiposIdentificacion}
             />
-          </Box>
 
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-              <CustomAutocomplete
-                label="Autorización para contacto de emergencia"
-                name="autorizacionContactoEmergencia"
-                options={siNo}
-                value={
-                  siNo.find(
-                    (opt) => opt.id === formData.autorizacionContactoEmergencia
-                  ) || null
-                }
-                onChange={handleAutocompleteChange(
-                  "autorizacionContactoEmergencia"
-                )}
-                getOptionLabel={(option) => option.nombre}
+            <Box sx={{ mt: 2 }}>
+              <ParentForm
+                title="Madre"
+                tiposIdentificacion={tiposIdentificacion}
               />
-            </Grid>
+            </Box>
 
-            {formData.autorizacionContactoEmergencia === "SI" && (
-              <Box sx={{ mt: 2, ml: 2 }}>
-                <EmergencyContactForm
-                  formData={formData}
-                  handleChange={handleChange}
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+                <CustomAutocomplete
+                  label="Autorización para contacto de emergencia"
+                  name="autorizacionContactoEmergencia"
+                  options={siNo}
+                  value={
+                    siNo.find(
+                      (opt) =>
+                        opt.id === formData.autorizacionContactoEmergencia
+                    ) || null
+                  }
+                  onChange={handleAutocompleteChange(
+                    "autorizacionContactoEmergencia"
+                  )}
+                  getOptionLabel={(option) => option.nombre}
                 />
-              </Box>
-            )}
+              </Grid>
 
-            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-              <CustomAutocomplete
-                label="Autorizo para uso de imagen (Fotografía/videos)"
-                name="autorizacionImagen"
-                options={siNo}
-                value={
-                  siNo.find((opt) => opt.id === formData.autorizacionImagen) ||
-                  null
-                }
-                onChange={handleAutocompleteChange("autorizacionImagen")}
-                getOptionLabel={(option) => option.nombre}
-              />
+              {formData.autorizacionContactoEmergencia === "SI" && (
+                <Box sx={{ mt: 2, ml: 2 }}>
+                  <EmergencyContactForm />
+                </Box>
+              )}
+
+              <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+                <CustomAutocomplete
+                  label="Autorizo para uso de imagen (Fotografía/videos)"
+                  name="autorizacionImagen"
+                  options={siNo}
+                  value={
+                    siNo.find(
+                      (opt) => opt.id === formData.autorizacionImagen
+                    ) || null
+                  }
+                  onChange={handleAutocompleteChange("autorizacionImagen")}
+                  getOptionLabel={(option) => option.nombre}
+                />
+              </Grid>
+
+              <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+                <CustomAutocomplete
+                  label="Declaración de veracidad de la información"
+                  name="veracidadInformacion"
+                  options={siNo}
+                  value={
+                    siNo.find(
+                      (opt) => opt.id === formData.veracidadInformacion
+                    ) || null
+                  }
+                  onChange={handleAutocompleteChange("veracidadInformacion")}
+                  getOptionLabel={(option) => option.nombre}
+                />
+              </Grid>
+
+              <Grid size={{ xs: 12, sm: 12, md: 12 }}>
+                <Typography
+                  variant="h5"
+                  align="justify"
+                  sx={{ fontWeight: "bold", mb: 3 }}
+                >
+                  Con mi firma y con la de mi padre, madre o acudiente, nos
+                  comprometemos a cumplir con lo establecido en el Manual de
+                  Convivencia del Colegio Alegría del Norte.
+                </Typography>
+              </Grid>
             </Grid>
+          </CardContent>
+        </Card>
 
-            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-              <CustomAutocomplete
-                label="Declaración de veracidad de la información"
-                name="veracidadInformacion"
-                options={siNo}
-                value={
-                  siNo.find(
-                    (opt) => opt.id === formData.veracidadInformacion
-                  ) || null
-                }
-                onChange={handleAutocompleteChange("veracidadInformacion")}
-                getOptionLabel={(option) => option.nombre}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 12, md: 12 }}>
-              <Typography
-                variant="h5"
-                align="justify"
-                sx={{ fontWeight: "bold", mb: 3 }}
-              >
-                Con mi firma y con la de mi padre, madre o acudiente, nos
-                comprometemos a cumplir con lo establecido en el Manual de
-                Convivencia del Colegio Alegria del Norte.
-              </Typography>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-
-      <Button
-        variant="contained"
-        color="primary"
-        fullWidth
-        onClick={handleSubmit}
-        sx={{ mt: 3 }}
-      >
-        Registrar Estudiante
-      </Button>
-    </Box>
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          onClick={handleSubmit(onSubmit)}
+          sx={{ mt: 3 }}
+        >
+          Registrar Estudiante
+        </Button>
+      </Box>
+    </FormProvider>
   );
 };
 

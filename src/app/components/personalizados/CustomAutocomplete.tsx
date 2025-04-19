@@ -1,85 +1,93 @@
-import { 
-  Autocomplete, 
-  TextField, 
+"use client";
+
+import {
+  Autocomplete,
   AutocompleteProps,
-  AutocompleteChangeDetails,
-  AutocompleteChangeReason
+  TextField,
+  TextFieldProps,
 } from "@mui/material";
-import { SyntheticEvent } from "react";
+import {
+  Controller,
+  useFormContext,
+  FieldValues,
+  Path,
+  RegisterOptions,
+} from "react-hook-form";
+import React from "react";
 
-interface OptionType {
-  id: string | number;
-  nombre: string;
-  [key: string]: unknown;
-}
-
-interface CustomAutocompleteProps<T = OptionType>
-  extends Omit<
-    AutocompleteProps<T, false, false, false>,
-    "renderInput" | "options"
-  > {
+type CustomAutocompleteProps<
+  T extends FieldValues,
+  OptionType
+> = {
+  name: Path<T>;
   label: string;
-  name: string;
-  options: T[];
-  getOptionLabel: (option: T) => string;
   required?: boolean;
-  onChangeSimple?: (value: T | null) => void; // Nueva prop opcional simplificada
-}
+  disabled?: boolean;
+  helperText?: string;
+  options: OptionType[];
+  getOptionLabel: (option: OptionType) => string;
+  rules?: Omit<
+    RegisterOptions<T, Path<T>>,
+    "disabled" | "valueAsNumber" | "valueAsDate" | "setValueAs"
+  >;
+  value?: OptionType | null;
+  onChange: (
+    event: React.SyntheticEvent<Element, Event>,
+    value: OptionType | null
+  ) => void;
+} & Omit<
+  AutocompleteProps<OptionType, false, false, false>,
+  "renderInput" | "name" | "value" | "onChange" | "options"
+> &
+  Omit<TextFieldProps, "name" | "value" | "onChange">;
 
-const CustomAutocomplete = <T extends OptionType>({
-  label,
+function CustomAutocomplete<T extends FieldValues, OptionType>({
   name,
-  options,
-  value,
-  onChange,
-  onChangeSimple, // Nueva prop
-  getOptionLabel,
+  label,
   required = false,
   disabled = false,
+  helperText,
+  options,
+  getOptionLabel,
+  rules,
+  value,
+  onChange,
   ...props
-}: CustomAutocompleteProps<T>) => {
-  const handleChange = (
-    event: SyntheticEvent<Element, Event>,
-    newValue: T | null,
-    reason: AutocompleteChangeReason,
-    details?: AutocompleteChangeDetails<T>
-  ) => {
-    // Si se proporcionó onChangeSimple, llamarlo con solo el valor
-    if (onChangeSimple) {
-      onChangeSimple(newValue);
-    }
-    // Llamar al onChange original de MUI si existe
-    if (onChange) {
-      onChange(event, newValue, reason, details);
-    }
-  };
+}: CustomAutocompleteProps<T, OptionType>) {
+  const { control } = useFormContext<T>();
 
   return (
-    <Autocomplete<T, false, false, false>
-      options={options}
-      value={value}
-      onChange={handleChange}
-      getOptionLabel={getOptionLabel}
-      isOptionEqualToValue={(option, val) => option?.id === val?.id}
-      disabled={disabled}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label={label}
-          name={name}
-          required={required}
-          variant="outlined"
-          fullWidth
-          slotProps={{
-            inputLabel: {
-              shrink: true,
-            },
-          }}
+    <Controller
+      name={name}
+      control={control}
+      rules={rules}
+      render={({ fieldState: { error } }) => (
+        <Autocomplete
+          {...props}
+          options={options}
+          getOptionLabel={getOptionLabel}
+          value={value}
+          onChange={onChange}
+          disabled={disabled}
+          isOptionEqualToValue={(option, val) =>
+            JSON.stringify(option) === JSON.stringify(val)
+          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={label}
+              name={name}
+              required={required}
+              error={error ? true : undefined}
+              helperText={error?.message || helperText}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+          )}
         />
       )}
-      {...props}
     />
   );
-};
+}
 
 export default CustomAutocomplete;

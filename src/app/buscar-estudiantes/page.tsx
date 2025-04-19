@@ -16,11 +16,11 @@ import {
   CircularProgress,
   Alert,
   InputAdornment,
+  TextField,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import api from "../axios/axiosClient";
 import { useRouter } from "next/navigation";
-import CustomTextField from "../components/personalizados/CustomTextField";
 import { useSnackbar } from "notistack";
 
 interface Estudiante {
@@ -128,7 +128,7 @@ const BuscarEstudiantes = () => {
           </Typography>
 
           <Box display="flex" gap={2} mb={4}>
-            <CustomTextField
+            <TextField
               fullWidth
               variant="outlined"
               label="Nombre, apellido o documento"

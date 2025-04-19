@@ -34,13 +34,19 @@ const Discapacidades: React.FC<DiscapacidadesProps> = ({
           <CustomAutocomplete
             label={field.label}
             name={field.name}
-            options={siNo.map((option, index) => ({ id: index, nombre: option }))}
+            options={siNo.map((option, index) => ({
+              id: index,
+              nombre: option,
+            }))}
             value={
               siNo
                 .map((option, index) => ({ id: index, nombre: option }))
-                .find((opt) => opt.nombre === formData[field.name as keyof FormDataType]) || null
+                .find(
+                  (opt) =>
+                    opt.nombre === formData[field.name as keyof FormDataType]
+                ) || null
             }
-            onChangeSimple={(value) =>
+            onChange={(_, value) =>
               handleAutocompleteChange(field.name, value?.nombre || "")
             }
             getOptionLabel={(option) => option.nombre}

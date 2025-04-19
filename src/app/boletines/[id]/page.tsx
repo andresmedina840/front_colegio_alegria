@@ -14,12 +14,12 @@ import {
   Paper,
   CircularProgress,
   Alert,
+  TextField,
 } from "@mui/material";
 import FusionTemplateColegio from "../../components/TemplateColegio";
 import api from "../../axios/axiosClient";
 import { useParams } from "next/navigation";
 import StudentCard from "@/app/components/personalizados/StudentCard";
-import CustomTextField from "@/app/components/personalizados/CustomTextField";
 import { useSnackbar } from "notistack";
 import { AxiosError } from "axios";
 
@@ -310,7 +310,7 @@ const PaginaBoletin = () => {
                     {materia.nombre}
                   </TableCell>
                   <TableCell>
-                    <CustomTextField
+                    <TextField
                       fullWidth
                       multiline
                       value={materia.fortalezas}
@@ -320,8 +320,9 @@ const PaginaBoletin = () => {
                       sx={{ backgroundColor: "white", borderRadius: 1 }}
                     />
                   </TableCell>
+
                   <TableCell>
-                    <CustomTextField
+                    <TextField
                       fullWidth
                       multiline
                       value={materia.debilidades}
@@ -335,8 +336,9 @@ const PaginaBoletin = () => {
                       sx={{ backgroundColor: "white", borderRadius: 1 }}
                     />
                   </TableCell>
+
                   <TableCell sx={{ textAlign: "center" }}>
-                    <CustomTextField
+                    <TextField
                       type="number"
                       value={materia.intensidadHoraria.toString()}
                       onChange={(e) =>
@@ -347,7 +349,7 @@ const PaginaBoletin = () => {
                         )
                       }
                       sx={{
-                        width: 40,
+                        width: 60,
                         textAlign: "center",
                         borderRadius: 1,
                         "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
@@ -358,10 +360,15 @@ const PaginaBoletin = () => {
                           MozAppearance: "textfield",
                         },
                       }}
+                      inputProps={{
+                        inputMode: "numeric",
+                        pattern: "[0-9]*",
+                      }}
                     />
                   </TableCell>
+
                   <TableCell sx={{ textAlign: "center" }}>
-                    <CustomTextField
+                    <TextField
                       type="number"
                       value={materia.fallas.toString()}
                       onChange={(e) =>
@@ -372,7 +379,7 @@ const PaginaBoletin = () => {
                         )
                       }
                       sx={{
-                        width: 40,
+                        width: 60,
                         textAlign: "center",
                         borderRadius: 1,
                         "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
@@ -383,17 +390,22 @@ const PaginaBoletin = () => {
                           MozAppearance: "textfield",
                         },
                       }}
+                      inputProps={{
+                        inputMode: "numeric",
+                        pattern: "[0-9]*",
+                      }}
                     />
                   </TableCell>
+
                   <TableCell sx={{ textAlign: "center" }}>
-                    <CustomTextField
+                    <TextField
                       type="number"
                       value={materia.valoracion.toString()}
                       onChange={(e) => {
                         const value = Math.min(
                           5,
                           Math.max(0, Number(e.target.value))
-                        ); // Cierre correcto
+                        );
                         handleChangeMateria(index, "valoracion", value);
                       }}
                       inputProps={{
@@ -415,6 +427,7 @@ const PaginaBoletin = () => {
                       }}
                     />
                   </TableCell>
+
                   <TableCell sx={{ textAlign: "center" }}>
                     <Typography>
                       {determinarNivel(materia.valoracion)}
@@ -446,7 +459,7 @@ const PaginaBoletin = () => {
           </Table>
         </TableContainer>
 
-        <CustomTextField
+        <TextField
           fullWidth
           label="Observaciones"
           multiline
@@ -457,6 +470,7 @@ const PaginaBoletin = () => {
           }
           sx={{ mb: 3 }}
         />
+
         <Box display="flex" gap={2} justifyContent="flex-end">
           <Button variant="contained" color="primary" onClick={guardarBoletin}>
             Guardar Boletín
