@@ -2,7 +2,6 @@
 
 import { Card, CardContent, Grid } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import CustomTextField from "./personalizados/CustomTextField";
 import CustomDatePicker from "./personalizados/CustomDatePicker";
 import { getCurrentDayjsUTC } from "../utils/dateUtils";
 import { useFormContext } from "react-hook-form";
