@@ -25,8 +25,8 @@ import EmergencyContactForm from "./EmergencyContactForm";
 import CustomAutocomplete from "./personalizados/CustomAutocomplete";
 import { FormDataType, FormField } from "../types/formTypes";
 import initialFormData from "../estudiantes/initialFormData";
-import { useCatalogosForm } from "../hooks/useCatalogosForm";
-import Image from 'next/image'
+import { useCatalogosEstudiantes } from "../hooks/apisEstudiantes";
+import Image from "next/image";
 
 const siNo: OpcionSelect[] = [
   { id: "SI", nombre: "SI" },
@@ -44,7 +44,7 @@ const CreateStudentForm = () => {
     tiposIdentificacion,
     estratosEconomico,
     loading,
-  } = useCatalogosForm();
+  } = useCatalogosEstudiantes();
 
   const [departamentos, setDepartamentos] = useState<OpcionSelect[]>([]);
   const [ciudades, setCiudades] = useState<OpcionSelect[]>([]);
@@ -141,7 +141,14 @@ const CreateStudentForm = () => {
           gap: 2,
         }}
       >
-        <Image src="/logo.png" alt="Logo" width={100} height={100} />
+        <Image
+          src="/logo-colegio.png"
+          alt="Logo del Colegio"
+          width={100}
+          height={100}
+          priority
+          style={{ marginBottom: 20 }}
+        />
 
         <Typography variant="h6" fontWeight="bold" color="text.secondary">
           Cargando datos del formulario de Estudiantes...
