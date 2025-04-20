@@ -33,7 +33,6 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
   handleChange,
   siNo,
 }) => {
-  const disableOtrosCampos = formData.capacidadesExceptionalesNoAplica === "NO";
 
   const handleAutocompleteChange = (fieldName: string) => (
     _: React.SyntheticEvent,
@@ -81,7 +80,6 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
               value={getCurrentValue("situacionAcademicaAprobo")}
               onChange={handleAutocompleteChange("situacionAcademicaAprobo")}
               getOptionLabel={(option: OptionType) => option.nombre}
-              disabled={disableOtrosCampos}
             />
           </Grid>
 
@@ -93,7 +91,6 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
               value={getCurrentValue("situcionAcademicaReprobo")}
               onChange={handleAutocompleteChange("situcionAcademicaReprobo")}
               getOptionLabel={(option: OptionType) => option.nombre}
-              disabled={disableOtrosCampos}
             />
           </Grid>
 
@@ -105,7 +102,6 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
               value={getCurrentValue("situacionAcademicaPendienteLogros")}
               onChange={handleAutocompleteChange("situacionAcademicaPendienteLogros")}
               getOptionLabel={(option: OptionType) => option.nombre}
-              disabled={disableOtrosCampos}
             />
           </Grid>
 
@@ -117,7 +113,6 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
               value={getCurrentValue("situacionAcademicaVieneOtraIE")}
               onChange={handleAutocompleteChange("situacionAcademicaVieneOtraIE")}
               getOptionLabel={(option: OptionType) => option.nombre}
-              disabled={disableOtrosCampos}
             />
           </Grid>
 
@@ -129,7 +124,6 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
               value={getCurrentValue("situcionAcademicaIngresaPrimeraVezIE")}
               onChange={handleAutocompleteChange("situcionAcademicaIngresaPrimeraVezIE")}
               getOptionLabel={(option: OptionType) => option.nombre}
-              disabled={disableOtrosCampos}
             />
           </Grid>
 
@@ -141,7 +135,6 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
               value={getCurrentValue("situcionAcademicaNoCulminoEstudios")}
               onChange={handleAutocompleteChange("situcionAcademicaNoCulminoEstudios")}
               getOptionLabel={(option: OptionType) => option.nombre}
-              disabled={disableOtrosCampos}
             />
           </Grid>
         </Grid>

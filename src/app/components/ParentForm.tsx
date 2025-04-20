@@ -38,7 +38,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
         <Grid size={{ xs: 12, md: 6 }}>
           <CustomAutocomplete<FormDataType, OpcionSelect>
             label={`Tipo Identificación ${title}`}
-            name={field("tipoIdentificacion")}
+            name={field(`tipoIdentificacion${title}`)}
             options={tiposIdentificacion}
             required
             value={
@@ -54,7 +54,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
         <Grid size={{ xs: 12, md: 6 }}>
           <CustomTextField<FormDataType>
             label={`Número Identificación ${title}`}
-            name={field("numeroIdentificacion")}
+            name={field(`numeroIdentificacion${title}`)}
             required
             uppercase
             maxLength={12}

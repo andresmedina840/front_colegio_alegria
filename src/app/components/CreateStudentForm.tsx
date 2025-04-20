@@ -25,7 +25,7 @@ import DocumentacionRecibida from "./DocumentacionRecibida";
 import ParentForm from "./ParentForm";
 import EmergencyContactForm from "./EmergencyContactForm";
 import CustomAutocomplete from "./personalizados/CustomAutocomplete";
-import { FormDataType, FormField } from "../types/formTypes";
+import { FormDataType } from "../types/formTypes";
 import initialFormData from "../estudiantes/initialFormData";
 import { useCatalogosEstudiantes } from "../hooks/apisEstudiantes";
 import Image from "next/image";
@@ -35,8 +35,11 @@ const siNo: OpcionSelect[] = [
   { id: "NO", nombre: "NO" },
 ];
 
+type FormField = keyof FormDataType;
+
 const CreateStudentForm = () => {
   const { enqueueSnackbar } = useSnackbar();
+
   const methods = useForm<FormDataType>({
     resolver: yupResolver(studentInfoSchema),
     defaultValues: initialFormData,

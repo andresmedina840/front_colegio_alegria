@@ -1,12 +1,19 @@
 const initialFormData = {
-  numeroMatricula: "",
   fechaMatricula: "",
+
+  //Segundo modulo
   tipoIdentificacionEstudianteId: "",
   numeroIdentificacionEstudiante: "",
   primerNombreEstudiante: "",
   segundoNombreEstudiante: "",
   primerApellidoEstudiante: "",
   segundoApellidoEstudiante: "",
+  generoEstudianteId: "",
+  fechaNacimiento: "",
+  edad: "",
+  paisNacimiento: "",
+  departamentoNacimiento: "",
+  municipioNacimiento: "",
   sedeMatricula: "",
   gradoId: "",
   pensionId: "",
@@ -14,12 +21,8 @@ const initialFormData = {
   institucionEducativaAnterior: "",
   ultimoGradoCursado: "",
   ultimoAnioCursado: "",
-  generoEstudianteId: "",
-  fechaNacimiento: "",
-  edad: "",
-  paisNacimiento: "",
-  departamentoNacimiento: "",
-  municipioNacimiento: "",
+
+  //Tercer modulo
   tipoSangre: "",
   epsAfiliado: "",
   ipsAsignada: "",
@@ -27,24 +30,51 @@ const initialFormData = {
   nroCarnetSisben: "",
   nivelSisben: "",
   estrato: "",
+
+  //Discapacidades
+  noAplica: "",
+  sorderaProfunda: "",
+  hipoacusiaBajaVision: "",
+  bajaVisionDiagnosticada: "",
+  paralisisCerebral: "",
+  autismo: "",
+  deficienciaCognitiva: "",
+  sindromeDown: "",
+  multiple: "",
+
+  //CapacidadesExcepcionales
+  noAplicaCapacidad: "",
+  superdotado: "",
+  talentoCientifico: "",
+  talentoTecnologico: "",
+  talentoSubjetivo: "",
+
+  //SituacionAcademica
+  situacionAcademicaNoEstudioVigenciaAnterior: "",
+  situacionAcademicaAprobo: "",
+  situcionAcademicaReprobo: "",
+  situacionAcademicaPendienteLogros: "",
+  situacionAcademicaVieneOtraIE: "",
+  situcionAcademicaIngresaPrimeraVezIE: "",
+  situcionAcademicaNoCulminoEstudios: "",
+
+  //Padre
+  tipoIdentificacionPadre : "",
   numeroIdentificacionPadre: "",
   primerNombrePadre: "",
   segundoNombrePadre: "",
   primerApellidoPadre: "",
   segundoApellidoPadre: "",
-  //direccionPadre: "",
-  //barrioPadre: "",
-  //numeroCelularPadre: "",
-  //ocupacionPadre: "",
-  //correoElectronicoPadre: "",
+
+  //Madre
+  tipoIdentificacionMadre : "",
+  numeroIdentificacionMadre: "",
   primerNombreMadre: "",
   segundoNombreMadre: "",
   primerApellidoMadre: "",
   segundoApellidoMadre: "",
-  numeroIdentificacionMadre: "",
-  autorizacionImagen: "",
-  veracidadInformacion: "",
-  autorizacionContactoEmergencia: "",
+
+  //DocumentacionRecibida
   documentacionRecibidaRegistroCivil: "",
   documentacionRecibidaCertificadosEstudios: "",
   documentacionRecibidaFotos: "",
@@ -57,29 +87,18 @@ const initialFormData = {
   documentacionRecibidaRegistroVacunacion: "",
   documentacionRecibidaExamenSerologia: "",
 
-  discapacidad: "",
-  capacidadesExceptionalesNoAplica: "",
+  //Authorization
+  autorizacionContactoEmergencia: "",
+  autorizacionImagen: "",
+  veracidadInformacion: "",
+
+  //EmergencyContact
   primerNombreEmergencia: "",
   segundoNombreEmergencia: "",
   primerApellidoEmergencia: "",
   segundoApellidoEmergencia: "",
   telefonoEmergencia: "",
   parentescoEmergencia: "",
-  noAplica: "",
-  sorderaProfunda: "",
-  hipoacusiaBajaVision: "",
-  bajaVisionDiagnosticada: "",
-  paralisisCerebral: "",
-  autismo: "",
-  deficienciaCognitiva: "",
-  sindromeDown: "",
-  multiple: "",
-  capacidad_excepcional: "",
-  superdotado: "",
-  talentoCientifico: "",
-  talentoTecnologico: "",
-  talentoSubjetivo: "",
-  noAplicaCapacidad: "",
 };
 
 export default initialFormData;

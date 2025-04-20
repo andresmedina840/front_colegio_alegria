@@ -1,13 +1,21 @@
 // src/app/types/formTypes.ts
-export interface FormDataType {
-  numeroMatricula: string;
+export interface EnrollmentInfoForm {
   fechaMatricula: string;
+}
+
+export interface StudentInfoForm {
   tipoIdentificacionEstudianteId: string;
   numeroIdentificacionEstudiante: string;
   primerNombreEstudiante: string;
   segundoNombreEstudiante: string;
   primerApellidoEstudiante: string;
   segundoApellidoEstudiante: string;
+  generoEstudianteId: string;
+  fechaNacimiento: string;
+  edad: string;
+  paisNacimiento: string;
+  departamentoNacimiento: string;
+  municipioNacimiento: string;
   sedeMatricula: string;
   gradoId: string;
   pensionId: string;
@@ -15,12 +23,9 @@ export interface FormDataType {
   institucionEducativaAnterior: string;
   ultimoGradoCursado: string;
   ultimoAnioCursado: string;
-  generoEstudianteId: string;
-  fechaNacimiento: string;
-  edad: string;
-  paisNacimiento: string;
-  departamentoNacimiento: string;
-  municipioNacimiento: string;
+}
+
+export interface HealthAffiliationForm {
   tipoSangre: string;
   epsAfiliado: string;
   ipsAsignada: string;
@@ -28,19 +33,57 @@ export interface FormDataType {
   nroCarnetSisben: string;
   nivelSisben: string;
   estrato: string;
+}
+
+export interface CondicionesEspeciales {
+  //Discapacidades
+  noAplica: string;
+  sorderaProfunda: string;
+  hipoacusiaBajaVision: string;
+  bajaVisionDiagnosticada: string;
+  paralisisCerebral: string;
+  autismo: string;
+  deficienciaCognitiva: string;
+  sindromeDown: string;
+  multiple: string;
+
+  //CapacidadesExcepcionales
+  noAplicaCapacidad: string;
+  superdotado: string;
+  talentoCientifico: string;
+  talentoTecnologico: string;
+  talentoSubjetivo: string;
+}
+
+export interface SituacionAcademica {
+  situacionAcademicaNoEstudioVigenciaAnterior: string;
+  situacionAcademicaAprobo: string;
+  situcionAcademicaReprobo: string;
+  situacionAcademicaPendienteLogros: string;
+  situacionAcademicaVieneOtraIE: string;
+  situcionAcademicaIngresaPrimeraVezIE: string;
+  situcionAcademicaNoCulminoEstudios: string;
+}
+
+export interface ParentsInfo {
+  //Padre
+  tipoIdentificacionPadre: string;
   numeroIdentificacionPadre: string;
   primerNombrePadre: string;
   segundoNombrePadre: string;
   primerApellidoPadre: string;
   segundoApellidoPadre: string;
+
+  //Madre
+  tipoIdentificacionMadre: string;
+  numeroIdentificacionMadre: string;
   primerNombreMadre: string;
   segundoNombreMadre: string;
   primerApellidoMadre: string;
   segundoApellidoMadre: string;
-  numeroIdentificacionMadre: string;
-  autorizacionImagen: string;
-  veracidadInformacion: string;
-  autorizacionContactoEmergencia: string;
+}
+
+export interface DocumentacionRecibida {
   documentacionRecibidaRegistroCivil: string;
   documentacionRecibidaCertificadosEstudios: string;
   documentacionRecibidaFotos: string;
@@ -52,35 +95,30 @@ export interface FormDataType {
   documentacionRecibidaPagoSalvo: string;
   documentacionRecibidaRegistroVacunacion: string;
   documentacionRecibidaExamenSerologia: string;
-  discapacidad: string;
-  capacidadesExceptionalesNoAplica: string;
+}
+
+export interface Authorization {
+  autorizacionContactoEmergencia: string;
+  autorizacionImagen: string;
+  veracidadInformacion: string;
+}
+
+export interface EmergencyContact {
   primerNombreEmergencia: string;
   segundoNombreEmergencia: string;
   primerApellidoEmergencia: string;
   segundoApellidoEmergencia: string;
   telefonoEmergencia: string;
   parentescoEmergencia: string;
-
-  // Discapacidades
-  noAplica: string;
-  sorderaProfunda: string;
-  hipoacusiaBajaVision: string;
-  bajaVisionDiagnosticada: string;
-  paralisisCerebral: string;
-  autismo: string;
-  deficienciaCognitiva: string;
-  sindromeDown: string;
-  multiple: string;
-
-  // Capacidades excepcionales
-  capacidad_excepcional: string;
-  superdotado: string;
-  talentoCientifico: string;
-  talentoTecnologico: string;
-  talentoSubjetivo: string;
-  noAplicaCapacidad: string;
-
-
 }
 
-export type FormField = keyof FormDataType;
+export interface FormDataType extends
+  EnrollmentInfoForm,
+  StudentInfoForm,
+  HealthAffiliationForm,
+  CondicionesEspeciales,
+  SituacionAcademica,
+  DocumentacionRecibida,
+  ParentsInfo,
+  EmergencyContact,
+  Authorization {}
