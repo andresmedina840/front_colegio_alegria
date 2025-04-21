@@ -161,6 +161,9 @@ const PaginaBoletin = () => {
   };
 
   const handleValoracionChange = (index: number, value: string) => {
+    // Solo permitir valores numéricos con máximo 2 decimales
+    if (!/^\d*\.?\d{0,2}$/.test(value)) return;
+
     if (value === "") {
       handleChangeMateria(index, "valoracion", 0);
       return;
@@ -402,14 +405,9 @@ const PaginaBoletin = () => {
                     <TextField
                       type="text"
                       value={materia.valoracion}
-                      onChange={(e) => {
-                        const value = e.target.value;
-
-                        // Solo permitir valores numéricos con punto decimal
-                        if (/^\d*\.?\d{0,2}$/.test(value)) {
-                          handleChangeMateria(index, "valoracion", value);
-                        }
-                      }}
+                      onChange={(e) =>
+                        handleValoracionChange(index, e.target.value)
+                      }
                       inputProps={{
                         inputMode: "decimal",
                         pattern: "\\d*\\.?\\d*",
