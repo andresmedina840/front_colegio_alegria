@@ -56,12 +56,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
   const [loadingPension, setLoadingPension] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
-  const {
-    setValue,
-    watch,
-    control,
-  } = useFormContext<FormDataType>();
-
+  const { setValue, watch, control } = useFormContext<FormDataType>();
   const formData = watch();
 
   useEffect(() => {
@@ -82,8 +77,6 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
       setValue("edad", calcularEdad(formData.fechaNacimiento));
     }
   }, [formData.fechaNacimiento, setValue]);
-
-  if (!isMounted) return null;
 
   const handleAutocompleteChange =
     (fieldName: AutocompleteFields) =>
@@ -110,8 +103,11 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
 
       if (fieldName === "paisNacimiento") {
         cargarDepartamentos(newValue);
+        setValue("departamentoNacimiento", "");
+        setValue("municipioNacimiento", "");
       } else if (fieldName === "departamentoNacimiento") {
         cargarCiudades(newValue);
+        setValue("municipioNacimiento", "");
       }
     };
 
@@ -121,6 +117,8 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
   ) => {
     setValue("jornada", value?.id ?? "");
   };
+
+  if (!isMounted) return null;
 
   return (
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
@@ -144,6 +142,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                 "tipoIdentificacionEstudianteId"
               )}
               getOptionLabel={(option: OpcionSelect) => option.nombre}
+              getOptionValue={(option) => option.id}
               rules={{ required: "Este campo es obligatorio" }}
             />
           </Grid>
@@ -155,6 +154,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               name="numeroIdentificacionEstudiante"
               maxLength={11}
               showCharCount
+              rules={{ required: "Este campo es obligatorio" }}
             />
           </Grid>
 
@@ -204,6 +204,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               control={control}
               onChange={handleAutocompleteChange("generoEstudianteId")}
               getOptionLabel={(option: OpcionSelect) => option.nombre}
+              getOptionValue={(option) => option.id}
               rules={{ required: "Este campo es obligatorio" }}
             />
           </Grid>
@@ -232,6 +233,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               control={control}
               onChange={handleAutocompleteChange("paisNacimiento")}
               getOptionLabel={(option: OpcionSelect) => option.nombre}
+              getOptionValue={(option) => option.id}
               rules={{ required: "Este campo es obligatorio" }}
             />
           </Grid>
@@ -244,6 +246,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               control={control}
               onChange={handleAutocompleteChange("departamentoNacimiento")}
               getOptionLabel={(option: OpcionSelect) => option.nombre}
+              getOptionValue={(option) => option.id}
               disabled={!formData.paisNacimiento}
               rules={{ required: "Este campo es obligatorio" }}
             />
@@ -257,6 +260,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               control={control}
               onChange={handleAutocompleteChange("municipioNacimiento")}
               getOptionLabel={(option: OpcionSelect) => option.nombre}
+              getOptionValue={(option) => option.id}
               disabled={!formData.departamentoNacimiento}
               rules={{ required: "Este campo es obligatorio" }}
             />
@@ -274,7 +278,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Grado a matricular */}
-          <Grid size={{ xs: 12, sm: 3, md: 3 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 6 }}>
             <CustomAutocomplete<FormDataType, OpcionSelect>
               label="Grado a matricular *"
               name="gradoId"
@@ -282,6 +286,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               control={control}
               onChange={handleAutocompleteChange("gradoId")}
               getOptionLabel={(option: OpcionSelect) => option.nombre}
+              getOptionValue={(option) => option.id}
               rules={{ required: "Este campo es obligatorio" }}
             />
             {loadingPension && (
@@ -303,6 +308,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               control={control}
               onChange={handleJornadaChange}
               getOptionLabel={(option: OpcionSelect) => option.nombre}
+              getOptionValue={(option) => option.id}
               rules={{ required: "Este campo es obligatorio" }}
             />
           </Grid>
@@ -327,6 +333,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               control={control}
               onChange={handleAutocompleteChange("ultimoGradoCursado")}
               getOptionLabel={(option: OpcionSelect) => option.nombre}
+              getOptionValue={(option) => option.id}
             />
           </Grid>
 
