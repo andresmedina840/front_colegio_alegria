@@ -67,6 +67,12 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
   }, []);
 
   useEffect(() => {
+    if (sedes.length === 1) {
+      setValue("sedeMatricula", sedes[0].id);
+    }
+  }, [sedes, setValue]);  
+
+  useEffect(() => {
     const calcularEdad = (fechaNacimiento: string): string => {
       if (!fechaNacimiento) return "";
       const nacimiento = dayjs(fechaNacimiento);
@@ -280,6 +286,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               getOptionLabel={(option: OpcionSelect) => option.nombre}
               getOptionValue={(option) => option.id}
               rules={{ required: "Este campo es obligatorio" }}
+              disabled={sedes.length === 1}
             />
           </Grid>
 
