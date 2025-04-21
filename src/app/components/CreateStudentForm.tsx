@@ -67,6 +67,7 @@ const CreateStudentForm = () => {
     generos,
     paises,
     tiposIdentificacion,
+    sedes,
     estratosEconomico,
     loading,
   } = useCatalogosEstudiantes();
@@ -212,6 +213,7 @@ const CreateStudentForm = () => {
           jornadaEscolar={jornadaEscolar}
           paises={paises}
           tiposIdentificacion={tiposIdentificacion}
+          sedes={sedes}
         />
 
         <HealthAffiliationForm

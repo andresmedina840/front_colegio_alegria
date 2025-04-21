@@ -24,6 +24,7 @@ type AutocompleteFields =
   | "paisNacimiento"
   | "departamentoNacimiento"
   | "municipioNacimiento"
+  | "sedeMatricula"  
   | "gradoId"
   | "ultimoGradoCursado";
 
@@ -37,6 +38,7 @@ type StudentInfoFormProps = {
   cargarDepartamentos: (paisId: string) => void;
   cargarCiudades: (departamentoId: string) => void;
   tiposIdentificacion: OpcionSelect[];
+  sedes: OpcionSelect[];
 };
 
 const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
@@ -49,6 +51,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
   cargarDepartamentos,
   cargarCiudades,
   tiposIdentificacion,
+  sedes,
 }) => {
   const maxDateActual = getCurrentDayjsUTC();
   const [isMounted, setIsMounted] = useState(false);
@@ -268,12 +271,15 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
 
           {/* Sede */}
           <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-            <CustomTextField
-              label="Sede para donde se matrícula"
+            <CustomAutocomplete<FormDataType, OpcionSelect>
+              label="Sede para donde se matrícula *"
               name="sedeMatricula"
-              maxLength={26}
-              showCharCount
-              uppercase
+              options={sedes}
+              control={control}
+              onChange={handleAutocompleteChange("sedeMatricula")}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
+              getOptionValue={(option) => option.id}
+              rules={{ required: "Este campo es obligatorio" }}
             />
           </Grid>
 
