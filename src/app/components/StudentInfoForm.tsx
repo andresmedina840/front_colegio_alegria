@@ -278,7 +278,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Grado a matricular */}
-          <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+          <Grid size={{ xs: 12, sm: 3, md: 3}}>
             <CustomAutocomplete<FormDataType, OpcionSelect>
               label="Grado a matricular *"
               name="gradoId"
