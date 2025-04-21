@@ -1,5 +1,3 @@
-"use client";
-
 import { Grid, Typography } from "@mui/material";
 import React from "react";
 import CustomTextField from "../components/personalizados/CustomTextField";
@@ -22,9 +20,10 @@ const ParentForm: React.FC<ParentFormProps> = ({
   tiposIdentificacion,
 }) => {
   const field = (key: string) => `${key}${title}` as keyof FormDataType;
-  const { getValues, setValue } = useFormContext<FormDataType>();
+  const { control, setValue } = useFormContext<FormDataType>();
 
-  const handleAutocompleteChange = (fieldName: keyof FormDataType) =>
+  const handleAutocompleteChange =
+    (fieldName: keyof FormDataType) =>
     (_: React.SyntheticEvent, value: OpcionSelect | null) => {
       setValue(fieldName, value?.id.toString() || "");
     };
@@ -35,34 +34,30 @@ const ParentForm: React.FC<ParentFormProps> = ({
         {title}
       </Typography>
       <Grid container spacing={2}>
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
           <CustomAutocomplete<FormDataType, OpcionSelect>
             label={`Tipo Identificación ${title}`}
             name={field(`tipoIdentificacion${title}`)}
             options={tiposIdentificacion}
-            required
-            value={
-              tiposIdentificacion.find(
-                (tipo) => tipo.id === getValues(field("tipoIdentificacion"))
-              ) || null
-            }
-            onChange={handleAutocompleteChange(field("tipoIdentificacion"))}
-            getOptionLabel={(option) => option.nombre}
+            control={control}
+            getOptionLabel={(option: OpcionSelect) => option.nombre}
+            onChange={handleAutocompleteChange(
+              field(`tipoIdentificacion${title}`)
+            )}
           />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
           <CustomTextField<FormDataType>
             label={`Número Identificación ${title}`}
             name={field(`numeroIdentificacion${title}`)}
-            required
             uppercase
             maxLength={12}
             showCharCount
           />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
           <CustomTextField<FormDataType>
             label={`Primer Nombre ${title}`}
             name={field("primerNombre")}
@@ -72,7 +67,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
           />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
           <CustomTextField<FormDataType>
             label={`Segundo Nombre ${title}`}
             name={field("segundoNombre")}
@@ -82,7 +77,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
           />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
           <CustomTextField<FormDataType>
             label={`Primer Apellido ${title}`}
             name={field("primerApellido")}
@@ -92,7 +87,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
           />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
           <CustomTextField<FormDataType>
             label={`Segundo Apellido ${title}`}
             name={field("segundoApellido")}

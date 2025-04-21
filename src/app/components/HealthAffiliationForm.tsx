@@ -1,10 +1,9 @@
-"use client";
-
 import { Card, CardContent, Grid, Typography } from "@mui/material";
 import CustomTextField from "./personalizados/CustomTextField";
 import CustomAutocomplete from "./personalizados/CustomAutocomplete";
 import { FormDataType } from "../types/formTypes";
 import { OpcionSelect } from "../types";
+import { useFormContext } from "react-hook-form";
 
 interface HealthAffiliationFormProps {
   estratoEconomico: OpcionSelect[];
@@ -15,6 +14,8 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
   estratoEconomico,
   updateField,
 }) => {
+  const { control } = useFormContext<FormDataType>();
+
   const formFields = [
     {
       label: "Tipo de Sangre y RH",
@@ -61,7 +62,7 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
 
         <Grid container spacing={2}>
           {formFields.map((field) => (
-            <Grid size={{ xs: 12, sm: 2, md: 6 }} key={field.name}>
+            <Grid size={{ xs: 12, sm: 6, md: 6 }} key={field.name}>
               <CustomTextField<FormDataType>
                 label={field.label}
                 name={field.name}
@@ -72,17 +73,19 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
             </Grid>
           ))}
 
-          <Grid size={{ xs: 12, sm: 2, md: 6 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 6 }}>
             <CustomAutocomplete<FormDataType, OpcionSelect>
               name="estrato"
               label="Estrato económico"
               options={estratoEconomico}
               required
-              getOptionLabel={(option) => option.nombre}
-              isOptionEqualToValue={(option, value) => option.id === value?.id}
-              onChange={(_, value) =>
-                updateField("estrato", value?.id ?? "")
-              }
+              control={control}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
+              onChange={(event, value: OpcionSelect | null) => {
+                if (value) {
+                  updateField("estrato", value.id);
+                }
+              }}
             />
           </Grid>
         </Grid>

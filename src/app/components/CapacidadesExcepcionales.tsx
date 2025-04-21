@@ -1,6 +1,12 @@
 import { Grid } from "@mui/material";
+import { useFormContext } from "react-hook-form";
 import { FormDataType } from "../types/formTypes";
 import CustomAutocomplete from "../components/personalizados/CustomAutocomplete";
+
+interface OpcionSiNo {
+  id: number;
+  nombre: string;
+}
 
 interface CapacidadesExcepcionalesProps {
   formData: FormDataType;
@@ -10,9 +16,16 @@ interface CapacidadesExcepcionalesProps {
 
 const CapacidadesExcepcionales: React.FC<CapacidadesExcepcionalesProps> = ({
   formData,
-  handleAutocompleteChange,
   siNo,
+  handleAutocompleteChange,
 }) => {
+  const { control } = useFormContext<FormDataType>();
+
+  const opcionesSiNo: OpcionSiNo[] = siNo.map((option, index) => ({
+    id: index,
+    nombre: option,
+  }));
+
   const capacidadFields = [
     { name: "noAplicaCapacidad", label: "No aplica" },
     { name: "superdotado", label: "Superdotado" },
@@ -27,25 +40,15 @@ const CapacidadesExcepcionales: React.FC<CapacidadesExcepcionalesProps> = ({
     <Grid container spacing={2}>
       {capacidadFields.map((field) => (
         <Grid size={{ xs: 12, sm: 6, md: 4 }} key={field.name}>
-          <CustomAutocomplete
+          <CustomAutocomplete<FormDataType, OpcionSiNo>
             label={field.label}
-            name={field.name}
-            options={siNo.map((option, index) => ({
-              id: index,
-              nombre: option,
-            }))}
-            value={
-              siNo
-                .map((option, index) => ({ id: index, nombre: option }))
-                .find(
-                  (opt) =>
-                    opt.nombre === formData[field.name as keyof FormDataType]
-                ) || null
-            }
-            onChange={(_, value) =>
-              handleAutocompleteChange(field.name, value?.nombre || "")
-            }
+            name={field.name as keyof FormDataType}
+            options={opcionesSiNo}
+            control={control}
             getOptionLabel={(option) => option.nombre}
+            onChange={(event, value) => {
+              handleAutocompleteChange(field.name, value?.nombre || "");
+            }}
             disabled={field.name !== "noAplicaCapacidad" && disableOthers}
           />
         </Grid>

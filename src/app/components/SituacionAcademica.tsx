@@ -1,14 +1,10 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  Grid,
-  Typography,
-} from "@mui/material";
+import { Card, CardContent, Grid, Typography } from "@mui/material";
 import React from "react";
 import CustomAutocomplete from "./personalizados/CustomAutocomplete";
 import { FormDataType } from "../types/formTypes";
+import { useFormContext } from "react-hook-form";
 
 type OptionType = {
   id: string;
@@ -17,54 +13,49 @@ type OptionType = {
 
 type SituacionAcademicaProps = {
   formData: FormDataType;
-  handleChange: (
-    e: {
-      target: {
-        name: string;
-        value: string | number | boolean | null | undefined;
-      };
-    }
-  ) => void;
+  handleChange: (e: {
+    target: {
+      name: string;
+      value: string | number | boolean | null | undefined;
+    };
+  }) => void;
   siNo: OptionType[];
 };
 
 const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
-  formData,
   handleChange,
   siNo,
 }) => {
+  const { control } = useFormContext<FormDataType>();
 
-  const handleAutocompleteChange = (fieldName: string) => (
-    _: React.SyntheticEvent,
-    value: OptionType | null
-  ) => {
-    handleChange({
-      target: {
-        name: fieldName,
-        value: value ? value.id : "",
-      },
-    });
-  };
-
-  const getCurrentValue = (fieldName: string) => {
-    return siNo.find(
-      (option) => option.id === formData[fieldName as keyof FormDataType]
-    ) || null;
-  };
+  const handleAutocompleteChange =
+    (fieldName: string) =>
+    (_: React.SyntheticEvent, value: OptionType | null) => {
+      handleChange({
+        target: {
+          name: fieldName,
+          value: value ? value.id : "",
+        },
+      });
+    };
 
   return (
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
       <CardContent>
-        <Typography variant="h6" align="left" sx={{ fontWeight: "bold", mb: 3 }}>
+        <Typography
+          variant="h6"
+          align="left"
+          sx={{ fontWeight: "bold", mb: 3 }}
+        >
           Situación académica
         </Typography>
         <Grid container spacing={2}>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <CustomAutocomplete
+          <Grid size={{ xs: 12, sm: 4, md: 4 }}>
+            <CustomAutocomplete<FormDataType, OptionType>
               label="No estudió en la vigencia anterior"
               name="situacionAcademicaNoEstudioVigenciaAnterior"
               options={siNo}
-              value={getCurrentValue("situacionAcademicaNoEstudioVigenciaAnterior")}
+              control={control}
               onChange={handleAutocompleteChange(
                 "situacionAcademicaNoEstudioVigenciaAnterior"
               )}
@@ -72,68 +63,76 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
             />
           </Grid>
 
-          <Grid size={{ xs: 12, md: 2 }}>
-            <CustomAutocomplete
+          <Grid size={{ xs: 12, sm: 2, md: 2 }}>
+            <CustomAutocomplete<FormDataType, OptionType>
               label="Aprobó"
               name="situacionAcademicaAprobo"
               options={siNo}
-              value={getCurrentValue("situacionAcademicaAprobo")}
+              control={control}
               onChange={handleAutocompleteChange("situacionAcademicaAprobo")}
               getOptionLabel={(option: OptionType) => option.nombre}
             />
           </Grid>
 
-          <Grid size={{ xs: 12, md: 2 }}>
-            <CustomAutocomplete
+          <Grid size={{ xs: 12, sm: 2, md: 2 }}>
+            <CustomAutocomplete<FormDataType, OptionType>
               label="Reprobó"
               name="situcionAcademicaReprobo"
               options={siNo}
-              value={getCurrentValue("situcionAcademicaReprobo")}
+              control={control}
               onChange={handleAutocompleteChange("situcionAcademicaReprobo")}
               getOptionLabel={(option: OptionType) => option.nombre}
             />
           </Grid>
 
-          <Grid size={{ xs: 12, md: 4 }}>
-            <CustomAutocomplete
+          <Grid size={{ xs: 12, sm: 4, md: 4 }}>
+            <CustomAutocomplete<FormDataType, OptionType>
               label="Pendiente de logros"
               name="situacionAcademicaPendienteLogros"
               options={siNo}
-              value={getCurrentValue("situacionAcademicaPendienteLogros")}
-              onChange={handleAutocompleteChange("situacionAcademicaPendienteLogros")}
+              control={control}
+              onChange={handleAutocompleteChange(
+                "situacionAcademicaPendienteLogros"
+              )}
               getOptionLabel={(option: OptionType) => option.nombre}
             />
           </Grid>
 
-          <Grid size={{ xs: 12, md: 3 }}>
-            <CustomAutocomplete
+          <Grid size={{ xs: 12, sm: 3, md: 3 }}>
+            <CustomAutocomplete<FormDataType, OptionType>
               label="Viene de otra I.E."
               name="situacionAcademicaVieneOtraIE"
               options={siNo}
-              value={getCurrentValue("situacionAcademicaVieneOtraIE")}
-              onChange={handleAutocompleteChange("situacionAcademicaVieneOtraIE")}
+              control={control}
+              onChange={handleAutocompleteChange(
+                "situacionAcademicaVieneOtraIE"
+              )}
               getOptionLabel={(option: OptionType) => option.nombre}
             />
           </Grid>
 
-          <Grid size={{ xs: 12, md: 4 }}>
-            <CustomAutocomplete
+          <Grid size={{ xs: 12, sm: 4, md: 4 }}>
+            <CustomAutocomplete<FormDataType, OptionType>
               label="Ingresa por primera vez a la I.E."
               name="situcionAcademicaIngresaPrimeraVezIE"
               options={siNo}
-              value={getCurrentValue("situcionAcademicaIngresaPrimeraVezIE")}
-              onChange={handleAutocompleteChange("situcionAcademicaIngresaPrimeraVezIE")}
+              control={control}
+              onChange={handleAutocompleteChange(
+                "situcionAcademicaIngresaPrimeraVezIE"
+              )}
               getOptionLabel={(option: OptionType) => option.nombre}
             />
           </Grid>
 
-          <Grid size={{ xs: 12, md: 5 }}>
-            <CustomAutocomplete
+          <Grid size={{ xs: 12, sm: 5, md: 5 }}>
+            <CustomAutocomplete<FormDataType, OptionType>
               label="No culminó estudios"
               name="situcionAcademicaNoCulminoEstudios"
               options={siNo}
-              value={getCurrentValue("situcionAcademicaNoCulminoEstudios")}
-              onChange={handleAutocompleteChange("situcionAcademicaNoCulminoEstudios")}
+              control={control}
+              onChange={handleAutocompleteChange(
+                "situcionAcademicaNoCulminoEstudios"
+              )}
               getOptionLabel={(option: OptionType) => option.nombre}
             />
           </Grid>

@@ -1,12 +1,7 @@
 // src/app/components/StudentInfoForm.tsx
 "use client";
 
-import {
-  Card,
-  CardContent,
-  Grid,
-  Typography,
-} from "@mui/material";
+import { Card, CardContent, Grid, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import CustomTextField from "./personalizados/CustomTextField";
 import CustomDatePicker from "./personalizados/CustomDatePicker";
@@ -64,7 +59,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
   const {
     setValue,
     watch,
-    formState: { errors },
+    control,
   } = useFormContext<FormDataType>();
 
   const formData = watch();
@@ -130,29 +125,31 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
   return (
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
       <CardContent>
-        <Typography variant="h6" align="left" sx={{ fontWeight: "bold", mb: 3 }}>
+        <Typography
+          variant="h6"
+          align="left"
+          sx={{ fontWeight: "bold", mb: 3 }}
+        >
           Información del estudiante
         </Typography>
         <Grid container spacing={2}>
-
           {/* Tipo Identificación */}
-          <Grid size={{ xs: 12, sm: 2, md: 6 }}>
-            <CustomAutocomplete
+          <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+            <CustomAutocomplete<FormDataType, OpcionSelect>
               label="Tipo Identificación Estudiante *"
               name="tipoIdentificacionEstudianteId"
               options={tiposIdentificacion}
-              value={tiposIdentificacion.find(
-                (tipo) => tipo.id === formData.tipoIdentificacionEstudianteId
-              ) || null}
-              onChange={handleAutocompleteChange("tipoIdentificacionEstudianteId")}
-              getOptionLabel={(option) => option.nombre}
-              error={!!errors.tipoIdentificacionEstudianteId}
-              helperText={errors.tipoIdentificacionEstudianteId?.message}
+              control={control}
+              onChange={handleAutocompleteChange(
+                "tipoIdentificacionEstudianteId"
+              )}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
+              rules={{ required: "Este campo es obligatorio" }}
             />
           </Grid>
 
           {/* Número Identificación */}
-          <Grid size={{ xs: 12, sm: 2, md: 6 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 6 }}>
             <CustomTextField
               label="Número Identificación Estudiante *"
               name="numeroIdentificacionEstudiante"
@@ -162,12 +159,26 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Nombres y Apellidos */}
-          {([
-            { field: "primerNombreEstudiante", label: "Primer Nombre Estudiante *" },
-            { field: "segundoNombreEstudiante", label: "Segundo Nombre Estudiante" },
-            { field: "primerApellidoEstudiante", label: "Primer Apellido Estudiante *" },
-            { field: "segundoApellidoEstudiante", label: "Segundo Apellido Estudiante" },
-          ] as const).map(({ field, label }) => (
+          {(
+            [
+              {
+                field: "primerNombreEstudiante",
+                label: "Primer Nombre Estudiante *",
+              },
+              {
+                field: "segundoNombreEstudiante",
+                label: "Segundo Nombre Estudiante",
+              },
+              {
+                field: "primerApellidoEstudiante",
+                label: "Primer Apellido Estudiante *",
+              },
+              {
+                field: "segundoApellidoEstudiante",
+                label: "Segundo Apellido Estudiante",
+              },
+            ] as const
+          ).map(({ field, label }) => (
             <Grid size={{ xs: 12, sm: 6, md: 6 }} key={field}>
               <CustomTextField
                 label={label}
@@ -175,22 +186,25 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                 maxLength={26}
                 showCharCount
                 uppercase
+                rules={
+                  label.includes("*")
+                    ? { required: "Este campo es obligatorio" }
+                    : undefined
+                }
               />
             </Grid>
           ))}
 
           {/* Género */}
           <Grid size={{ xs: 12, sm: 4, md: 4 }}>
-            <CustomAutocomplete
+            <CustomAutocomplete<FormDataType, OpcionSelect>
               label="Género *"
               name="generoEstudianteId"
-              required
               options={generos}
-              value={generos.find((g) => g.id === formData.generoEstudianteId) || null}
+              control={control}
               onChange={handleAutocompleteChange("generoEstudianteId")}
-              getOptionLabel={(option) => option.nombre}
-              error={!!errors.generoEstudianteId}
-              helperText={errors.generoEstudianteId?.message}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
+              rules={{ required: "Este campo es obligatorio" }}
             />
           </Grid>
 
@@ -200,54 +214,51 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               label="Fecha de Nacimiento *"
               name="fechaNacimiento"
               maxDate={maxDateActual}
-              helperText={errors.fechaNacimiento?.message}
+              rules={{ required: "Este campo es obligatorio" }}
             />
           </Grid>
 
           {/* Edad */}
           <Grid size={{ xs: 12, sm: 2, md: 2 }}>
-            <CustomTextField label="Edad" name="edad" />
+            <CustomTextField label="Edad" name="edad" disabled />
           </Grid>
 
           {/* País, Departamento y Municipio */}
           <Grid size={{ xs: 12, sm: 3, md: 3 }}>
-            <CustomAutocomplete
+            <CustomAutocomplete<FormDataType, OpcionSelect>
               label="País de Nacimiento *"
               name="paisNacimiento"
               options={paises}
-              value={paises.find((p) => p.id === formData.paisNacimiento) || null}
+              control={control}
               onChange={handleAutocompleteChange("paisNacimiento")}
-              getOptionLabel={(option) => option.nombre}
-              error={!!errors.paisNacimiento}
-              helperText={errors.paisNacimiento?.message}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
+              rules={{ required: "Este campo es obligatorio" }}
             />
           </Grid>
 
           <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-            <CustomAutocomplete
+            <CustomAutocomplete<FormDataType, OpcionSelect>
               label="Departamento de Nacimiento *"
               name="departamentoNacimiento"
               options={departamentos}
-              value={departamentos.find((d) => d.id === formData.departamentoNacimiento) || null}
+              control={control}
               onChange={handleAutocompleteChange("departamentoNacimiento")}
-              getOptionLabel={(option) => option.nombre}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
               disabled={!formData.paisNacimiento}
-              error={!!errors.departamentoNacimiento}
-              helperText={errors.departamentoNacimiento?.message}
+              rules={{ required: "Este campo es obligatorio" }}
             />
           </Grid>
 
           <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-            <CustomAutocomplete
+            <CustomAutocomplete<FormDataType, OpcionSelect>
               label="Municipio de Nacimiento *"
               name="municipioNacimiento"
               options={ciudades}
-              value={ciudades.find((c) => c.id === formData.municipioNacimiento) || null}
+              control={control}
               onChange={handleAutocompleteChange("municipioNacimiento")}
-              getOptionLabel={(option) => option.nombre}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
               disabled={!formData.departamentoNacimiento}
-              error={!!errors.municipioNacimiento}
-              helperText={errors.municipioNacimiento?.message}
+              rules={{ required: "Este campo es obligatorio" }}
             />
           </Grid>
 
@@ -264,15 +275,14 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
 
           {/* Grado a matricular */}
           <Grid size={{ xs: 12, sm: 3, md: 3 }}>
-            <CustomAutocomplete
+            <CustomAutocomplete<FormDataType, OpcionSelect>
               label="Grado a matricular *"
               name="gradoId"
               options={grados}
-              value={grados.find((g) => g.id === String(formData.gradoId)) || null}
+              control={control}
               onChange={handleAutocompleteChange("gradoId")}
-              getOptionLabel={(option) => option.nombre}
-              error={!!errors.gradoId}
-              helperText={errors.gradoId?.message}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
+              rules={{ required: "Este campo es obligatorio" }}
             />
             {loadingPension && (
               <Typography variant="body2">Cargando...</Typography>
@@ -286,19 +296,14 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
 
           {/* Jornada Escolar */}
           <Grid size={{ xs: 12, sm: 3, md: 3 }}>
-            <CustomAutocomplete
+            <CustomAutocomplete<FormDataType, OpcionSelect>
               label="Jornada Escolar *"
               name="jornada"
               options={jornadaEscolar.map((j) => ({ id: j, nombre: j }))}
-              value={
-                jornadaEscolar
-                  .map((j) => ({ id: j, nombre: j }))
-                  .find((opt) => opt.id === formData.jornada) || null
-              }
+              control={control}
               onChange={handleJornadaChange}
-              getOptionLabel={(option) => option.nombre}
-              error={!!errors.jornada}
-              helperText={errors.jornada?.message}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
+              rules={{ required: "Este campo es obligatorio" }}
             />
           </Grid>
 
@@ -315,13 +320,13 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
 
           {/* Último grado cursado */}
           <Grid size={{ xs: 12, sm: 3, md: 3 }}>
-            <CustomAutocomplete
+            <CustomAutocomplete<FormDataType, OpcionSelect>
               label="Último Grado Cursado"
               name="ultimoGradoCursado"
               options={grados}
-              value={grados.find((g) => g.id === formData.ultimoGradoCursado) || null}
+              control={control}
               onChange={handleAutocompleteChange("ultimoGradoCursado")}
-              getOptionLabel={(option) => option.nombre}
+              getOptionLabel={(option: OpcionSelect) => option.nombre}
             />
           </Grid>
 
@@ -334,7 +339,6 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               showCharCount
             />
           </Grid>
-
         </Grid>
       </CardContent>
     </Card>

@@ -36,18 +36,11 @@ const CondicionesEspeciales: React.FC<CondicionesEspecialesProps> = ({
           Condiciones Especiales del Estudiante
         </Typography>
 
-        <Discapacidades
-          formData={formData}
-          handleAutocompleteChange={(name, value) =>
-            handleChange({
-              target: { name, value },
-            } as React.ChangeEvent<HTMLInputElement>)
-          }
-          siNo={siNo}
-        />
+        <Discapacidades siNo={siNo} />
+
         <CapacidadesExcepcionales
           formData={formData}
-          handleAutocompleteChange={handleAutocompleteChange}
+          handleAutocompleteChange={handleAutocompleteChange} // Pasando handleAutocompleteChange
           siNo={siNo}
         />
       </CardContent>

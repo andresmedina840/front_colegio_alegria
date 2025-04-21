@@ -35,8 +35,6 @@ const siNo: OpcionSelect[] = [
   { id: "NO", nombre: "NO" },
 ];
 
-type FormField = keyof FormDataType;
-
 const CreateStudentForm = () => {
   const { enqueueSnackbar } = useSnackbar();
 
@@ -117,14 +115,6 @@ const CreateStudentForm = () => {
         console.error("Error al cargar ciudades:", error);
       }
     },
-    [updateField]
-  );
-
-  const handleAutocompleteChange = useCallback(
-    (fieldName: FormField) =>
-      (_: React.SyntheticEvent, value: OpcionSelect | null) => {
-        updateField(fieldName, value ? value.id : "");
-      },
     [updateField]
   );
 
@@ -241,11 +231,7 @@ const CreateStudentForm = () => {
           siNo={siNo}
         />
 
-        <DocumentacionRecibida
-          formData={formData}
-          handleChange={handleChange}
-          siNo={siNo}
-        />
+        <DocumentacionRecibida siNo={siNo} />
 
         <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
           <CardContent>
@@ -271,19 +257,11 @@ const CreateStudentForm = () => {
 
             <Grid container spacing={2} sx={{ mt: 1 }}>
               <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-                <CustomAutocomplete
+                <CustomAutocomplete<FormDataType, OpcionSelect>
                   label="Autorización para contacto de emergencia"
                   name="autorizacionContactoEmergencia"
                   options={siNo}
-                  value={
-                    siNo.find(
-                      (opt) =>
-                        opt.id === formData.autorizacionContactoEmergencia
-                    ) || null
-                  }
-                  onChange={handleAutocompleteChange(
-                    "autorizacionContactoEmergencia"
-                  )}
+                  control={methods.control}
                   getOptionLabel={(option) => option.nombre}
                 />
               </Grid>
@@ -295,31 +273,21 @@ const CreateStudentForm = () => {
               )}
 
               <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-                <CustomAutocomplete
+                <CustomAutocomplete<FormDataType, OpcionSelect>
                   label="Autorizo para uso de imagen (Fotografía/videos)"
                   name="autorizacionImagen"
                   options={siNo}
-                  value={
-                    siNo.find(
-                      (opt) => opt.id === formData.autorizacionImagen
-                    ) || null
-                  }
-                  onChange={handleAutocompleteChange("autorizacionImagen")}
+                  control={methods.control}
                   getOptionLabel={(option) => option.nombre}
                 />
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-                <CustomAutocomplete
+                <CustomAutocomplete<FormDataType, OpcionSelect>
                   label="Declaración de veracidad de la información"
                   name="veracidadInformacion"
                   options={siNo}
-                  value={
-                    siNo.find(
-                      (opt) => opt.id === formData.veracidadInformacion
-                    ) || null
-                  }
-                  onChange={handleAutocompleteChange("veracidadInformacion")}
+                  control={methods.control}
                   getOptionLabel={(option) => option.nombre}
                 />
               </Grid>

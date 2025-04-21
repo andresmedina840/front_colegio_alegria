@@ -1,87 +1,69 @@
+// src/app/components/personalizados/CustomAutocomplete.tsx
 "use client";
 
-import {
-  Autocomplete,
-  AutocompleteProps,
-  TextField,
-  TextFieldProps,
-} from "@mui/material";
-import {
-  Controller,
-  useFormContext,
-  FieldValues,
-  Path,
-  RegisterOptions,
-} from "react-hook-form";
+import { Controller, Control, FieldValues, Path, RegisterOptions } from "react-hook-form";
+import { Autocomplete, TextField, AutocompleteProps } from "@mui/material";
 import React from "react";
 
-type CustomAutocompleteProps<
-  T extends FieldValues,
-  OptionType
-> = {
+type CustomAutocompleteProps<T extends FieldValues, TOption> = {
   name: Path<T>;
   label: string;
-  required?: boolean;
+  options: TOption[];
+  control: Control<T>;
+  getOptionLabel: (option: TOption) => string;
+  onChange?: (event: React.SyntheticEvent, value: TOption | null) => void;
   disabled?: boolean;
+  required?: boolean;
   helperText?: string;
-  options: OptionType[];
-  getOptionLabel: (option: OptionType) => string;
   rules?: Omit<
     RegisterOptions<T, Path<T>>,
     "disabled" | "valueAsNumber" | "valueAsDate" | "setValueAs"
   >;
-  value?: OptionType | null;
-  onChange: (
-    event: React.SyntheticEvent<Element, Event>,
-    value: OptionType | null
-  ) => void;
-} & Omit<
-  AutocompleteProps<OptionType, false, false, false>,
-  "renderInput" | "name" | "value" | "onChange" | "options"
-> &
-  Omit<TextFieldProps, "name" | "value" | "onChange">;
+} & Omit<AutocompleteProps<TOption, false, false, false>, "renderInput" | "options" | "onChange">;
 
-function CustomAutocomplete<T extends FieldValues, OptionType>({
+function CustomAutocomplete<T extends FieldValues, TOption>({
   name,
   label,
-  required = false,
-  disabled = false,
-  helperText,
   options,
+  control,
   getOptionLabel,
-  rules,
-  value,
   onChange,
+  disabled = false,
+  required = false,
+  helperText,
+  rules,
   ...props
-}: CustomAutocompleteProps<T, OptionType>) {
-  const { control } = useFormContext<T>();
-
+}: CustomAutocompleteProps<T, TOption>) {
   return (
     <Controller
-      name={name}
       control={control}
+      name={name}
       rules={rules}
-      render={({ fieldState: { error } }) => (
+      render={({ field: { onChange: onFieldChange, value, ref }, fieldState: { error } }) => (
         <Autocomplete
           {...props}
           options={options}
           getOptionLabel={getOptionLabel}
-          value={value}
-          onChange={onChange}
+          onChange={(event, newValue) => {
+            onFieldChange(newValue);
+            onChange?.(event, newValue);
+          }}
+          value={value || null}
           disabled={disabled}
-          isOptionEqualToValue={(option, val) =>
-            JSON.stringify(option) === JSON.stringify(val)
+          isOptionEqualToValue={(option, value) => 
+            getOptionLabel(option) === (value ? getOptionLabel(value) : '')
           }
           renderInput={(params) => (
             <TextField
               {...params}
               label={label}
-              name={name}
               required={required}
-              error={error ? true : undefined}
+              error={!!error}
               helperText={error?.message || helperText}
-              fullWidth
-              InputLabelProps={{ shrink: true }}
+              inputRef={ref}
+              InputLabelProps={{
+                shrink: true,
+              }}
             />
           )}
         />
