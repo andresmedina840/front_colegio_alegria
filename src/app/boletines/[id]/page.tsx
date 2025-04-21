@@ -34,20 +34,22 @@ interface Materia {
   debilidades: string;
   intensidadHoraria: number;
   fallas: number;
-  valoracion: number;
+  valoracion: string;
   recomendaciones: string;
 }
 
+interface Estudiante {
+  id: number;
+  nombre: string;
+  gradoId: number;
+  grado: string;
+  directorGrupo: string;
+  periodo: string;
+  fechaReporte: string;
+}
+
 interface BoletinData {
-  estudiante: {
-    id: number;
-    nombre: string;
-    gradoId: number;
-    grado: string;
-    directorGrupo: string;
-    periodo: string;
-    fechaReporte: string;
-  };
+  estudiante: Estudiante;
   materias: Materia[];
   observaciones: string;
 }
@@ -58,10 +60,6 @@ const PaginaBoletin = () => {
   const id = params?.id as string;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [totalHoras, setTotalHoras] = useState(0);
-  const [totalFallas, setTotalFallas] = useState(0);
-  const [promedio, setPromedio] = useState(0);
-
   const [formData, setFormData] = useState<BoletinData>({
     estudiante: {
       id: 0,
@@ -76,6 +74,19 @@ const PaginaBoletin = () => {
     observaciones: "",
   });
 
+  // Calcular totales
+  const { totalHoras, totalFallas, promedio } = formData.materias.reduce(
+    (acc, materia) => ({
+      totalHoras: acc.totalHoras + materia.intensidadHoraria,
+      totalFallas: acc.totalFallas + materia.fallas,
+      promedio: acc.promedio + parseFloat(materia.valoracion || "0"),
+    }),
+    { totalHoras: 0, totalFallas: 0, promedio: 0 }
+  );
+
+  const promedioFinal =
+    formData.materias.length > 0 ? promedio / formData.materias.length : 0;
+
   const determinarNivel = (valoracion: number) => {
     if (valoracion >= 4.6) return "SUPERIOR";
     if (valoracion >= 4.0) return "ALTO";
@@ -84,49 +95,35 @@ const PaginaBoletin = () => {
   };
 
   useEffect(() => {
-    const calcularTotales = () => {
-      const horas = formData.materias.reduce(
-        (acc, materia) => acc + materia.intensidadHoraria,
-        0
-      );
-      const fallas = formData.materias.reduce(
-        (acc, materia) => acc + materia.fallas,
-        0
-      );
-      const valoraciones = formData.materias.reduce(
-        (acc, materia) => acc + materia.valoracion,
-        0
-      );
-      const promedioCalc =
-        formData.materias.length > 0
-          ? valoraciones / formData.materias.length
-          : 0;
-
-      setTotalHoras(horas);
-      setTotalFallas(fallas);
-      setPromedio(promedioCalc);
-    };
-
-    calcularTotales();
-  }, [formData.materias]);
-
-  useEffect(() => {
     if (!id) return;
 
     const cargarDatos = async () => {
       try {
+        setLoading(true);
+
         const alumnoResponse = await api.get(`/alumnos/${id}`);
         const alumnoData = alumnoResponse.data?.data;
-        const gradoIdEstudiante = alumnoData?.gradoId;
-        if (!gradoIdEstudiante) return;
+        const gradoId = alumnoData?.gradoId;
+
+        if (!gradoId)
+          throw new Error("No se pudo obtener el grado del estudiante");
 
         const [materiasResponse, directoraResponse] = await Promise.all([
-          api.get(`/materias/grado/${gradoIdEstudiante}`),
-          api.get(`/grados/${gradoIdEstudiante}/directora`),
+          api.get(`/materias/grado/${gradoId}`),
+          api.get(`/grados/${gradoId}/directora`),
         ]);
 
-        const materiasTransformadas = materiasResponse.data.map(
-          (materia: MateriaAPI) => ({
+        setFormData({
+          estudiante: {
+            id: alumnoData.id,
+            nombre: `${alumnoData.nombre} ${alumnoData.apellido}`.trim(),
+            gradoId: gradoId,
+            grado: alumnoData.gradoNombre,
+            directorGrupo: directoraResponse.data.data,
+            periodo: "I",
+            fechaReporte: new Date().toLocaleDateString(),
+          },
+          materias: materiasResponse.data.map((materia: MateriaAPI) => ({
             nombre: materia.nombre,
             fortalezas: "",
             debilidades: "",
@@ -134,92 +131,106 @@ const PaginaBoletin = () => {
             valoracion: 0,
             intensidadHoraria: materia.intensidadHoraria || 0,
             fallas: 0,
-          })
-        );
-
-        setFormData({
-          estudiante: {
-            id: alumnoData.id,
-            nombre: `${alumnoData.nombre} ${alumnoData.apellido}`.trim(),
-            gradoId: gradoIdEstudiante,
-            grado: alumnoData.gradoNombre,
-            directorGrupo: directoraResponse.data.data,
-            periodo: "I",
-            fechaReporte: new Date().toLocaleDateString(),
-          },
-          materias: materiasTransformadas,
+          })),
           observaciones: "",
         });
       } catch (err) {
-        setError("Error al cargar datos");
-        console.error("Error en carga de datos:", err);
+        const errorMessage =
+          err instanceof Error ? err.message : "Error al cargar datos";
+        setError(errorMessage);
+        enqueueSnackbar(errorMessage, { variant: "error" });
       } finally {
         setLoading(false);
       }
     };
 
     cargarDatos();
-  }, [id]);
+  }, [id, enqueueSnackbar]);
 
   const handleChangeMateria = (
     index: number,
     campo: keyof Materia,
     valor: string | number
   ) => {
-    const nuevasMaterias = [...formData.materias];
-    nuevasMaterias[index] = {
-      ...nuevasMaterias[index],
-      [campo]: valor,
-    };
-    setFormData({ ...formData, materias: nuevasMaterias });
+    setFormData((prev) => ({
+      ...prev,
+      materias: prev.materias.map((m, i) =>
+        i === index ? { ...m, [campo]: valor } : m
+      ),
+    }));
+  };
+
+  const handleValoracionChange = (index: number, value: string) => {
+    if (value === "") {
+      handleChangeMateria(index, "valoracion", 0);
+      return;
+    }
+
+    const numericValue = parseFloat(value);
+    if (!isNaN(numericValue)) {
+      handleChangeMateria(
+        index,
+        "valoracion",
+        Math.min(5, Math.max(0, numericValue))
+      );
+    }
   };
 
   const guardarBoletin = async () => {
     try {
+      setLoading(true);
       const {
         data: { message },
       } = await api.post("/boletines/crearBoletin", formData);
-
       enqueueSnackbar(message, { variant: "success" });
     } catch (err) {
-      let errorMessage = "Error al guardar el boletín";
-
-      if (err instanceof Error) {
-        const axiosError = err as AxiosError<{ message?: string }>;
-        errorMessage = axiosError.response?.data?.message || errorMessage;
-      }
-
-      console.error("Error en guardarBoletin:", errorMessage);
+      const errorMessage =
+        err instanceof AxiosError
+          ? err.response?.data?.message || "Error al guardar el boletín"
+          : "Error al guardar el boletín";
       setError(errorMessage);
       enqueueSnackbar(errorMessage, { variant: "error" });
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) return <CircularProgress />;
+  if (loading && !formData.estudiante.nombre) {
+    return (
+      <FusionTemplateColegio>
+        <Box display="flex" justifyContent="center" p={4}>
+          <CircularProgress />
+        </Box>
+      </FusionTemplateColegio>
+    );
+  }
 
   return (
     <FusionTemplateColegio>
       <Box p={4}>
         <Typography variant="h4" gutterBottom>
-          Boletin de Notas
+          Boletín de Notas
         </Typography>
 
         <StudentCard
           nombre={formData.estudiante.nombre}
-          //gradoId={formData.estudiante.gradoId}
           grado={formData.estudiante.grado}
           periodo={formData.estudiante.periodo}
           fechaReporte={formData.estudiante.fechaReporte}
           directorGrupo={formData.estudiante.directorGrupo}
           onPeriodoChange={(nuevoPeriodo) =>
-            setFormData({
-              ...formData,
-              estudiante: { ...formData.estudiante, periodo: nuevoPeriodo },
-            })
+            setFormData((prev) => ({
+              ...prev,
+              estudiante: { ...prev.estudiante, periodo: nuevoPeriodo },
+            }))
           }
         />
 
-        {error && <Alert severity="error">{error}</Alert>}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
         <TableContainer
           component={Paper}
@@ -233,7 +244,6 @@ const PaginaBoletin = () => {
                     fontWeight: "bold",
                     textAlign: "center",
                     color: "white",
-                    width: 200,
                   }}
                 >
                   Materia
@@ -243,7 +253,6 @@ const PaginaBoletin = () => {
                     fontWeight: "bold",
                     textAlign: "center",
                     color: "white",
-                    width: 200,
                   }}
                 >
                   Fortalezas
@@ -253,7 +262,6 @@ const PaginaBoletin = () => {
                     fontWeight: "bold",
                     textAlign: "center",
                     color: "white",
-                    width: 200,
                   }}
                 >
                   Debilidades
@@ -263,7 +271,7 @@ const PaginaBoletin = () => {
                     fontWeight: "bold",
                     textAlign: "center",
                     color: "white",
-                    width: 20,
+                    width: 80,
                   }}
                 >
                   IH
@@ -273,7 +281,7 @@ const PaginaBoletin = () => {
                     fontWeight: "bold",
                     textAlign: "center",
                     color: "white",
-                    width: 20,
+                    width: 80,
                   }}
                 >
                   Fallas
@@ -283,7 +291,7 @@ const PaginaBoletin = () => {
                     fontWeight: "bold",
                     textAlign: "center",
                     color: "white",
-                    width: 80,
+                    width: 100,
                   }}
                 >
                   Valoración
@@ -293,7 +301,7 @@ const PaginaBoletin = () => {
                     fontWeight: "bold",
                     textAlign: "center",
                     color: "white",
-                    width: 50,
+                    width: 100,
                   }}
                 >
                   Nivel
@@ -304,11 +312,10 @@ const PaginaBoletin = () => {
               {formData.materias.map((materia, index) => (
                 <TableRow
                   key={index}
-                  sx={{ "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" } }}
+                  sx={index % 2 ? { backgroundColor: "#f9f9f9" } : {}}
                 >
-                  <TableCell sx={{ textAlign: "left" }}>
-                    {materia.nombre}
-                  </TableCell>
+                  <TableCell>{materia.nombre}</TableCell>
+
                   <TableCell>
                     <TextField
                       fullWidth
@@ -340,12 +347,12 @@ const PaginaBoletin = () => {
                   <TableCell sx={{ textAlign: "center" }}>
                     <TextField
                       type="number"
-                      value={materia.intensidadHoraria.toString()}
+                      value={materia.intensidadHoraria}
                       onChange={(e) =>
                         handleChangeMateria(
                           index,
                           "intensidadHoraria",
-                          Number(e.target.value)
+                          Math.max(0, Number(e.target.value))
                         )
                       }
                       sx={{
@@ -360,22 +367,19 @@ const PaginaBoletin = () => {
                           MozAppearance: "textfield",
                         },
                       }}
-                      inputProps={{
-                        inputMode: "numeric",
-                        pattern: "[0-9]*",
-                      }}
+                      inputProps={{ min: 0 }}
                     />
                   </TableCell>
 
                   <TableCell sx={{ textAlign: "center" }}>
                     <TextField
                       type="number"
-                      value={materia.fallas.toString()}
+                      value={materia.fallas}
                       onChange={(e) =>
                         handleChangeMateria(
                           index,
                           "fallas",
-                          Number(e.target.value)
+                          Math.max(0, Number(e.target.value))
                         )
                       }
                       sx={{
@@ -390,51 +394,40 @@ const PaginaBoletin = () => {
                           MozAppearance: "textfield",
                         },
                       }}
-                      inputProps={{
-                        inputMode: "numeric",
-                        pattern: "[0-9]*",
-                      }}
+                      inputProps={{ min: 0 }}
                     />
                   </TableCell>
 
                   <TableCell sx={{ textAlign: "center" }}>
                     <TextField
-                      type="number"
-                      value={materia.valoracion.toString()}
+                      type="text"
+                      value={materia.valoracion}
                       onChange={(e) => {
-                        const value = Math.min(
-                          5,
-                          Math.max(0, Number(e.target.value))
-                        );
-                        handleChangeMateria(index, "valoracion", value);
+                        const value = e.target.value;
+
+                        // Solo permitir valores numéricos con punto decimal
+                        if (/^\d*\.?\d{0,2}$/.test(value)) {
+                          handleChangeMateria(index, "valoracion", value);
+                        }
                       }}
                       inputProps={{
-                        step: "0.1",
-                        min: "0",
-                        max: "5",
+                        inputMode: "decimal",
+                        pattern: "\\d*\\.?\\d*",
                       }}
                       sx={{
-                        width: 60,
+                        width: 80,
                         textAlign: "center",
                         borderRadius: 1,
-                        "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
-                          {
-                            display: "none",
-                          },
-                        "& input[type=number]": {
-                          MozAppearance: "textfield",
-                        },
                       }}
                     />
                   </TableCell>
 
                   <TableCell sx={{ textAlign: "center" }}>
-                    <Typography>
-                      {determinarNivel(materia.valoracion)}
-                    </Typography>
+                    {determinarNivel(parseFloat(materia.valoracion))}
                   </TableCell>
                 </TableRow>
               ))}
+
               <TableRow sx={{ backgroundColor: "#f0f0f0" }}>
                 <TableCell
                   colSpan={3}
@@ -449,10 +442,10 @@ const PaginaBoletin = () => {
                   {totalFallas}
                 </TableCell>
                 <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
-                  {promedio.toFixed(1)}
+                  {promedioFinal.toFixed(1)}
                 </TableCell>
                 <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
-                  {determinarNivel(promedio)}
+                  {determinarNivel(promedioFinal)}
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -466,14 +459,19 @@ const PaginaBoletin = () => {
           rows={4}
           value={formData.observaciones}
           onChange={(e) =>
-            setFormData({ ...formData, observaciones: e.target.value })
+            setFormData((prev) => ({ ...prev, observaciones: e.target.value }))
           }
           sx={{ mb: 3 }}
         />
 
         <Box display="flex" gap={2} justifyContent="flex-end">
-          <Button variant="contained" color="primary" onClick={guardarBoletin}>
-            Guardar Boletín
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={guardarBoletin}
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={24} /> : "Guardar Boletín"}
           </Button>
         </Box>
       </Box>
