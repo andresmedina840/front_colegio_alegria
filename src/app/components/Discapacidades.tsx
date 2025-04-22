@@ -38,6 +38,12 @@ const Discapacidades: React.FC<DiscapacidadesProps> = ({ siNo }) => {
           setValue(field.name as keyof FormDataType, "");
         }
       });
+    } else if (noAplica === "NO") {
+      discapacidadFields.forEach((field) => {
+        if (field.name !== "noAplica") {
+          setValue(field.name as keyof FormDataType, "NO");
+        }
+      });
     }
   }, [noAplica, setValue]);
 
@@ -56,7 +62,7 @@ const Discapacidades: React.FC<DiscapacidadesProps> = ({ siNo }) => {
             options={opciones}
             control={control}
             getOptionLabel={(option: OpcionSiNo) => option.nombre}
-            disabled={field.name !== "noAplica" && noAplica === "SI"}
+            disabled={field.name !== "noAplica" && noAplica === "NO"}
           />
         </Grid>
       ))}

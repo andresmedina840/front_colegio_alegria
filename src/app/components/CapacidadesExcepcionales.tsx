@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect } from "react";
 import { Grid } from "@mui/material";
 import { useFormContext } from "react-hook-form";
 import { FormDataType } from "../types/formTypes";
@@ -14,41 +17,58 @@ interface CapacidadesExcepcionalesProps {
   siNo: string[];
 }
 
+const capacidadFields = [
+  { name: "noAplicaCapacidad", label: "No aplica" },
+  { name: "superdotado", label: "Superdotado" },
+  { name: "talentoCientifico", label: "Con talento científico" },
+  { name: "talentoTecnologico", label: "Con talento tecnológico" },
+  { name: "talentoSubjetivo", label: "Con talento subjetivo" },
+];
+
 const CapacidadesExcepcionales: React.FC<CapacidadesExcepcionalesProps> = ({
   formData,
   siNo,
   handleAutocompleteChange,
 }) => {
-  const { control } = useFormContext<FormDataType>();
+  const { control, setValue } = useFormContext<FormDataType>();
+  const noAplicaCapacidad = formData.noAplicaCapacidad;
+
+  useEffect(() => {
+    if (noAplicaCapacidad === "SI") {
+      capacidadFields.forEach((field) => {
+        if (field.name !== "noAplicaCapacidad") {
+          setValue(field.name as keyof FormDataType, "");
+        }
+      });
+    } else if (noAplicaCapacidad === "NO") {
+      capacidadFields.forEach((field) => {
+        if (field.name !== "noAplicaCapacidad") {
+          setValue(field.name as keyof FormDataType, "NO");
+        }
+      });
+    }
+  }, [noAplicaCapacidad, setValue]);
 
   const opcionesSiNo: OpcionSiNo[] = siNo.map((option, index) => ({
     id: index,
     nombre: option,
   }));
 
-  const capacidadFields = [
-    { name: "noAplicaCapacidad", label: "No aplica" },
-    { name: "superdotado", label: "Superdotado" },
-    { name: "talentoCientifico", label: "Con talento científico" },
-    { name: "talentoTecnologico", label: "Con talento tecnológico" },
-    { name: "talentoSubjetivo", label: "Con talento subjetivo" },
-  ];
-
-  const disableOthers = formData.noAplicaCapacidad === "SI";
+  const disableOthers = noAplicaCapacidad === "NO";
 
   return (
     <Grid container spacing={2}>
       {capacidadFields.map((field) => (
-        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={field.name}>
+        <Grid size={{ xs: 12, sm: 4, md: 4 }} key={field.name}>
           <CustomAutocomplete<FormDataType, OpcionSiNo>
             label={field.label}
             name={field.name as keyof FormDataType}
             options={opcionesSiNo}
             control={control}
             getOptionLabel={(option) => option.nombre}
-            onChange={(event, value) => {
-              handleAutocompleteChange(field.name, value?.nombre || "");
-            }}
+            onChange={(_, value) =>
+              handleAutocompleteChange(field.name, value?.nombre || "")
+            }
             disabled={field.name !== "noAplicaCapacidad" && disableOthers}
           />
         </Grid>

@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography } from "@mui/material";
+import { Box, Card, CardContent, Divider, Typography } from "@mui/material";
 import Discapacidades from "../components/Discapacidades";
 import CapacidadesExcepcionales from "./CapacidadesExcepcionales";
 import { FormDataType } from "../types/formTypes";
@@ -28,19 +28,17 @@ const CondicionesEspeciales: React.FC<CondicionesEspecialesProps> = ({
   return (
     <Card sx={{ p: 2, mb: 3, boxShadow: 3, borderRadius: 2 }}>
       <CardContent>
-        <Typography
-          variant="h6"
-          align="left"
-          sx={{ fontWeight: "bold", mb: 3 }}
-        >
+        <Typography variant="h6" align="left" sx={{ fontWeight: "bold", mb: 3 }}>
           Condiciones Especiales del Estudiante
         </Typography>
 
         <Discapacidades siNo={siNo} />
 
+        <Divider sx={{ my: 4 }} />
+
         <CapacidadesExcepcionales
           formData={formData}
-          handleAutocompleteChange={handleAutocompleteChange} // Pasando handleAutocompleteChange
+          handleAutocompleteChange={handleAutocompleteChange}
           siNo={siNo}
         />
       </CardContent>

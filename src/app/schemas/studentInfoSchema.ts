@@ -22,7 +22,10 @@ const StudentInfoFormSchema = yup.object({
   departamentoNacimiento: yup.string().required(),
   municipioNacimiento: yup.string().required(),
   sedeMatricula: yup.string().required("Sede de matrícula requerida"),
-  gradoId: yup.string().required("Grado estudiante requerido").notOneOf([""], "Seleccione un grado válido"),
+  gradoId: yup
+    .string()
+    .required("Grado estudiante requerido")
+    .notOneOf([""], "Seleccione un grado válido"),
   pensionId: yup.string().defined(),
   jornada: yup.string().required("Jornada escolar requerida"),
   institucionEducativaAnterior: yup.string().defined(),
@@ -79,7 +82,7 @@ const parentInfoSchema = yup.object({
   primerApellidoPadre: yup.string().defined(),
   segundoApellidoPadre: yup.string().defined(),
 
-   //Madre
+  //Madre
   tipoIdentificacionMadre: yup.string().defined(),
   numeroIdentificacionMadre: yup.string().defined(),
   primerNombreMadre: yup.string().defined(),
@@ -117,6 +120,14 @@ const authorizationsSchema = yup.object({
   autorizacionContactoEmergencia: yup.string().defined(),
 });
 
+const acudienteSchema = yup.object().shape({
+  nombre: yup.string().required("Nombre requerido"),
+  apellido: yup.string().required("Apellido requerido"),
+  email: yup.string().email("Correo inválido").required("Correo requerido"),
+  telefono: yup.string().required("Teléfono requerido"),
+  tipoAcudiente: yup.string().required("Tipo de acudiente requerido"),
+});
+
 // Combinar todos los esquemas
 export const studentInfoSchema: yup.ObjectSchema<FormDataType> =
   enrollmentInfoFormSchema
@@ -128,5 +139,9 @@ export const studentInfoSchema: yup.ObjectSchema<FormDataType> =
     .concat(parentInfoSchema)
     .concat(emergencyContactSchema)
     .concat(authorizationsSchema)
-    .concat(documentationSchema);
-
+    .concat(documentationSchema)
+    .concat(
+      yup.object({
+        acudientes: yup.array().of(acudienteSchema).default([]),
+      })
+    );

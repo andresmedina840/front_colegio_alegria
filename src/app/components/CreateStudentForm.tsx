@@ -29,6 +29,7 @@ import { FormDataType } from "../types/formTypes";
 import initialFormData from "../estudiantes/initialFormData";
 import { useCatalogosEstudiantes } from "../hooks/apisEstudiantes";
 import Image from "next/image";
+import AcudientesForm from "./AcudientesForm";
 
 const siNo: OpcionSelect[] = [
   { id: "SI", nombre: "SI" },
@@ -69,6 +70,7 @@ const CreateStudentForm = () => {
     tiposIdentificacion,
     sedes,
     estratosEconomico,
+    tiposAcudiente,
     loading,
   } = useCatalogosEstudiantes();
 
@@ -234,6 +236,8 @@ const CreateStudentForm = () => {
         />
 
         <DocumentacionRecibida siNo={siNo} />
+
+        <AcudientesForm tiposAcudiente={tiposAcudiente} />
 
         <Card sx={{ p: 2, boxShadow: 3, borderRadius: 2 }}>
           <CardContent>

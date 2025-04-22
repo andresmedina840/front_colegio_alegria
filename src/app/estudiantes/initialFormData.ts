@@ -99,6 +99,9 @@ const initialFormData = {
   segundoApellidoEmergencia: "",
   telefonoEmergencia: "",
   parentescoEmergencia: "",
+
+  acudientes: [],
+
 };
 
 export default initialFormData;

@@ -112,6 +112,16 @@ export interface EmergencyContact {
   parentescoEmergencia: string;
 }
 
+export interface AcudienteForm {
+  tipoAcudiente: string;
+  primerNombre: string;
+  segundoNombre: string;
+  primerApellido: string;
+  segundoApellido: string;
+  email: string;
+  telefono: string;
+}
+
 export interface FormDataType extends
   EnrollmentInfoForm,
   StudentInfoForm,
@@ -121,4 +131,7 @@ export interface FormDataType extends
   DocumentacionRecibida,
   ParentsInfo,
   EmergencyContact,
-  Authorization {}
+  Authorization {
+  acudientes?: AcudienteForm[];
+}
+

@@ -49,3 +49,6 @@ export interface OpcionSelect {
   nombre: string;
   [key: string]: unknown;
 }
+
+// 👇 Agrega esto para que funcione tu import desde "../types"
+export * from "./formTypes";

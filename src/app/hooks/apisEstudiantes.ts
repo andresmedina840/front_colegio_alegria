@@ -10,6 +10,7 @@ export interface Catalogos {
   paises: OpcionSelect[];
   grados: OpcionSelect[];
   sedes: OpcionSelect[];
+  tiposAcudiente: OpcionSelect[];
   loading: boolean;
   error: string | null;
   recargar: () => void;
@@ -22,6 +23,7 @@ export const useCatalogosEstudiantes = (): Catalogos => {
   const [paises, setPaises] = useState<OpcionSelect[]>([]);
   const [grados, setGrados] = useState<OpcionSelect[]>([]);
   const [sedes, setSedes] = useState<OpcionSelect[]>([]);
+  const [tiposAcudiente, setTiposAcudiente] = useState<OpcionSelect[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,6 +58,8 @@ export const useCatalogosEstudiantes = (): Catalogos => {
       fetchCatalog("/ubicacion/paises", setPaises, "Paises"),
       fetchCatalog("/grados/listaGrados", setGrados, "Grados"),
       fetchCatalog("/sedes", setSedes, "Sedes"),
+      fetchCatalog("/tipos-acudiente", setTiposAcudiente, "Tipos de acudiente"),
+
     ]);
     setLoading(false);
   }, [fetchCatalog]);
@@ -71,6 +75,7 @@ export const useCatalogosEstudiantes = (): Catalogos => {
     paises,
     grados,
     sedes,
+    tiposAcudiente,
     loading,
     error,
     recargar: cargarCatalogos,
