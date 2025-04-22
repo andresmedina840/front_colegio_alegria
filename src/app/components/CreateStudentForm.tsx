@@ -9,6 +9,7 @@ import {
   CardContent,
   Grid,
   CircularProgress,
+  Divider,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import api from "../axios/axiosClient";
@@ -253,6 +254,8 @@ const CreateStudentForm = () => {
               title="Padre"
               tiposIdentificacion={tiposIdentificacion}
             />
+
+            <Divider sx={{ my: 4 }} />
 
             <Box sx={{ mt: 2 }}>
               <ParentForm

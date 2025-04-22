@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Divider, Typography } from "@mui/material";
+import { Card, CardContent, Divider, Typography } from "@mui/material";
 import Discapacidades from "../components/Discapacidades";
 import CapacidadesExcepcionales from "./CapacidadesExcepcionales";
 import { FormDataType } from "../types/formTypes";

@@ -121,11 +121,13 @@ const authorizationsSchema = yup.object({
 });
 
 const acudienteSchema = yup.object().shape({
-  nombre: yup.string().required("Nombre requerido"),
-  apellido: yup.string().required("Apellido requerido"),
-  email: yup.string().email("Correo inválido").required("Correo requerido"),
-  telefono: yup.string().required("Teléfono requerido"),
-  tipoAcudiente: yup.string().required("Tipo de acudiente requerido"),
+  primerNombre: yup.string().defined(),
+  segundoNombre: yup.string().defined(),
+  primerApellido: yup.string().defined(),
+  segundoApellido: yup.string().defined(),
+  email: yup.string().email("Correo inválido").defined(),
+  telefono: yup.string().defined(),
+  tipoAcudiente: yup.string().defined(),
 });
 
 // Combinar todos los esquemas
