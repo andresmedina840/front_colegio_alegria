@@ -12,7 +12,6 @@ interface HealthAffiliationFormProps {
 
 const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
   estratoEconomico,
-  updateField,
 }) => {
   const { control } = useFormContext<FormDataType>();
 

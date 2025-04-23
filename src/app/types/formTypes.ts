@@ -58,7 +58,7 @@ export interface CondicionesEspeciales {
 export interface SituacionAcademica {
   situacionAcademicaNoEstudioVigenciaAnterior: string;
   situacionAcademicaAprobo: string;
-  situcionAcademicaReprobo: string;
+  situacionAcademicaReprobo: string;
   situacionAcademicaPendienteLogros: string;
   situacionAcademicaVieneOtraIE: string;
   situcionAcademicaIngresaPrimeraVezIE: string;

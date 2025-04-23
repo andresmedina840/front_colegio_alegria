@@ -52,7 +52,7 @@ const initialFormData = {
   //SituacionAcademica
   situacionAcademicaNoEstudioVigenciaAnterior: "",
   situacionAcademicaAprobo: "",
-  situcionAcademicaReprobo: "",
+  situacionAcademicaReprobo: "",
   situacionAcademicaPendienteLogros: "",
   situacionAcademicaVieneOtraIE: "",
   situcionAcademicaIngresaPrimeraVezIE: "",

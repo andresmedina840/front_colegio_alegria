@@ -2,148 +2,206 @@
 import * as yup from "yup";
 import { FormDataType } from "../types/formTypes";
 
-// Cada parte como un esquema separado
+// 1. Esquema de información de matrícula
 const enrollmentInfoFormSchema = yup.object({
-  //numeroMatricula: yup.string().required(),
   fechaMatricula: yup.string().required("Fecha de matrícula requerida"),
 });
 
+// 2. Esquema de información del estudiante
 const StudentInfoFormSchema = yup.object({
-  tipoIdentificacionEstudianteId: yup.string().required(),
-  numeroIdentificacionEstudiante: yup.string().required(),
-  primerNombreEstudiante: yup.string().required(),
-  segundoNombreEstudiante: yup.string().defined(),
-  primerApellidoEstudiante: yup.string().required(),
-  segundoApellidoEstudiante: yup.string().defined(),
-  generoEstudianteId: yup.string().required(),
-  fechaNacimiento: yup.string().required(),
-  edad: yup.string().defined(),
-  paisNacimiento: yup.string().required(),
-  departamentoNacimiento: yup.string().required(),
-  municipioNacimiento: yup.string().required(),
+  tipoIdentificacionEstudianteId: yup.string().required("Tipo de identificación requerido"),
+  numeroIdentificacionEstudiante: yup.string().required("Número de identificación requerido"),
+  primerNombreEstudiante: yup.string().required("Primer nombre requerido"),
+  segundoNombreEstudiante: yup.string().nullable().optional(),
+  primerApellidoEstudiante: yup.string().required("Primer apellido requerido"),
+  segundoApellidoEstudiante: yup.string().nullable().optional(),
+  generoEstudianteId: yup.string().required("Género requerido"),
+  fechaNacimiento: yup.string().required("Fecha de nacimiento requerida"),
+  edad: yup.string().optional(),
+  paisNacimiento: yup.string().required("País de nacimiento requerido"),
+  departamentoNacimiento: yup.string().required("Departamento requerido"),
+  municipioNacimiento: yup.string().required("Municipio requerido"),
   sedeMatricula: yup.string().required("Sede de matrícula requerida"),
-  gradoId: yup
-    .string()
-    .required("Grado estudiante requerido")
-    .notOneOf([""], "Seleccione un grado válido"),
-  pensionId: yup.string().defined(),
+  gradoId: yup.string().required("Grado requerido").notOneOf([""], "Seleccione un grado válido"),
+  pensionId: yup.string().optional(),
   jornada: yup.string().required("Jornada escolar requerida"),
-  institucionEducativaAnterior: yup.string().defined(),
-  ultimoGradoCursado: yup.string().defined(),
-  ultimoAnioCursado: yup.string().defined(),
+  institucionEducativaAnterior: yup.string().optional(),
+  ultimoGradoCursado: yup.string().optional(),
+  ultimoAnioCursado: yup.string().optional(),
 });
 
+// 3. Esquema de afiliación de salud
 const healthAffiliationFormSchema = yup.object({
-  tipoSangre: yup.string().defined(),
-  epsAfiliado: yup.string().defined(),
-  ipsAsignada: yup.string().defined(),
-  arsAfiliado: yup.string().defined(),
-  nroCarnetSisben: yup.string().defined(),
-  nivelSisben: yup.string().defined(),
-  estrato: yup.string().defined(),
+  tipoSangre: yup.string().required("Tipo de sangre requerido"),
+  epsAfiliado: yup.string().required("EPS afiliado requerida"),
+  ipsAsignada: yup.string().optional(),
+  arsAfiliado: yup.string().optional(),
+  nroCarnetSisben: yup.string().optional(),
+  nivelSisben: yup.string().optional(),
+  estrato: yup.string().required("Estrato socioeconómico requerido"),
 });
 
+// 4. Esquema de discapacidades
 const discapacidadesSchema = yup.object({
-  noAplica: yup.string().defined(),
-  sorderaProfunda: yup.string().defined(),
-  hipoacusiaBajaVision: yup.string().defined(),
-  bajaVisionDiagnosticada: yup.string().defined(),
-  paralisisCerebral: yup.string().defined(),
-  autismo: yup.string().defined(),
-  deficienciaCognitiva: yup.string().defined(),
-  sindromeDown: yup.string().defined(),
-  multiple: yup.string().defined(),
+  discapacidadesNoAplica: yup.string().optional().default("NO"),
+  discapacidadesSorderaProfunda: yup.string().optional().default("NO"),
+  discapacidadesHipoacusiaBajaVision: yup.string().optional().default("NO"),
+  discapacidadesBajaVisionDiagnosticada: yup.string().optional().default("NO"),
+  discapacidadesParalisisCerebral: yup.string().optional().default("NO"),
+  discapacidadesAutismo: yup.string().optional().default("NO"),
+  discapacidadesDeficienciaCognitiva: yup.string().optional().default("NO"),
+  discapacidadesSindromeDown: yup.string().optional().default("NO"),
+  discapacidadesMultiple: yup.string().optional().default("NO"),
 });
 
+// 5. Esquema de capacidades excepcionales
 const capacidadesExcepcionalesSchema = yup.object({
-  noAplicaCapacidad: yup.string().defined(),
-  superdotado: yup.string().defined(),
-  talentoCientifico: yup.string().defined(),
-  talentoTecnologico: yup.string().defined(),
-  talentoSubjetivo: yup.string().defined(),
+  capacidadesExcepcionalesNoAplicaCapacidad: yup.string().optional().default("NO"),
+  capacidadesExcepcionalesSuperdotado: yup.string().optional().default("NO"),
+  capacidadesExcepcionalesTalentoCientifico: yup.string().optional().default("NO"),
+  capacidadesExcepcionalesTalentoTecnologico: yup.string().optional().default("NO"),
+  capacidadesExcepcionalesTalentoSubjetivo: yup.string().optional().default("NO"),
 });
 
+// 6. Esquema de situación académica
 const situacionAcademicaSchema = yup.object({
-  situacionAcademicaNoEstudioVigenciaAnterior: yup.string().defined(),
-  situacionAcademicaAprobo: yup.string().defined(),
-  situcionAcademicaReprobo: yup.string().defined(),
-  situacionAcademicaPendienteLogros: yup.string().defined(),
-  situacionAcademicaVieneOtraIE: yup.string().defined(),
-  situcionAcademicaIngresaPrimeraVezIE: yup.string().defined(),
-  situcionAcademicaNoCulminoEstudios: yup.string().defined(),
+  situacionAcademicaNoEstudioVigenciaAnterior: yup.string().optional().default("NO"),
+  situacionAcademicaAprobo: yup.string().optional().default("NO"),
+  situacionAcademicaReprobo: yup.string().optional().default("NO"),
+  situacionAcademicaPendienteLogros: yup.string().optional().default("NO"),
+  situacionAcademicaVieneOtraIE: yup.string().optional().default("NO"),
+  situcionAcademicaIngresaPrimeraVezIE: yup.string().optional().default("NO"),
+  situcionAcademicaNoCulminoEstudios: yup.string().optional().default("NO"),
 });
 
-const parentInfoSchema = yup.object({
-  //Padre
-  tipoIdentificacionPadre: yup.string().defined(),
-  numeroIdentificacionPadre: yup.string().defined(),
-  primerNombrePadre: yup.string().defined(),
-  segundoNombrePadre: yup.string().defined(),
-  primerApellidoPadre: yup.string().defined(),
-  segundoApellidoPadre: yup.string().defined(),
+// 7. Esquema de información de padres
+const parentsInfoSchema = yup.object({
+  // Padre
+  tipoIdentificacionPadre: yup.string().optional(),
+  numeroIdentificacionPadre: yup.string().optional(),
+  primerNombrePadre: yup.string().optional(),
+  segundoNombrePadre: yup.string().nullable().optional(),
+  primerApellidoPadre: yup.string().optional(),
+  segundoApellidoPadre: yup.string().nullable().optional(),
+  direccionPadre: yup.string().optional(),
+  barrioPadre: yup.string().optional(),
+  numeroCelularPadre: yup.string().optional(),
+  ocupacionPadre: yup.string().optional(),
+  correoElectronicoPadre: yup.string().email("Correo electrónico inválido").optional(),
 
-  //Madre
-  tipoIdentificacionMadre: yup.string().defined(),
-  numeroIdentificacionMadre: yup.string().defined(),
-  primerNombreMadre: yup.string().defined(),
-  segundoNombreMadre: yup.string().defined(),
-  primerApellidoMadre: yup.string().defined(),
-  segundoApellidoMadre: yup.string().defined(),
+  // Madre
+  tipoIdentificacionMadre: yup.string().optional(),
+  numeroIdentificacionMadre: yup.string().optional(),
+  primerNombreMadre: yup.string().optional(),
+  segundoNombreMadre: yup.string().nullable().optional(),
+  primerApellidoMadre: yup.string().optional(),
+  segundoApellidoMadre: yup.string().nullable().optional(),
+  direccionMadre: yup.string().optional(),
+  barrioMadre: yup.string().optional(),
+  numeroCelularMadre: yup.string().optional(),
+  ocupacionMadre: yup.string().optional(),
+  correoElectronicoMadre: yup.string().email("Correo electrónico inválido").optional(),
 });
 
-const documentationSchema = yup.object({
-  documentacionRecibidaRegistroCivil: yup.string().defined(),
-  documentacionRecibidaCertificadosEstudios: yup.string().defined(),
-  documentacionRecibidaFotos: yup.string().defined(),
-  documentacionRecibidaCertificadoVinculado: yup.string().defined(),
-  documentacionRecibidaSistemaSocial: yup.string().defined(),
-  documentacionRecibidaEntidadAseguradora: yup.string().defined(),
-  documentacionRecibidaSeguroEstudiantil: yup.string().defined(),
-  documentacionRecibidaCertificadoEstratoSocioeconomico: yup.string().defined(),
-  documentacionRecibidaPagoSalvo: yup.string().defined(),
-  documentacionRecibidaRegistroVacunacion: yup.string().defined(),
-  documentacionRecibidaExamenSerologia: yup.string().defined(),
+// 8. Esquema de documentación recibida
+const documentacionRecibidaSchema = yup.object({
+  documentacionRecibidaRegistroCivil: yup.string().optional().default("NO"),
+  documentacionRecibidaCertificadosEstudios: yup.string().optional().default("NO"),
+  documentacionRecibidaFotos: yup.string().optional().default("NO"),
+  documentacionRecibidaCertificadoVinculado: yup.string().optional().default("NO"),
+  documentacionRecibidaSistemaSocial: yup.string().optional().default("NO"),
+  documentacionRecibidaEntidadAseguradora: yup.string().optional().default("NO"),
+  documentacionRecibidaSeguroEstudiantil: yup.string().optional().default("NO"),
+  documentacionRecibidaCertificadoEstratoSocioeconomico: yup.string().optional().default("NO"),
+  documentacionRecibidaPagoSalvo: yup.string().optional().default("NO"),
+  documentacionRecibidaRegistroVacunacion: yup.string().optional().default("NO"),
+  documentacionRecibidaExamenSerologia: yup.string().optional().default("NO"),
 });
 
+// 9. Esquema de autorizaciones
+const authorizationSchema = yup.object({
+  autorizacionContactoEmergencia: yup.string().required("Autorización requerida"),
+  autorizacionImagen: yup.string().required("Autorización requerida"),
+  veracidadInformacion: yup.string().required("Declaración requerida"),
+});
+
+// 10. Esquema de contacto de emergencia
 const emergencyContactSchema = yup.object({
-  primerNombreEmergencia: yup.string().defined(),
-  segundoNombreEmergencia: yup.string().defined(),
-  primerApellidoEmergencia: yup.string().defined(),
-  segundoApellidoEmergencia: yup.string().defined(),
-  telefonoEmergencia: yup.string().defined(),
-  parentescoEmergencia: yup.string().defined(),
+  primerNombreEmergencia: yup.string()
+    .when('autorizacionContactoEmergencia', {
+      is: (value: string) => value === 'SI',
+      then: (schema) => schema.required("Nombre de contacto requerido"),
+      otherwise: (schema) => schema.optional()
+    }),
+  segundoNombreEmergencia: yup.string().nullable().optional(),
+  primerApellidoEmergencia: yup.string()
+    .when('autorizacionContactoEmergencia', {
+      is: (value: string) => value === 'SI',
+      then: (schema) => schema.required("Apellido de contacto requerido"),
+      otherwise: (schema) => schema.optional()
+    }),
+  segundoApellidoEmergencia: yup.string().nullable().optional(),
+  telefonoEmergencia: yup.string()
+    .when('autorizacionContactoEmergencia', {
+      is: (value: string) => value === 'SI',
+      then: (schema) => schema.required("Teléfono de contacto requerido"),
+      otherwise: (schema) => schema.optional()
+    }),
+  parentescoEmergencia: yup.string()
+    .when('autorizacionContactoEmergencia', {
+      is: (value: string) => value === 'SI',
+      then: (schema) => schema.required("Parentesco requerido"),
+      otherwise: (schema) => schema.optional()
+    }),
 });
 
-const authorizationsSchema = yup.object({
-  autorizacionImagen: yup.string().defined(),
-  veracidadInformacion: yup.string().defined(),
-  autorizacionContactoEmergencia: yup.string().defined(),
-});
 
+// 11. Esquema de acudientes
 const acudienteSchema = yup.object().shape({
-  primerNombre: yup.string().defined(),
-  segundoNombre: yup.string().defined(),
-  primerApellido: yup.string().defined(),
-  segundoApellido: yup.string().defined(),
-  email: yup.string().email("Correo inválido").defined(),
-  telefono: yup.string().defined(),
-  tipoAcudiente: yup.string().defined(),
+  tipoAcudiente: yup.string().optional(),
+  primerNombre: yup.string().optional(),
+  segundoNombre: yup.string().nullable().optional(),
+  primerApellido: yup.string().optional(),
+  segundoApellido: yup.string().nullable().optional(),
+  email: yup.string().email("Correo inválido").optional(),
+  telefono: yup.string().optional(),
 });
 
-// Combinar todos los esquemas
-export const studentInfoSchema: yup.ObjectSchema<FormDataType> =
-  enrollmentInfoFormSchema
-    .concat(StudentInfoFormSchema)
-    .concat(healthAffiliationFormSchema)
-    .concat(discapacidadesSchema)
-    .concat(capacidadesExcepcionalesSchema)
-    .concat(situacionAcademicaSchema)
-    .concat(parentInfoSchema)
-    .concat(emergencyContactSchema)
-    .concat(authorizationsSchema)
-    .concat(documentationSchema)
-    .concat(
-      yup.object({
-        acudientes: yup.array().of(acudienteSchema).default([]),
-      })
-    );
+// 12. Combinación de todos los esquemas
+export const studentInfoSchema: yup.ObjectSchema<FormDataType> = yup.object().shape({
+  // Información de matrícula
+  ...enrollmentInfoFormSchema.fields,
+  
+  // Información del estudiante
+  ...StudentInfoFormSchema.fields,
+  
+  // Afiliación de salud
+  ...healthAffiliationFormSchema.fields,
+  
+  // Discapacidades
+  ...discapacidadesSchema.fields,
+  
+  // Capacidades excepcionales
+  ...capacidadesExcepcionalesSchema.fields,
+  
+  // Situación académica
+  ...situacionAcademicaSchema.fields,
+  
+  // Información de padres
+  ...parentsInfoSchema.fields,
+  
+  // Documentación recibida
+  ...documentacionRecibidaSchema.fields,
+  
+  // Autorizaciones
+  ...authorizationSchema.fields,
+  
+  // Contacto de emergencia
+  ...emergencyContactSchema.fields,
+  
+  // Acudientes (opcional)
+  acudientes: yup.array().of(acudienteSchema).optional().default(undefined),
+}) as yup.ObjectSchema<FormDataType>;
+
+// Tipo derivado para los valores del formulario
+export type StudentInfoFormValues = yup.InferType<typeof studentInfoSchema>;
