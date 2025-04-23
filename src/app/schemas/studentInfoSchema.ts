@@ -32,13 +32,13 @@ const StudentInfoFormSchema = yup.object({
 
 // 3. Esquema de afiliación de salud
 const healthAffiliationFormSchema = yup.object({
-  tipoSangre: yup.string().required("Tipo de sangre requerido"),
-  epsAfiliado: yup.string().required("EPS afiliado requerida"),
+  tipoSangre: yup.string().optional(),
+  epsAfiliado: yup.string().optional(),
   ipsAsignada: yup.string().optional(),
   arsAfiliado: yup.string().optional(),
   nroCarnetSisben: yup.string().optional(),
   nivelSisben: yup.string().optional(),
-  estrato: yup.string().required("Estrato socioeconómico requerido"),
+  estrato: yup.string().optional(),
 });
 
 // 4. Esquema de discapacidades
@@ -70,8 +70,8 @@ const situacionAcademicaSchema = yup.object({
   situacionAcademicaReprobo: yup.string().optional().default("NO"),
   situacionAcademicaPendienteLogros: yup.string().optional().default("NO"),
   situacionAcademicaVieneOtraIE: yup.string().optional().default("NO"),
-  situcionAcademicaIngresaPrimeraVezIE: yup.string().optional().default("NO"),
-  situcionAcademicaNoCulminoEstudios: yup.string().optional().default("NO"),
+  situacionAcademicaIngresaPrimeraVezIE: yup.string().optional().default("NO"),
+  situacionAcademicaNoCulminoEstudios: yup.string().optional().default("NO"),
 });
 
 // 7. Esquema de información de padres

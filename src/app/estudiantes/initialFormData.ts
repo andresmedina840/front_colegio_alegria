@@ -55,8 +55,8 @@ const initialFormData = {
   situacionAcademicaReprobo: "",
   situacionAcademicaPendienteLogros: "",
   situacionAcademicaVieneOtraIE: "",
-  situcionAcademicaIngresaPrimeraVezIE: "",
-  situcionAcademicaNoCulminoEstudios: "",
+  situacionAcademicaIngresaPrimeraVezIE: "",
+  situacionAcademicaNoCulminoEstudios: "",
 
   //Padre
   tipoIdentificacionPadre: "",

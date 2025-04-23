@@ -97,17 +97,17 @@ const ParentForm: React.FC<ParentFormProps> = ({
           />
         </Grid>
 
-        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+        <Grid size={{ xs: 12, sm: 7, md: 7 }}>
           <CustomTextField<FormDataType>
             label={`Direccion ${title}`}
             name={field("direccion")}
             uppercase
-            maxLength={26}
+            maxLength={50}
             showCharCount
           />
         </Grid>
 
-        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+        <Grid size={{ xs: 12, sm: 5, md: 5 }}>
           <CustomTextField<FormDataType>
             label={`Barrio ${title}`}
             name={field("barrio")}
@@ -122,7 +122,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             label={`Numero Celular ${title}`}
             name={field("numeroCelular")}
             uppercase
-            maxLength={26}
+            maxLength={10}
             showCharCount
           />
         </Grid>
@@ -137,12 +137,12 @@ const ParentForm: React.FC<ParentFormProps> = ({
           />
         </Grid>
 
-        <Grid size={{ xs: 12, sm: 7, md: 7 }}>
+        <Grid size={{ xs: 12, sm: 12, md: 12 }}>
           <CustomTextField<FormDataType>
             label={`Correo Electronico ${title}`}
             name={field("correoElectronico")}
-            uppercase
-            maxLength={26}
+            uppercase={false}
+            maxLength={50}
             showCharCount
           />
         </Grid>

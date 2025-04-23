@@ -114,11 +114,11 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
           <Grid size={{ xs: 12, sm: 4, md: 4 }}>
             <CustomAutocomplete<FormDataType, OptionType>
               label="Ingresa por primera vez a la I.E."
-              name="situcionAcademicaIngresaPrimeraVezIE"
+              name="situacionAcademicaIngresaPrimeraVezIE"
               options={siNo}
               control={control}
               onChange={handleAutocompleteChange(
-                "situcionAcademicaIngresaPrimeraVezIE"
+                "situacionAcademicaIngresaPrimeraVezIE"
               )}
               getOptionLabel={(option: OptionType) => option.nombre}
             />
@@ -127,11 +127,11 @@ const SituacionAcademica: React.FC<SituacionAcademicaProps> = ({
           <Grid size={{ xs: 12, sm: 5, md: 5 }}>
             <CustomAutocomplete<FormDataType, OptionType>
               label="No culminó estudios"
-              name="situcionAcademicaNoCulminoEstudios"
+              name="situacionAcademicaNoCulminoEstudios"
               options={siNo}
               control={control}
               onChange={handleAutocompleteChange(
-                "situcionAcademicaNoCulminoEstudios"
+                "situacionAcademicaNoCulminoEstudios"
               )}
               getOptionLabel={(option: OptionType) => option.nombre}
             />

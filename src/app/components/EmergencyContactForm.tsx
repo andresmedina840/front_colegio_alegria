@@ -16,6 +16,7 @@ const EmergencyContactForm = () => {
             label="Primer Nombre Contacto Emergencia"
             name="primerNombreEmergencia"
             maxLength={26}
+            uppercase
             showCharCount
             required
           />
@@ -25,6 +26,7 @@ const EmergencyContactForm = () => {
           <CustomTextField
             label="Segundo Nombre Contacto Emergencia"
             name="segundoNombreEmergencia"
+            uppercase
             maxLength={26}
             showCharCount
           />
@@ -34,6 +36,7 @@ const EmergencyContactForm = () => {
           <CustomTextField
             label="Primer Apellido Contacto Emergencia"
             name="primerApellidoEmergencia"
+            uppercase
             maxLength={26}
             showCharCount
             required
@@ -44,6 +47,7 @@ const EmergencyContactForm = () => {
           <CustomTextField
             label="Segundo Apellido Contacto Emergencia"
             name="segundoApellidoEmergencia"
+            uppercase
             maxLength={26}
             showCharCount
           />
@@ -63,6 +67,7 @@ const EmergencyContactForm = () => {
           <CustomTextField
             label="Parentesco Contacto Emergencia"
             name="parentescoEmergencia"
+            uppercase
             maxLength={26}
             showCharCount
             required

@@ -61,8 +61,8 @@ export interface SituacionAcademica {
   situacionAcademicaReprobo: string;
   situacionAcademicaPendienteLogros: string;
   situacionAcademicaVieneOtraIE: string;
-  situcionAcademicaIngresaPrimeraVezIE: string;
-  situcionAcademicaNoCulminoEstudios: string;
+  situacionAcademicaIngresaPrimeraVezIE: string;
+  situacionAcademicaNoCulminoEstudios: string;
 }
 
 export interface ParentsInfo {

@@ -53,7 +53,7 @@ const DocumentacionRecibida: React.FC<DocumentacionRecibidaProps> = ({
               .trim();
 
             return (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={fieldName}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }} key={fieldName}>
                 <CustomAutocomplete<FormDataType, OptionType>
                   name={fieldName}
                   label={label}
