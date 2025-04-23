@@ -1,7 +1,7 @@
 // src/app/components/StudentInfoForm.tsx
 "use client";
 
-import { Card, CardContent, Grid, Typography } from "@mui/material";
+import { Card, CardContent, Grid, TextField, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import CustomTextField from "./personalizados/CustomTextField";
 import CustomDatePicker from "./personalizados/CustomDatePicker";
@@ -24,7 +24,7 @@ type AutocompleteFields =
   | "paisNacimiento"
   | "departamentoNacimiento"
   | "municipioNacimiento"
-  | "sedeMatricula"  
+  | "sedeMatricula"
   | "gradoId"
   | "ultimoGradoCursado";
 
@@ -70,7 +70,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
     if (sedes.length === 1) {
       setValue("sedeMatricula", sedes[0].id);
     }
-  }, [sedes, setValue]);  
+  }, [sedes, setValue]);
 
   useEffect(() => {
     const calcularEdad = (fechaNacimiento: string): string => {
@@ -276,7 +276,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Sede */}
-          <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+          <Grid size={{ xs: 12, sm: 5, md: 5 }}>
             <CustomAutocomplete<FormDataType, OpcionSelect>
               label="Sede para donde se matrícula *"
               name="sedeMatricula"
@@ -291,7 +291,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Grado a matricular */}
-          <Grid size={{ xs: 12, sm: 3, md: 3}}>
+          <Grid size={{ xs: 12, sm: 3, md: 3 }}>
             <CustomAutocomplete<FormDataType, OpcionSelect>
               label="Grado a matricular *"
               name="gradoId"
@@ -302,14 +302,23 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               getOptionValue={(option) => option.id}
               rules={{ required: "Este campo es obligatorio" }}
             />
-            {loadingPension && (
-              <Typography variant="body2">Cargando...</Typography>
-            )}
-            {pensionValue && !loadingPension && (
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                Pensión: ${parseFloat(pensionValue).toLocaleString()}
-              </Typography>
-            )}
+          </Grid>
+
+          {/* Valor de la pensión (solo lectura) */}
+          <Grid size={{ xs: 12, sm: 5, md: 4 }}>
+            <TextField
+              label="Pensión"
+              name="pensionDisplay"
+              fullWidth
+              value={
+                loadingPension
+                  ? "Cargando..."
+                  : pensionValue
+                  ? `$${parseInt(pensionValue).toLocaleString("es-CO")}`
+                  : ""
+              }
+              disabled
+            />
           </Grid>
 
           {/* Jornada Escolar */}
@@ -327,7 +336,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
           </Grid>
 
           {/* Institución anterior */}
-          <Grid size={{ xs: 12, sm: 7, md: 7 }}>
+          <Grid size={{ xs: 12, sm: 9, md: 9 }}>
             <CustomTextField
               label="Institución Educativa anterior (si aplica)"
               name="institucionEducativaAnterior"

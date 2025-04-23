@@ -59,7 +59,7 @@ const initialFormData = {
   situcionAcademicaNoCulminoEstudios: "",
 
   //Padre
-  tipoIdentificacionPadre : "",
+  tipoIdentificacionPadre: "",
   numeroIdentificacionPadre: "",
   primerNombrePadre: "",
   segundoNombrePadre: "",
@@ -67,7 +67,7 @@ const initialFormData = {
   segundoApellidoPadre: "",
 
   //Madre
-  tipoIdentificacionMadre : "",
+  tipoIdentificacionMadre: "",
   numeroIdentificacionMadre: "",
   primerNombreMadre: "",
   segundoNombreMadre: "",

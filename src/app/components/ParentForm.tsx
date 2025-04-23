@@ -42,7 +42,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
             control={control}
             getOptionLabel={(option: OpcionSelect) => option.nombre}
             onChange={handleAutocompleteChange(
-              field(`tipoIdentificacion${title}`)
+              field(`tipoIdentificacion`)
             )}
           />
         </Grid>
@@ -50,7 +50,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
         <Grid size={{ xs: 12, sm: 6, md: 6 }}>
           <CustomTextField<FormDataType>
             label={`Número Identificación ${title}`}
-            name={field(`numeroIdentificacion${title}`)}
+            name={field(`numeroIdentificacion`)}
             uppercase
             maxLength={12}
             showCharCount

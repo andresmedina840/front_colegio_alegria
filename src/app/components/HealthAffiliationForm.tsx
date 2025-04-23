@@ -81,11 +81,7 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
               required
               control={control}
               getOptionLabel={(option: OpcionSelect) => option.nombre}
-              onChange={(event, value: OpcionSelect | null) => {
-                if (value) {
-                  updateField("estrato", value.id);
-                }
-              }}
+              getOptionValue={(option: OpcionSelect) => option.id}
             />
           </Grid>
         </Grid>
