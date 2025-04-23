@@ -56,7 +56,7 @@ const discapacidadesSchema = yup.object({
 
 // 5. Esquema de capacidades excepcionales
 const capacidadesExcepcionalesSchema = yup.object({
-  capacidadesExcepcionalesNoAplicaCapacidad: yup.string().optional().default("NO"),
+  capacidadesExcepcionalesNoAplica: yup.string().optional().default("NO"),
   capacidadesExcepcionalesSuperdotado: yup.string().optional().default("NO"),
   capacidadesExcepcionalesTalentoCientifico: yup.string().optional().default("NO"),
   capacidadesExcepcionalesTalentoTecnologico: yup.string().optional().default("NO"),

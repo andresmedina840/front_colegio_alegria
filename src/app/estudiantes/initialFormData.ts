@@ -43,7 +43,7 @@ const initialFormData = {
   discapacidadesMultiple: "",
 
   //CapacidadesExcepcionales
-  capacidadesExcepcionalesNoAplicaCapacidad: "",
+  capacidadesExcepcionalesNoAplica: "",
   capacidadesExcepcionalesSuperdotado: "",
   capacidadesExcepcionalesTalentoCientifico: "",
   capacidadesExcepcionalesTalentoTecnologico: "",

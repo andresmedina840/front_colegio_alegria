@@ -40,10 +40,11 @@ const ParentForm: React.FC<ParentFormProps> = ({
             name={field(`tipoIdentificacion${title}`)}
             options={tiposIdentificacion}
             control={control}
-            getOptionLabel={(option: OpcionSelect) => option.nombre}
             onChange={handleAutocompleteChange(
-              field(`tipoIdentificacion`)
+              field(`tipoIdentificacion${title}`)
             )}
+            getOptionLabel={(option: OpcionSelect) => option.nombre}
+            getOptionValue={(option) => option.id.toString()}           
           />
         </Grid>
 

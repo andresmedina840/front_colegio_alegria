@@ -48,7 +48,7 @@ export interface CondicionesEspeciales {
   discapacidadesMultiple: string;
 
   //CapacidadesExcepcionales
-  capacidadesExcepcionalesNoAplicaCapacidad: string;
+  capacidadesExcepcionalesNoAplica: string;
   capacidadesExcepcionalesSuperdotado: string;
   capacidadesExcepcionalesTalentoCientifico: string;
   capacidadesExcepcionalesTalentoTecnologico: string;
