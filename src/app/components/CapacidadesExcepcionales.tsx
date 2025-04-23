@@ -18,11 +18,11 @@ interface CapacidadesExcepcionalesProps {
 }
 
 const capacidadFields = [
-  { name: "noAplicaCapacidad", label: "No aplica" },
-  { name: "superdotado", label: "Superdotado" },
-  { name: "talentoCientifico", label: "Con talento científico" },
-  { name: "talentoTecnologico", label: "Con talento tecnológico" },
-  { name: "talentoSubjetivo", label: "Con talento subjetivo" },
+  { name: "capacidadesExcepcionalesNoAplicaCapacidad", label: "No aplica" },
+  { name: "capacidadesExcepcionalesSuperdotado", label: "Superdotado" },
+  { name: "capacidadesExcepcionalesTalentoCientifico", label: "Con talento científico" },
+  { name: "capacidadesExcepcionalesTalentoTecnologico", label: "Con talento tecnológico" },
+  { name: "capacidadesExcepcionalesTalentoSubjetivo", label: "Con talento subjetivo" },
 ];
 
 const CapacidadesExcepcionales: React.FC<CapacidadesExcepcionalesProps> = ({
@@ -31,30 +31,30 @@ const CapacidadesExcepcionales: React.FC<CapacidadesExcepcionalesProps> = ({
   handleAutocompleteChange,
 }) => {
   const { control, setValue } = useFormContext<FormDataType>();
-  const noAplicaCapacidad = formData.noAplicaCapacidad;
+  const capacidadesExcepcionalesNoAplicaCapacidad = formData.capacidadesExcepcionalesNoAplicaCapacidad;
 
   useEffect(() => {
-    if (noAplicaCapacidad === "SI") {
+    if (capacidadesExcepcionalesNoAplicaCapacidad === "SI") {
       capacidadFields.forEach((field) => {
-        if (field.name !== "noAplicaCapacidad") {
+        if (field.name !== "capacidadesExcepcionalesNoAplicaCapacidad") {
           setValue(field.name as keyof FormDataType, "");
         }
       });
-    } else if (noAplicaCapacidad === "NO") {
+    } else if (capacidadesExcepcionalesNoAplicaCapacidad === "NO") {
       capacidadFields.forEach((field) => {
-        if (field.name !== "noAplicaCapacidad") {
+        if (field.name !== "capacidadesExcepcionalesNoAplicaCapacidad") {
           setValue(field.name as keyof FormDataType, "NO");
         }
       });
     }
-  }, [noAplicaCapacidad, setValue]);
+  }, [capacidadesExcepcionalesNoAplicaCapacidad, setValue]);
 
   const opcionesSiNo: OpcionSiNo[] = siNo.map((option, index) => ({
     id: index,
     nombre: option,
   }));
 
-  const disableOthers = noAplicaCapacidad === "NO";
+  const disableOthers = capacidadesExcepcionalesNoAplicaCapacidad === "NO";
 
   return (
     <Grid container spacing={2}>
@@ -69,7 +69,7 @@ const CapacidadesExcepcionales: React.FC<CapacidadesExcepcionalesProps> = ({
             onChange={(_, value) =>
               handleAutocompleteChange(field.name, value?.nombre || "")
             }
-            disabled={field.name !== "noAplicaCapacidad" && disableOthers}
+            disabled={field.name !== "capacidadesExcepcionalesNoAplicaCapacidad" && disableOthers}
           />
         </Grid>
       ))}

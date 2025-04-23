@@ -1,7 +1,7 @@
 const initialFormData = {
   fechaMatricula: "",
 
-  //Segundo modulo
+  //Información del estudiante
   tipoIdentificacionEstudianteId: "",
   numeroIdentificacionEstudiante: "",
   primerNombreEstudiante: "",
@@ -22,7 +22,7 @@ const initialFormData = {
   ultimoGradoCursado: "",
   ultimoAnioCursado: "",
 
-  //Tercer modulo
+  //Afiliación al sistema de salud
   tipoSangre: "",
   epsAfiliado: "",
   ipsAsignada: "",
@@ -32,22 +32,22 @@ const initialFormData = {
   estrato: "",
 
   //Discapacidades
-  noAplica: "",
-  sorderaProfunda: "",
-  hipoacusiaBajaVision: "",
-  bajaVisionDiagnosticada: "",
-  paralisisCerebral: "",
-  autismo: "",
-  deficienciaCognitiva: "",
-  sindromeDown: "",
-  multiple: "",
+  discapacidadesNoAplica: "",
+  discapacidadesSorderaProfunda: "",
+  discapacidadesHipoacusiaBajaVision: "",
+  discapacidadesBajaVisionDiagnosticada: "",
+  discapacidadesParalisisCerebral: "",
+  discapacidadesAutismo: "",
+  discapacidadesDeficienciaCognitiva: "",
+  discapacidadesSindromeDown: "",
+  discapacidadesMultiple: "",
 
   //CapacidadesExcepcionales
-  noAplicaCapacidad: "",
-  superdotado: "",
-  talentoCientifico: "",
-  talentoTecnologico: "",
-  talentoSubjetivo: "",
+  capacidadesExcepcionalesNoAplicaCapacidad: "",
+  capacidadesExcepcionalesSuperdotado: "",
+  capacidadesExcepcionalesTalentoCientifico: "",
+  capacidadesExcepcionalesTalentoTecnologico: "",
+  capacidadesExcepcionalesTalentoSubjetivo: "",
 
   //SituacionAcademica
   situacionAcademicaNoEstudioVigenciaAnterior: "",
@@ -65,6 +65,11 @@ const initialFormData = {
   segundoNombrePadre: "",
   primerApellidoPadre: "",
   segundoApellidoPadre: "",
+  direccionPadre: "",
+  barrioPadre: "",
+  numeroCelularPadre: "",
+  ocupacionPadre: "",
+  correoElectronicoPadre: "",
 
   //Madre
   tipoIdentificacionMadre: "",
@@ -73,6 +78,11 @@ const initialFormData = {
   segundoNombreMadre: "",
   primerApellidoMadre: "",
   segundoApellidoMadre: "",
+  direccionMadre: "",
+  barrioMadre: "",
+  numeroCelularMadre: "",
+  ocupacionMadre: "",
+  correoElectronicoMadre: "",
 
   //DocumentacionRecibida
   documentacionRecibidaRegistroCivil: "",

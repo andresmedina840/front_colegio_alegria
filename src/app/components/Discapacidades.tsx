@@ -16,36 +16,36 @@ interface DiscapacidadesProps {
 }
 
 const discapacidadFields = [
-  { name: "noAplica", label: "No aplica" },
-  { name: "sorderaProfunda", label: "Sordera profunda" },
-  { name: "hipoacusiaBajaVision", label: "Hipoacusia o baja visión" },
-  { name: "bajaVisionDiagnosticada", label: "Baja visión diagnosticada" },
-  { name: "paralisisCerebral", label: "Parálisis cerebral" },
-  { name: "autismo", label: "Autismo" },
-  { name: "deficienciaCognitiva", label: "Deficiencia cognitiva" },
-  { name: "sindromeDown", label: "Síndrome de Down" },
-  { name: "multiple", label: "Múltiple" },
+  { name: "discapacidadesNoAplica", label: "No aplica" },
+  { name: "discapacidadesSorderaProfunda", label: "Sordera profunda" },
+  { name: "discapacidadesHipoacusiaBajaVision", label: "Hipoacusia o baja visión" },
+  { name: "discapacidadesBajaVisionDiagnosticada", label: "Baja visión diagnosticada" },
+  { name: "discapacidadesParalisisCerebral", label: "Parálisis cerebral" },
+  { name: "discapacidadesAutismo", label: "Autismo" },
+  { name: "discapacidadesDeficienciaCognitiva", label: "Deficiencia cognitiva" },
+  { name: "discapacidadesSindromeDown", label: "Síndrome de Down" },
+  { name: "discapacidadesMultiple", label: "Múltiple" },
 ];
 
 const Discapacidades: React.FC<DiscapacidadesProps> = ({ siNo }) => {
   const { watch, setValue, control } = useFormContext<FormDataType>();
-  const noAplica = watch("noAplica");
+  const discapacidadesNoAplica = watch("discapacidadesNoAplica");
 
   useEffect(() => {
-    if (noAplica === "SI") {
+    if (discapacidadesNoAplica === "SI") {
       discapacidadFields.forEach((field) => {
-        if (field.name !== "noAplica") {
+        if (field.name !== "discapacidadesNoAplica") {
           setValue(field.name as keyof FormDataType, "");
         }
       });
-    } else if (noAplica === "NO") {
+    } else if (discapacidadesNoAplica === "NO") {
       discapacidadFields.forEach((field) => {
-        if (field.name !== "noAplica") {
+        if (field.name !== "discapacidadesNoAplica") {
           setValue(field.name as keyof FormDataType, "NO");
         }
       });
     }
-  }, [noAplica, setValue]);
+  }, [discapacidadesNoAplica, setValue]);
 
   const opciones: OpcionSiNo[] = siNo.map((option, index) => ({
     id: String(index),
@@ -62,7 +62,7 @@ const Discapacidades: React.FC<DiscapacidadesProps> = ({ siNo }) => {
             options={opciones}
             control={control}
             getOptionLabel={(option: OpcionSiNo) => option.nombre}
-            disabled={field.name !== "noAplica" && noAplica === "NO"}
+            disabled={field.name !== "discapacidadesNoAplica" && discapacidadesNoAplica === "NO"}
           />
         </Grid>
       ))}

@@ -34,7 +34,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
         {title}
       </Typography>
       <Grid container spacing={2}>
-        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+        <Grid size={{ xs: 12, sm: 5, md: 5 }}>
           <CustomAutocomplete<FormDataType, OpcionSelect>
             label={`Tipo Identificación ${title}`}
             name={field(`tipoIdentificacion${title}`)}
@@ -47,7 +47,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
           />
         </Grid>
 
-        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+        <Grid size={{ xs: 12, sm: 3, md: 3 }}>
           <CustomTextField<FormDataType>
             label={`Número Identificación ${title}`}
             name={field(`numeroIdentificacion`)}
@@ -57,7 +57,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
           />
         </Grid>
 
-        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
           <CustomTextField<FormDataType>
             label={`Primer Nombre ${title}`}
             name={field("primerNombre")}
@@ -67,7 +67,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
           />
         </Grid>
 
-        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
           <CustomTextField<FormDataType>
             label={`Segundo Nombre ${title}`}
             name={field("segundoNombre")}
@@ -77,7 +77,7 @@ const ParentForm: React.FC<ParentFormProps> = ({
           />
         </Grid>
 
-        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
           <CustomTextField<FormDataType>
             label={`Primer Apellido ${title}`}
             name={field("primerApellido")}
@@ -87,10 +87,60 @@ const ParentForm: React.FC<ParentFormProps> = ({
           />
         </Grid>
 
-        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
           <CustomTextField<FormDataType>
             label={`Segundo Apellido ${title}`}
             name={field("segundoApellido")}
+            uppercase
+            maxLength={26}
+            showCharCount
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+          <CustomTextField<FormDataType>
+            label={`Direccion ${title}`}
+            name={field("direccion")}
+            uppercase
+            maxLength={26}
+            showCharCount
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+          <CustomTextField<FormDataType>
+            label={`Barrio ${title}`}
+            name={field("barrio")}
+            uppercase
+            maxLength={26}
+            showCharCount
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
+          <CustomTextField<FormDataType>
+            label={`Numero Celular ${title}`}
+            name={field("numeroCelular")}
+            uppercase
+            maxLength={26}
+            showCharCount
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, sm: 8, md: 8 }}>
+          <CustomTextField<FormDataType>
+            label={`Ocupación ${title}`}
+            name={field("ocupacion")}
+            uppercase
+            maxLength={26}
+            showCharCount
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, sm: 7, md: 7 }}>
+          <CustomTextField<FormDataType>
+            label={`Correo Electronico ${title}`}
+            name={field("correoElectronico")}
             uppercase
             maxLength={26}
             showCharCount

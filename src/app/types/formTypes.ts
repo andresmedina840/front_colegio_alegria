@@ -37,22 +37,22 @@ export interface HealthAffiliationForm {
 
 export interface CondicionesEspeciales {
   //Discapacidades
-  noAplica: string;
-  sorderaProfunda: string;
-  hipoacusiaBajaVision: string;
-  bajaVisionDiagnosticada: string;
-  paralisisCerebral: string;
-  autismo: string;
-  deficienciaCognitiva: string;
-  sindromeDown: string;
-  multiple: string;
+  discapacidadesNoAplica: string;
+  discapacidadesSorderaProfunda: string;
+  discapacidadesHipoacusiaBajaVision: string;
+  discapacidadesBajaVisionDiagnosticada: string;
+  discapacidadesParalisisCerebral: string;
+  discapacidadesAutismo: string;
+  discapacidadesDeficienciaCognitiva: string;
+  discapacidadesSindromeDown: string;
+  discapacidadesMultiple: string;
 
   //CapacidadesExcepcionales
-  noAplicaCapacidad: string;
-  superdotado: string;
-  talentoCientifico: string;
-  talentoTecnologico: string;
-  talentoSubjetivo: string;
+  capacidadesExcepcionalesNoAplicaCapacidad: string;
+  capacidadesExcepcionalesSuperdotado: string;
+  capacidadesExcepcionalesTalentoCientifico: string;
+  capacidadesExcepcionalesTalentoTecnologico: string;
+  capacidadesExcepcionalesTalentoSubjetivo: string;
 }
 
 export interface SituacionAcademica {
@@ -73,6 +73,11 @@ export interface ParentsInfo {
   segundoNombrePadre: string;
   primerApellidoPadre: string;
   segundoApellidoPadre: string;
+  direccionPadre: string;
+  barrioPadre: string;
+  numeroCelularPadre: string;
+  ocupacionPadre: string;
+  correoElectronicoPadre: string;
 
   //Madre
   tipoIdentificacionMadre: string;
@@ -81,6 +86,11 @@ export interface ParentsInfo {
   segundoNombreMadre: string;
   primerApellidoMadre: string;
   segundoApellidoMadre: string;
+  direccionMadre: string;
+  barrioMadre: string;
+  numeroCelularMadre: string;
+  ocupacionMadre: string;
+  correoElectronicoMadre: string;
 }
 
 export interface DocumentacionRecibida {
