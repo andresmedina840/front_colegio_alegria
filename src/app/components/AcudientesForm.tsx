@@ -48,6 +48,7 @@ const AcudientesForm = ({ tiposAcudiente }: Props) => {
                   options={tiposAcudiente}
                   control={control}
                   getOptionLabel={(opt) => opt.nombre}
+                  getOptionValue={(option) => option.id}  
                 />
               </Grid>
               <Grid size={{ xs: 12, sm: 2, md: 4 }}>
