@@ -32,7 +32,7 @@ import AcudientesForm from "./AcudientesForm";
 import initialFormData from "../estudiantes/initialFormData";
 import { FormDataType } from "../types/formTypes";
 import { useCatalogosEstudiantes } from "../hooks/apisEstudiantes";
-import Image from "next/image";
+//import Image from "next/image";
 
 const siNo: OpcionSelect[] = [
   { id: "SI", nombre: "SI" },
