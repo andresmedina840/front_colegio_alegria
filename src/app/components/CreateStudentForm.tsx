@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import {
   Box,
   Typography,
@@ -9,10 +9,10 @@ import {
   Step,
   StepLabel,
   CircularProgress,
-  Divider,
   Paper,
   useTheme,
   useMediaQuery,
+  LinearProgress,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { motion, AnimatePresence } from "framer-motion";
@@ -40,37 +40,60 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CircleIcon from "@mui/icons-material/Circle";
 
+// --- CONSTANTES ---
 const siNo: OpcionSelect[] = [
   { id: "SI", nombre: "SI" },
   { id: "NO", nombre: "NO" },
 ];
 
 const steps = [
-  "Información de Matrícula",
-  "Información del Estudiante",
-  "Afiliación en Salud",
-  "Condiciones Especiales y Académicas",
-  "Documentación Recibida",
+  "Matrícula",
+  "Estudiante",
+  "Salud",
+  "Condiciones",
+  "Situación Académica", // Nuevo paso separado
+  "Documentos",
   "Acudientes",
-  "Familia y Emergencia",
+  "Padre",
+  "Madre",
+  "Emergencia",
+  "Autorizaciones",
 ];
 
-// Definimos el tipo para las props del ícono personalizado
+const LOCAL_STORAGE_KEY = "create-student-form-data";
+
+// --- CUSTOM STEP ICON ---
 interface CustomStepIconProps {
   active: boolean;
   completed: boolean;
 }
 
-const CustomStepIcon = ({ active, completed }: CustomStepIconProps) => {
-  if (completed) return <CheckCircleIcon color="success" />;
-  if (active) return <CircleIcon color="primary" />;
-  return <RadioButtonUncheckedIcon color="disabled" />;
-};
+const CustomStepIcon = ({ active, completed }: CustomStepIconProps) => (
+  <motion.div
+    initial={false}
+    animate={{
+      scale: completed ? 1.2 : active ? 1.1 : 1,
+      opacity: completed ? 1 : 0.8,
+    }}
+    transition={{ duration: 0.4, ease: "easeOut" }}
+    style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+  >
+    {completed ? (
+      <CheckCircleIcon color="success" />
+    ) : active ? (
+      <CircleIcon color="primary" />
+    ) : (
+      <RadioButtonUncheckedIcon color="disabled" />
+    )}
+  </motion.div>
+);
 
+// --- COMPONENTE PRINCIPAL ---
 const CreateStudentForm = () => {
   const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -81,14 +104,7 @@ const CreateStudentForm = () => {
     mode: "onBlur",
   });
 
-  const {
-    handleSubmit,
-    reset,
-    watch,
-    setValue,
-    control,
-  } = methods;
-
+  const { handleSubmit, reset, watch, setValue, control } = methods;
   const formData = watch();
 
   const {
@@ -104,8 +120,9 @@ const CreateStudentForm = () => {
 
   const [departamentos, setDepartamentos] = useState<OpcionSelect[]>([]);
   const [ciudades, setCiudades] = useState<OpcionSelect[]>([]);
-
   const jornadaEscolar = ["Mañana", "Tarde", "Completa"];
+
+  const progressPercentage = (activeStep / (steps.length - 1)) * 100;
 
   const updateField = useCallback(
     (field: keyof FormDataType, value: string) => {
@@ -135,7 +152,6 @@ const CreateStudentForm = () => {
         });
         return;
       }
-
       updateField("paisNacimiento", paisId);
       updateField("departamentoNacimiento", "");
       updateField("municipioNacimiento", "");
@@ -188,33 +204,38 @@ const CreateStudentForm = () => {
       case 2:
         return ["tipoSangre", "epsAfiliado", "ipsAsignada", "estrato"];
       case 3:
+        return ["discapacidadesNoAplica", "capacidadesExcepcionalesNoAplica"];
+      case 4:
         return [
-          "discapacidadesNoAplica",
-          "capacidadesExcepcionalesNoAplica",
+          // Nuevo paso para situación académica
           "situacionAcademicaNoEstudioVigenciaAnterior",
           "situacionAcademicaAprobo",
           "situacionAcademicaReprobo",
         ];
-      case 4:
+      case 5:
         return [
           "documentacionRecibidaRegistroCivil",
           "documentacionRecibidaCertificadosEstudios",
           "documentacionRecibidaFotos",
         ];
-      case 5:
-        return ["acudientes"];
       case 6:
+        return ["acudientes"];
+      case 7:
         return [
           "tipoIdentificacionPadre",
           "primerNombrePadre",
           "primerApellidoPadre",
+        ];
+      case 8:
+        return [
           "tipoIdentificacionMadre",
           "primerNombreMadre",
           "primerApellidoMadre",
-          "autorizacionContactoEmergencia",
-          "autorizacionImagen",
-          "veracidadInformacion",
         ];
+      case 9:
+        return ["autorizacionContactoEmergencia"];
+      case 10:
+        return ["autorizacionImagen", "veracidadInformacion"];
       default:
         return [];
     }
@@ -223,23 +244,21 @@ const CreateStudentForm = () => {
   const handleNext = async () => {
     const fields = getFieldsByStep(activeStep);
     const isValid = await methods.trigger(fields);
-
-    if (isValid) {
-      setActiveStep((prev) => prev + 1);
-    }
+    if (isValid) setActiveStep((prev) => prev + 1);
   };
 
-  const handleBack = () => {
-    setActiveStep((prev) => prev - 1);
-  };
+  const handleBack = () => setActiveStep((prev) => prev - 1);
 
   const onSubmit = async (data: FormDataType) => {
     setIsSubmitting(true);
     try {
       await api.post("/alumnos", data);
-      enqueueSnackbar("Estudiante registrado con éxito", { variant: "success" });
+      enqueueSnackbar("Estudiante registrado con éxito", {
+        variant: "success",
+      });
       reset(initialFormData);
       setActiveStep(0);
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : "Error desconocido";
       enqueueSnackbar(msg, { variant: "error" });
@@ -248,6 +267,7 @@ const CreateStudentForm = () => {
     }
   };
 
+  // --- Renderiza el contenido de cada paso ---
   const renderStepContent = (step: number) => {
     switch (step) {
       case 0:
@@ -268,68 +288,173 @@ const CreateStudentForm = () => {
           />
         );
       case 2:
-        return <HealthAffiliationForm updateField={updateField} estratoEconomico={estratosEconomico} />;
+        return (
+          <HealthAffiliationForm
+            updateField={updateField}
+            estratoEconomico={estratosEconomico}
+          />
+        );
       case 3:
         return (
-          <>
-            <CondicionesEspeciales
-              formData={formData}
-              handleChange={(e) => updateField(e.target.name as keyof FormDataType, String(e.target.value))}
-              siNo={siNo.map((opt) => opt.nombre)}
-            />
-            <SituacionAcademica
-              formData={formData}
-              handleChange={(e) => updateField(e.target.name as keyof FormDataType, String(e.target.value))}
-              siNo={siNo}
-            />
-          </>
+          <CondicionesEspeciales
+            formData={formData}
+            handleChange={(e) =>
+              updateField(
+                e.target.name as keyof FormDataType,
+                String(e.target.value)
+              )
+            }
+            siNo={siNo.map((opt) => opt.nombre)}
+          />
         );
       case 4:
-        return <DocumentacionRecibida siNo={siNo} />;
-      case 5:
-        return <AcudientesForm tiposAcudiente={tiposAcudiente} />;
-      case 6:
         return (
-          <>
-            <ParentForm title="Padre" tiposIdentificacion={tiposIdentificacion} />
-            <Divider sx={{ my: 4 }} />
-            <ParentForm title="Madre" tiposIdentificacion={tiposIdentificacion} />
+          <SituacionAcademica
+            formData={formData}
+            handleChange={(e) =>
+              updateField(
+                e.target.name as keyof FormDataType,
+                String(e.target.value)
+              )
+            }
+            siNo={siNo}
+          />
+        );
+      case 5:
+        return <DocumentacionRecibida siNo={siNo} />;
+      case 6:
+        return <AcudientesForm tiposAcudiente={tiposAcudiente} />;
+      case 7:
+        return (
+          <ParentForm title="Padre" tiposIdentificacion={tiposIdentificacion} />
+        );
+      case 8:
+        return (
+          <ParentForm title="Madre" tiposIdentificacion={tiposIdentificacion} />
+        );
+      case 9:
+        return (
+          <Box>
             <CustomAutocomplete<FormDataType, OpcionSelect>
-              label="Autorización para contacto de emergencia"
+              label="Autorización para contacto de emergencia *"
               name="autorizacionContactoEmergencia"
               options={siNo}
               control={control}
               getOptionLabel={(option) => option.nombre}
+              rules={{ required: "Este campo es obligatorio" }}
             />
             {formData.autorizacionContactoEmergencia === "SI" && (
-              <Box sx={{ mt: 2 }}>
+              <Box sx={{ mt: 4 }}>
                 <EmergencyContactForm />
               </Box>
             )}
+          </Box>
+        );
+      case 10:
+        return (
+          <Box>
             <CustomAutocomplete<FormDataType, OpcionSelect>
-              label="Autorizo uso de imagen"
+              label="Autorizo uso de imagen *"
               name="autorizacionImagen"
               options={siNo}
               control={control}
               getOptionLabel={(option) => option.nombre}
+              rules={{ required: "Este campo es obligatorio" }}
             />
-            <CustomAutocomplete<FormDataType, OpcionSelect>
-              label="Veracidad de la información"
-              name="veracidadInformacion"
-              options={siNo}
-              control={control}
-              getOptionLabel={(option) => option.nombre}
-            />
-          </>
+            <Box sx={{ mt: 3 }}>
+              <CustomAutocomplete<FormDataType, OpcionSelect>
+                label="Veracidad de la información *"
+                name="veracidadInformacion"
+                options={siNo}
+                control={control}
+                getOptionLabel={(option) => option.nombre}
+                rules={{ required: "Este campo es obligatorio" }}
+              />
+            </Box>
+            <Typography variant="body2" sx={{ mt: 2, color: "text.secondary" }}>
+              * Todos los campos son obligatorios
+            </Typography>
+          </Box>
         );
       default:
         return null;
     }
   };
 
+  // --- Autoguardado y recuperación ---
+  useEffect(() => {
+    const subscription = methods.watch((value) => {
+      if (value) {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(value));
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [methods]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (stored) methods.reset(JSON.parse(stored));
+  }, []);
+
+  // --- Scroll automático en cambio de paso ---
+  useEffect(() => {
+    if (containerRef.current)
+      containerRef.current.scrollIntoView({ behavior: "smooth" });
+  }, [activeStep]);
+
+  // --- Prevención de cierre accidental ---
+  useEffect(() => {
+    const handler = (event: BeforeUnloadEvent) => {
+      if (localStorage.getItem(LOCAL_STORAGE_KEY)) {
+        event.preventDefault();
+        event.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, []);
+
+  // --- Barra de progreso y contador animado ---
+  // Se muestra encima del Stepper
+  const ProgressBar = () => (
+    <Box sx={{ position: "relative", width: "100%", mb: 4 }}>
+      <LinearProgress
+        variant="determinate"
+        value={progressPercentage}
+        sx={{
+          height: 10,
+          borderRadius: 5,
+          [`& .MuiLinearProgress-bar`]: {
+            borderRadius: 5,
+            backgroundColor: "primary.main",
+          },
+        }}
+      />
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{
+          position: "absolute",
+          top: "-24px",
+          right: 0,
+          fontWeight: "bold",
+        }}
+      >
+        {`${Math.round(progressPercentage)}% completado`}
+      </Typography>
+    </Box>
+  );
+
   if (loading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "80vh",
+        }}
+      >
         <CircularProgress size={50} />
       </Box>
     );
@@ -338,6 +463,7 @@ const CreateStudentForm = () => {
   return (
     <FormProvider {...methods}>
       <Paper
+        ref={containerRef}
         elevation={6}
         sx={{
           p: { xs: 2, md: 4 },
@@ -352,28 +478,52 @@ const CreateStudentForm = () => {
           Registro de Estudiante
         </Typography>
 
-        <Stepper
-          activeStep={activeStep}
-          orientation={isMobile ? "vertical" : "horizontal"}
-          alternativeLabel={!isMobile}
-          sx={{ mb: 6 }}
-        >
-          {steps.map((label) => (
-            <Step key={label}>
-              <StepLabel 
-                StepIconComponent={(props) => (
-                  <CustomStepIcon 
-                    active={props.active || false} 
-                    completed={props.completed || false} 
-                  />
-                )}
-              >
-                {label}
-              </StepLabel>
-            </Step>
-          ))}
-        </Stepper>
+        {/* Barra de Progreso y Contador */}
+        <ProgressBar />
 
+        {/* Stepper */}
+        <Box sx={{ width: "100%", overflowX: "auto", mb: 4, py: 1 }}>
+          <Stepper
+            activeStep={activeStep}
+            orientation={isMobile ? "vertical" : "horizontal"}
+            alternativeLabel={!isMobile}
+            sx={{
+              minWidth: "max-content",
+              px: 2,
+              "& .MuiStepLabel-root": {
+                px: 1,
+              },
+            }}
+          >
+            {steps.map((label, index) => (
+              <Step key={label}>
+                <StepLabel
+                  StepIconComponent={(props) => (
+                    <CustomStepIcon
+                      active={props.active || false}
+                      completed={props.completed || false}
+                    />
+                  )}
+                  sx={{
+                    minWidth: "fit-content",
+                    "& .MuiStepLabel-label": {
+                      fontSize: "0.8rem",
+                      fontWeight: activeStep === index ? "bold" : "normal",
+                      color:
+                        activeStep === index
+                          ? "primary.main"
+                          : "text.secondary",
+                    },
+                  }}
+                >
+                  {isMobile ? label.split(" ")[0] : label}
+                </StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+        </Box>
+
+        {/* Formulario */}
         <form onSubmit={handleSubmit(onSubmit)}>
           <AnimatePresence mode="wait">
             <motion.div
@@ -398,11 +548,20 @@ const CreateStudentForm = () => {
             </Button>
 
             {activeStep === steps.length - 1 ? (
-              <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? (
                   <>
                     Registrando...
-                    <CircularProgress size={20} color="inherit" sx={{ ml: 1 }} />
+                    <CircularProgress
+                      size={20}
+                      color="inherit"
+                      sx={{ ml: 1 }}
+                    />
                   </>
                 ) : (
                   "Registrar Estudiante"
@@ -415,6 +574,22 @@ const CreateStudentForm = () => {
             )}
           </Box>
         </form>
+
+        {/* Botón Limpiar Formulario */}
+        <Box sx={{ mt: 4, textAlign: "center" }}>
+          <Button
+            variant="text"
+            color="error"
+            onClick={() => {
+              reset(initialFormData);
+              localStorage.removeItem(LOCAL_STORAGE_KEY);
+              setActiveStep(0);
+              enqueueSnackbar("Formulario reseteado", { variant: "info" });
+            }}
+          >
+            Limpiar todo
+          </Button>
+        </Box>
       </Paper>
     </FormProvider>
   );
