@@ -34,7 +34,6 @@ import AcudientesForm from "./AcudientesForm";
 import initialFormData from "../estudiantes/initialFormData";
 import { FormDataType } from "../types/formTypes";
 import { useCatalogosEstudiantes } from "../hooks/apisEstudiantes";
-import Image from "next/image";
 
 // Íconos
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -359,7 +358,7 @@ const CreateStudentForm = () => {
           alternativeLabel={!isMobile}
           sx={{ mb: 6 }}
         >
-          {steps.map((label, index) => (
+          {steps.map((label) => (
             <Step key={label}>
               <StepLabel 
                 StepIconComponent={(props) => (
