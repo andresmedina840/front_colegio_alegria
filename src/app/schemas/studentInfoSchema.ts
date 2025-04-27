@@ -158,7 +158,7 @@ const emergencyContactSchema = yup.object({
 
 // 11. Esquema de acudientes
 const acudienteSchema = yup.object().shape({
-  tipoAcudiente: yup.string().optional(),
+  tipoAcudienteId: yup.string().optional(),
   primerNombre: yup.string().optional(),
   segundoNombre: yup.string().nullable().optional(),
   primerApellido: yup.string().optional(),

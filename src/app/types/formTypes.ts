@@ -124,7 +124,7 @@ export interface EmergencyContact {
 }
 
 export interface AcudienteForm {
-  tipoAcudiente: string;
+  tipoAcudienteId: string;
   primerNombre: string;
   segundoNombre: string;
   primerApellido: string;

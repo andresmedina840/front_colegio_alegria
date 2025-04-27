@@ -44,7 +44,7 @@ const AcudientesForm = ({ tiposAcudiente }: Props) => {
               <Grid size={{ xs: 12, sm: 2, md: 4 }}>
                 <CustomAutocomplete<FormDataType, OpcionSelect>
                   label="Tipo de Acudiente"
-                  name={`acudientes.${index}.tipoAcudiente`}
+                  name={`acudientes.${index}.tipoAcudienteId`}
                   options={tiposAcudiente}
                   control={control}
                   getOptionLabel={(opt) => opt.nombre}
@@ -123,7 +123,7 @@ const AcudientesForm = ({ tiposAcudiente }: Props) => {
             variant="outlined"
             onClick={() =>
               append({
-                tipoAcudiente: "",
+                tipoAcudienteId: "",
                 primerNombre: "",
                 segundoNombre: "",
                 primerApellido: "",

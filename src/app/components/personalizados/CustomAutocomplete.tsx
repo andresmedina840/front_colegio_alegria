@@ -92,6 +92,7 @@ function CustomAutocomplete<T extends FieldValues, TOption extends object, TValu
                 error={!!error}
                 helperText={error?.message || helperText}
                 inputRef={ref}
+                autoComplete="new-password"
                 InputLabelProps={{
                   shrink: true,
                 }}
