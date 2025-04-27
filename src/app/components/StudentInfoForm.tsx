@@ -93,19 +93,36 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
       const newValue = value?.id || "";
       setValue(fieldName, newValue);
 
-      if (fieldName === "gradoId" && newValue) {
+      if (fieldName === "gradoId") {
+        if (!newValue) {
+          setPensionValue("");
+          setValue("pensionId", "");
+          return;
+        }
+
         setLoadingPension(true);
         api
           .get(`/pensiones/by-grado/${newValue}`)
           .then((response) => {
-            if (response.data.length > 0) {
-              setPensionValue(response.data[0].valor);
-              setValue("pensionId", response.data[0].id);
+            if (response.data?.length > 0) {
+              const pension = response.data[0];
+              setPensionValue(pension.valor.toString());
+              setValue("pensionId", pension.id);
+              setValue("pensionValor", pension.valor); // Guarda también el valor en el formulario
+            } else {
+              setPensionValue("");
+              setValue("pensionId", "");
+              setValue("pensionValor", "");
             }
           })
           .catch((error) => {
-            enqueueSnackbar(error.message, { variant: "error" });
+            console.error("Error al cargar pensión:", error);
+            enqueueSnackbar("Error al cargar el valor de la pensión", {
+              variant: "error",
+            });
             setPensionValue("");
+            setValue("pensionId", "");
+            setValue("pensionValor", "");
           })
           .finally(() => setLoadingPension(false));
       }
@@ -315,9 +332,19 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
                   ? "Cargando..."
                   : pensionValue
                   ? `$${parseInt(pensionValue).toLocaleString("es-CO")}`
-                  : ""
+                  : "No disponible"
               }
               disabled
+              InputProps={{
+                readOnly: true,
+              }}
+              variant="outlined"
+              sx={{
+                "& .MuiInputBase-input": {
+                  color: pensionValue ? "inherit" : "#999",
+                  fontWeight: pensionValue ? "bold" : "normal",
+                },
+              }}
             />
           </Grid>
 

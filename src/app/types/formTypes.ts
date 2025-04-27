@@ -19,6 +19,7 @@ export interface StudentInfoForm {
   sedeMatricula: string;
   gradoId: string;
   pensionId: string;
+  pensionValor?: string;
   jornada: string;
   institucionEducativaAnterior: string;
   ultimoGradoCursado: string;
