@@ -11,6 +11,8 @@ import {
   CircularProgress,
   Divider,
   Paper,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,7 +34,12 @@ import AcudientesForm from "./AcudientesForm";
 import initialFormData from "../estudiantes/initialFormData";
 import { FormDataType } from "../types/formTypes";
 import { useCatalogosEstudiantes } from "../hooks/apisEstudiantes";
-//import Image from "next/image";
+import Image from "next/image";
+
+// Íconos
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import CircleIcon from "@mui/icons-material/Circle";
 
 const siNo: OpcionSelect[] = [
   { id: "SI", nombre: "SI" },
@@ -49,9 +56,25 @@ const steps = [
   "Familia y Emergencia",
 ];
 
+// Definimos el tipo para las props del ícono personalizado
+interface CustomStepIconProps {
+  active: boolean;
+  completed: boolean;
+}
+
+const CustomStepIcon = ({ active, completed }: CustomStepIconProps) => {
+  if (completed) return <CheckCircleIcon color="success" />;
+  if (active) return <CircleIcon color="primary" />;
+  return <RadioButtonUncheckedIcon color="disabled" />;
+};
+
 const CreateStudentForm = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const [activeStep, setActiveStep] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const methods = useForm<FormDataType>({
     resolver: yupResolver(studentInfoSchema),
@@ -144,20 +167,6 @@ const CreateStudentForm = () => {
     [updateField]
   );
 
-  const onSubmit = async (data: FormDataType) => {
-    try {
-      await api.post("/alumnos", data);
-      enqueueSnackbar("Estudiante registrado con éxito", {
-        variant: "success",
-      });
-      reset(initialFormData);
-      setActiveStep(0);
-    } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : "Error desconocido";
-      enqueueSnackbar(msg, { variant: "error" });
-    }
-  };
-
   const getFieldsByStep = (step: number): (keyof FormDataType)[] => {
     switch (step) {
       case 0:
@@ -175,15 +184,10 @@ const CreateStudentForm = () => {
           "municipioNacimiento",
           "sedeMatricula",
           "gradoId",
-          "jornada"
+          "jornada",
         ];
       case 2:
-        return [
-          "tipoSangre",
-          "epsAfiliado",
-          "ipsAsignada",
-          "estrato",
-        ];
+        return ["tipoSangre", "epsAfiliado", "ipsAsignada", "estrato"];
       case 3:
         return [
           "discapacidadesNoAplica",
@@ -210,7 +214,7 @@ const CreateStudentForm = () => {
           "primerApellidoMadre",
           "autorizacionContactoEmergencia",
           "autorizacionImagen",
-          "veracidadInformacion"
+          "veracidadInformacion",
         ];
       default:
         return [];
@@ -222,12 +226,27 @@ const CreateStudentForm = () => {
     const isValid = await methods.trigger(fields);
 
     if (isValid) {
-      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      setActiveStep((prev) => prev + 1);
     }
   };
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    setActiveStep((prev) => prev - 1);
+  };
+
+  const onSubmit = async (data: FormDataType) => {
+    setIsSubmitting(true);
+    try {
+      await api.post("/alumnos", data);
+      enqueueSnackbar("Estudiante registrado con éxito", { variant: "success" });
+      reset(initialFormData);
+      setActiveStep(0);
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : "Error desconocido";
+      enqueueSnackbar(msg, { variant: "error" });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderStepContent = (step: number) => {
@@ -250,27 +269,18 @@ const CreateStudentForm = () => {
           />
         );
       case 2:
-        return (
-          <HealthAffiliationForm
-            updateField={updateField}
-            estratoEconomico={estratosEconomico}
-          />
-        );
+        return <HealthAffiliationForm updateField={updateField} estratoEconomico={estratosEconomico} />;
       case 3:
         return (
           <>
             <CondicionesEspeciales
               formData={formData}
-              handleChange={(e) =>
-                updateField(e.target.name as keyof FormDataType, String(e.target.value))
-              }
+              handleChange={(e) => updateField(e.target.name as keyof FormDataType, String(e.target.value))}
               siNo={siNo.map((opt) => opt.nombre)}
             />
             <SituacionAcademica
               formData={formData}
-              handleChange={(e) =>
-                updateField(e.target.name as keyof FormDataType, String(e.target.value))
-              }
+              handleChange={(e) => updateField(e.target.name as keyof FormDataType, String(e.target.value))}
               siNo={siNo}
             />
           </>
@@ -320,16 +330,8 @@ const CreateStudentForm = () => {
 
   if (loading) {
     return (
-      <Box
-        sx={{
-          width: "100%",
-          height: "80vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <CircularProgress size={40} />
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
+        <CircularProgress size={50} />
       </Box>
     );
   }
@@ -339,7 +341,7 @@ const CreateStudentForm = () => {
       <Paper
         elevation={6}
         sx={{
-          p: 4,
+          p: { xs: 2, md: 4 },
           maxWidth: "1000px",
           mx: "auto",
           mt: 4,
@@ -351,18 +353,21 @@ const CreateStudentForm = () => {
           Registro de Estudiante
         </Typography>
 
-        <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 6 }}>
+        <Stepper
+          activeStep={activeStep}
+          orientation={isMobile ? "vertical" : "horizontal"}
+          alternativeLabel={!isMobile}
+          sx={{ mb: 6 }}
+        >
           {steps.map((label, index) => (
             <Step key={label}>
-              <StepLabel
-                sx={{
-                  color:
-                    index === activeStep
-                      ? "primary.main"
-                      : index < activeStep
-                      ? "success.main"
-                      : "inherit",
-                }}
+              <StepLabel 
+                StepIconComponent={(props) => (
+                  <CustomStepIcon 
+                    active={props.active || false} 
+                    completed={props.completed || false} 
+                  />
+                )}
               >
                 {label}
               </StepLabel>
@@ -394,8 +399,15 @@ const CreateStudentForm = () => {
             </Button>
 
             {activeStep === steps.length - 1 ? (
-              <Button type="submit" variant="contained" color="primary">
-                Registrar Estudiante
+              <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    Registrando...
+                    <CircularProgress size={20} color="inherit" sx={{ ml: 1 }} />
+                  </>
+                ) : (
+                  "Registrar Estudiante"
+                )}
               </Button>
             ) : (
               <Button onClick={handleNext} variant="contained" color="primary">
