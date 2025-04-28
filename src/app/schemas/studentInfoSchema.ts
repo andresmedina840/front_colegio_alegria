@@ -106,6 +106,7 @@ const parentsInfoSchema = yup.object({
 // 8. Esquema de documentación recibida
 const documentacionRecibidaSchema = yup.object({
   documentacionRecibidaRegistroCivil: yup.string().optional().default("NO"),
+  documentacionRecibidaTarjetaIdentidad: yup.string().optional().default("NO"),
   documentacionRecibidaCertificadosEstudios: yup.string().optional().default("NO"),
   documentacionRecibidaFotos: yup.string().optional().default("NO"),
   documentacionRecibidaCertificadoVinculado: yup.string().optional().default("NO"),

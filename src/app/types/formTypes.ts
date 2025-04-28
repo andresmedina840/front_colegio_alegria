@@ -96,6 +96,7 @@ export interface ParentsInfo {
 
 export interface DocumentacionRecibida {
   documentacionRecibidaRegistroCivil: string;
+  documentacionRecibidaTarjetaIdentidad: string;
   documentacionRecibidaCertificadosEstudios: string;
   documentacionRecibidaFotos: string;
   documentacionRecibidaCertificadoVinculado: string;

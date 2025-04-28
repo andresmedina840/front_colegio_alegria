@@ -18,6 +18,7 @@ interface DocumentacionRecibidaProps {
 // Campos estrictamente definidos como claves válidas de FormDataType
 const documentFields: (keyof FormDataType)[] = [
   "documentacionRecibidaRegistroCivil",
+  "documentacionRecibidaTarjetaIdentidad",
   "documentacionRecibidaCertificadosEstudios",
   "documentacionRecibidaCertificadoVinculado",
   "documentacionRecibidaSistemaSocial",

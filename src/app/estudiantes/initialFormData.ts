@@ -86,6 +86,7 @@ const initialFormData = {
 
   //DocumentacionRecibida
   documentacionRecibidaRegistroCivil: "",
+  documentacionRecibidaTarjetaIdentidad: "",
   documentacionRecibidaCertificadosEstudios: "",
   documentacionRecibidaFotos: "",
   documentacionRecibidaCertificadoVinculado: "",
