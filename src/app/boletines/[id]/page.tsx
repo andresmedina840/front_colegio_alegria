@@ -21,7 +21,6 @@ import {
   TableRow,
   Paper,
   CircularProgress,
-  Alert,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -36,11 +35,12 @@ import { AxiosError } from "axios";
 interface Materia {
   nombre: string;
   estandar?: string | null;
-  debilidades?: string | null;
+  desempeno?: string | null;
   recomendaciones?: string | null;
   intensidadHoraria: number;
   fallas: number;
   valoracion: number;
+  nivel?: string | null;
 }
 
 interface FormValues {
@@ -55,6 +55,9 @@ interface FormValues {
   };
   materias: Materia[];
   observaciones: string | null;
+  totalHoras?: number;
+  totalFallas?: number;
+  promedioFinal?: number;
 }
 
 const schema: yup.ObjectSchema<FormValues> = yup.object({
@@ -77,17 +80,23 @@ const schema: yup.ObjectSchema<FormValues> = yup.object({
         .object({
           nombre: yup.string().required(),
           estandar: yup.string().nullable().defined(),
-          debilidades: yup.string().nullable().defined(),
+          desempeno: yup.string().nullable().defined(),
           recomendaciones: yup.string().nullable().defined(),
           intensidadHoraria: yup.number().min(0).max(99).required(),
           fallas: yup.number().min(0).max(99).required(),
           valoracion: yup.number().min(0).max(5).required(),
+          nivel: yup.string().nullable().defined(),
         })
         .defined()
     )
     .required(),
 
   observaciones: yup.string().nullable().defined(),
+
+  // ✅ Añadir estos campos que están en FormValues
+  totalHoras: yup.number().optional(),
+  totalFallas: yup.number().optional(),
+  promedioFinal: yup.number().optional(),
 });
 
 const PaginaBoletin = () => {
@@ -182,11 +191,12 @@ const PaginaBoletin = () => {
           materias: materiasResponse.data.map((materia: Materia) => ({
             nombre: materia.nombre,
             estandar: "",
-            debilidades: "",
+            desempeno: "",
             recomendaciones: "",
             intensidadHoraria: materia.intensidadHoraria || 0,
             fallas: 0,
             valoracion: 0,
+            nivel: "",
           })),
           observaciones: null,
         });
@@ -206,8 +216,42 @@ const PaginaBoletin = () => {
   const guardarBoletin: SubmitHandler<FormValues> = async (data) => {
     try {
       setLoading(true);
-      const response = await api.post("/boletines/crearBoletin", data);
+
+      const { totalHoras, totalFallas, promedioFinal } = calcularTotales(
+        data.materias
+      );
+
+      const boletinConTotales = {
+        ...data,
+        totalHoras,
+        totalFallas,
+        promedioFinal,
+      };
+
+      const response = await api.post(
+        "/boletines/crearBoletin",
+        boletinConTotales
+      );
       enqueueSnackbar(response.data.message, { variant: "success" });
+
+      // ✅ LIMPIAR FORMULARIO después de guardar
+      reset({
+        estudiante: {
+          ...data.estudiante,
+          periodo: "I",
+          fechaReporte: new Date().toLocaleDateString(),
+        },
+        materias: data.materias.map((m) => ({
+          ...m,
+          estandar: "",
+          desempeno: "",
+          recomendaciones: "",
+          fallas: 0,
+          valoracion: 0,
+          nivel: "",
+        })),
+        observaciones: null,
+      });
     } catch (err) {
       const errorMessage =
         err instanceof AxiosError
@@ -234,8 +278,6 @@ const PaginaBoletin = () => {
     );
   }
 
-  //console.log("boeltines carlos",   formData);
-
   return (
     <FusionTemplateColegio>
       <Box p={{ xs: 1, sm: 3, md: 4 }}>
@@ -254,12 +296,6 @@ const PaginaBoletin = () => {
           }
         />
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(guardarBoletin)}>
             <TableContainer
@@ -272,7 +308,7 @@ const PaginaBoletin = () => {
                     {[
                       "Materia",
                       "Estándar",
-                      "Debilidades",
+                      "Desempeño",
                       "IH",
                       "Fallas",
                       "Valoración",
@@ -308,8 +344,8 @@ const PaginaBoletin = () => {
 
                       <TableCell>
                         <CustomTextField<FormValues>
-                          name={`materias.${index}.debilidades`}
-                          label="Debilidades"
+                          name={`materias.${index}.desempeno`}
+                          label="Desempeño"
                           maxLength={250}
                           showCharCount
                         />
