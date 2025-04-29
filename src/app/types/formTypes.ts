@@ -147,3 +147,34 @@ export interface FormDataType extends
   acudientes?: AcudienteForm[];
 }
 
+// Para boletín de notas
+
+export interface Materia {
+  nombre: string;
+  estandar?: string | null;
+  desempeno?: string | null;
+  recomendaciones?: string | null;
+  intensidadHoraria: number;
+  fallas: number;
+  valoracion: number;
+  nivel?: string | null;
+}
+
+export interface EstudianteInfo {
+  id: number;
+  nombre: string;
+  gradoId: number;
+  grado: string;
+  directorGrupo: string;
+  periodo: string;
+  fechaReporte: string;
+}
+
+export interface FormValues {
+  estudiante: EstudianteInfo;
+  materias: Materia[];
+  observaciones: string;
+  totalHoras: number;  // Cambiado a requerido
+  totalFallas: number; // Cambiado a requerido
+  promedioFinal: number; // Cambiado a requerido
+}
