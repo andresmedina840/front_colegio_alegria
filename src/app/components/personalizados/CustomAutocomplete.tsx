@@ -1,10 +1,20 @@
 "use client";
 
-import { Controller, Control, FieldValues, Path, RegisterOptions } from "react-hook-form";
+import {
+  Controller,
+  Control,
+  FieldValues,
+  Path,
+  RegisterOptions,
+} from "react-hook-form";
 import { Autocomplete, TextField, AutocompleteProps } from "@mui/material";
 import React from "react";
 
-type CustomAutocompleteProps<T extends FieldValues, TOption extends object, TValue = string> = {
+type CustomAutocompleteProps<
+  T extends FieldValues,
+  TOption extends object,
+  TValue = string
+> = {
   name: Path<T>;
   label: string;
   options: TOption[];
@@ -19,9 +29,17 @@ type CustomAutocompleteProps<T extends FieldValues, TOption extends object, TVal
     RegisterOptions<T, Path<T>>,
     "disabled" | "valueAsNumber" | "valueAsDate" | "setValueAs"
   >;
-} & Omit<AutocompleteProps<TOption, false, false, false>, "renderInput" | "options" | "onChange">;
+  loading?: boolean;
+} & Omit<
+  AutocompleteProps<TOption, false, false, false>,
+  "renderInput" | "options" | "onChange"
+>;
 
-function CustomAutocomplete<T extends FieldValues, TOption extends object, TValue = string>({
+function CustomAutocomplete<
+  T extends FieldValues,
+  TOption extends object,
+  TValue = string
+>({
   name,
   label,
   options,
@@ -33,6 +51,7 @@ function CustomAutocomplete<T extends FieldValues, TOption extends object, TValu
   required = false,
   helperText,
   rules,
+  loading,
   ...props
 }: CustomAutocompleteProps<T, TOption, TValue>) {
   return (
@@ -40,23 +59,34 @@ function CustomAutocomplete<T extends FieldValues, TOption extends object, TValu
       control={control}
       name={name}
       rules={rules}
-      render={({ field: { onChange: onFieldChange, value, ref }, fieldState: { error } }) => {
+      render={({
+        field: { onChange: onFieldChange, value, ref },
+        fieldState: { error },
+      }) => {
         // Función para obtener el valor de comparación seguro para tipos
         const getSafeValue = (item: TOption | TValue | null): TValue | null => {
           if (!item) return null;
-          if (typeof item === 'object' && 'id' in item) {
-            return getOptionValue ? getOptionValue(item as TOption) : (getOptionLabel(item as TOption) as unknown as TValue);
+          if (typeof item === "object" && "id" in item) {
+            return getOptionValue
+              ? getOptionValue(item as TOption)
+              : (getOptionLabel(item as TOption) as unknown as TValue);
           }
           return item as TValue;
         };
 
         // Encontrar la opción seleccionada de manera segura
-        const findSelectedOption = (currentValue: TValue | null): TOption | null => {
+        const findSelectedOption = (
+          currentValue: TValue | null
+        ): TOption | null => {
           if (currentValue === null) return null;
-          return options.find(option => {
-            const optionValue = getOptionValue ? getOptionValue(option) : (getOptionLabel(option) as unknown as TValue);
-            return optionValue === currentValue;
-          }) || null;
+          return (
+            options.find((option) => {
+              const optionValue = getOptionValue
+                ? getOptionValue(option)
+                : (getOptionLabel(option) as unknown as TValue);
+              return optionValue === currentValue;
+            }) || null
+          );
         };
 
         const currentValue = getSafeValue(value);
@@ -68,19 +98,24 @@ function CustomAutocomplete<T extends FieldValues, TOption extends object, TValu
             options={options}
             getOptionLabel={(option) => {
               const label = getOptionLabel(option);
-              return label ?? '';
+              return label ?? "";
             }}
             onChange={(event, newValue) => {
-              const valueToStore = newValue 
-                ? (getOptionValue ? getOptionValue(newValue) : (getOptionLabel(newValue) as unknown as TValue))
+              const valueToStore = newValue
+                ? getOptionValue
+                  ? getOptionValue(newValue)
+                  : (getOptionLabel(newValue) as unknown as TValue)
                 : null;
               onFieldChange(valueToStore);
               onChange?.(event, newValue);
             }}
             value={selectedOption}
             disabled={disabled}
+            loading={loading}
             isOptionEqualToValue={(option, val) => {
-              const optionValue = getOptionValue ? getOptionValue(option) : (getOptionLabel(option) as unknown as TValue);
+              const optionValue = getOptionValue
+                ? getOptionValue(option)
+                : (getOptionLabel(option) as unknown as TValue);
               const valValue = getSafeValue(val);
               return optionValue === valValue;
             }}

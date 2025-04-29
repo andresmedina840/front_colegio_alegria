@@ -131,56 +131,38 @@ const CreateStudentForm = () => {
     [setValue]
   );
 
-  const updateFields = useCallback(
-    (fields: Partial<FormDataType>) => {
-      Object.entries(fields).forEach(([key, value]) => {
-        setValue(key as keyof FormDataType, value ?? "");
-      });
-    },
-    [setValue]
-  );
+  const cargarDepartamentos = async (paisId: string) => {
+    if (!paisId) {
+      setDepartamentos([]);
+      setCiudades([]);
+      setValue("departamentoNacimiento", "");
+      setValue("municipioNacimiento", "");
+      return;
+    }
 
-  const cargarDepartamentos = useCallback(
-    async (paisId: string) => {
-      if (!paisId) {
-        setDepartamentos([]);
-        setCiudades([]);
-        updateFields({
-          paisNacimiento: "",
-          departamentoNacimiento: "",
-          municipioNacimiento: "",
-        });
-        return;
-      }
-      updateField("paisNacimiento", paisId);
-      updateField("departamentoNacimiento", "");
-      updateField("municipioNacimiento", "");
+    try {
+      const response = await api.get(`/ubicacion/departamentos/${paisId}`);
+      setDepartamentos(response.data);
+      setCiudades([]);
+    } catch (error) {
+      console.error("Error al cargar departamentos:", error);
+    }
+  };
 
-      try {
-        const response = await api.get(`/ubicacion/departamentos/${paisId}`);
-        setDepartamentos(response.data);
-        setCiudades([]);
-      } catch (error) {
-        console.error("Error al cargar departamentos:", error);
-      }
-    },
-    [updateField, updateFields]
-  );
+  const cargarCiudades = async (departamentoId: string) => {
+    if (!departamentoId) {
+      setCiudades([]);
+      setValue("municipioNacimiento", "");
+      return;
+    }
 
-  const cargarCiudades = useCallback(
-    async (departamentoId: string) => {
-      updateField("departamentoNacimiento", departamentoId);
-      updateField("municipioNacimiento", "");
-
-      try {
-        const response = await api.get(`/ubicacion/ciudades/${departamentoId}`);
-        setCiudades(response.data);
-      } catch (error) {
-        console.error("Error al cargar ciudades:", error);
-      }
-    },
-    [updateField]
-  );
+    try {
+      const response = await api.get(`/ubicacion/ciudades/${departamentoId}`);
+      setCiudades(response.data);
+    } catch (error) {
+      console.error("Error al cargar ciudades:", error);
+    }
+  };
 
   const getFieldsByStep = (step: number): (keyof FormDataType)[] => {
     switch (step) {
@@ -207,7 +189,6 @@ const CreateStudentForm = () => {
         return ["discapacidadesNoAplica", "capacidadesExcepcionalesNoAplica"];
       case 4:
         return [
-          // Nuevo paso para situación académica
           "situacionAcademicaNoEstudioVigenciaAnterior",
           "situacionAcademicaAprobo",
           "situacionAcademicaReprobo",

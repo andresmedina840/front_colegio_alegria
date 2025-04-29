@@ -10,6 +10,17 @@ interface HealthAffiliationFormProps {
   updateField: (field: keyof FormDataType, value: string) => void;
 }
 
+const tipoSangreOptions: OpcionSelect[] = [
+  { id: "A+", nombre: "A+" },
+  { id: "A-", nombre: "A-" },
+  { id: "B+", nombre: "B+" },
+  { id: "B-", nombre: "B-" },
+  { id: "AB+", nombre: "AB+" },
+  { id: "AB-", nombre: "AB-" },
+  { id: "O+", nombre: "O+" },
+  { id: "O-", nombre: "O-" },
+];
+
 const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
   estratoEconomico,
 }) => {
@@ -62,13 +73,25 @@ const HealthAffiliationForm: React.FC<HealthAffiliationFormProps> = ({
         <Grid container spacing={2}>
           {formFields.map((field) => (
             <Grid size={{ xs: 12, sm: 6, md: 6 }} key={field.name}>
-              <CustomTextField<FormDataType>
-                label={field.label}
-                name={field.name}
-                maxLength={field.maxLength}
-                uppercase
-                showCharCount
-              />
+              {field.name === "tipoSangre" ? (
+                <CustomAutocomplete<FormDataType, OpcionSelect>
+                  name="tipoSangre"
+                  label="Tipo de Sangre y RH"
+                  options={tipoSangreOptions}
+                  required
+                  control={control}
+                  getOptionLabel={(option: OpcionSelect) => option.nombre}
+                  getOptionValue={(option: OpcionSelect) => option.id}
+                />
+              ) : (
+                <CustomTextField<FormDataType>
+                  label={field.label}
+                  name={field.name}
+                  maxLength={field.maxLength}
+                  uppercase
+                  showCharCount
+                />
+              )}
             </Grid>
           ))}
 

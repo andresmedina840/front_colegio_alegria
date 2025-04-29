@@ -1,4 +1,3 @@
-// src/app/components/StudentInfoForm.tsx
 "use client";
 
 import { Card, CardContent, Grid, TextField, Typography } from "@mui/material";
@@ -35,8 +34,8 @@ type StudentInfoFormProps = {
   paises: OpcionSelect[];
   departamentos: OpcionSelect[];
   ciudades: OpcionSelect[];
-  cargarDepartamentos: (paisId: string) => void;
-  cargarCiudades: (departamentoId: string) => void;
+  cargarDepartamentos: (paisId: string) => Promise<void>;
+  cargarCiudades: (departamentoId: string) => Promise<void>;
   tiposIdentificacion: OpcionSelect[];
   sedes: OpcionSelect[];
 };
@@ -57,10 +56,16 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
   const [isMounted, setIsMounted] = useState(false);
   const [pensionValue, setPensionValue] = useState("");
   const [loadingPension, setLoadingPension] = useState(false);
+  const [loadingDepartamentos, setLoadingDepartamentos] = useState(false);
+  const [loadingCiudades, setLoadingCiudades] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
   const { setValue, watch, control } = useFormContext<FormDataType>();
   const formData = watch();
+
+  // Nuevo: grados filtrados según gradoId
+  const [gradosFiltrados, setGradosFiltrados] =
+    useState<OpcionSelect[]>(grados);
 
   useEffect(() => {
     setIsMounted(true);
@@ -87,6 +92,40 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
     }
   }, [formData.fechaNacimiento, setValue]);
 
+  // Nuevo: filtrar grados para "Último Grado Cursado"
+  useEffect(() => {
+    if (!formData.gradoId) {
+      setGradosFiltrados(grados);
+      return;
+    }
+
+    // Buscar el índice real por ID
+    const indexSeleccionado = grados.findIndex(
+      (g) => g.id === formData.gradoId
+    );
+
+    if (indexSeleccionado !== -1) {
+      const filtrados = grados.slice(0, indexSeleccionado + 1);
+      setGradosFiltrados(filtrados);
+    } else {
+      setGradosFiltrados(grados);
+    }
+  }, [formData.gradoId, grados]);
+
+  // Nuevo: poner "N/A" en Institución anterior si queda vacío
+  useEffect(() => {
+    if (
+      formData.ultimoGradoCursado &&
+      !formData.institucionEducativaAnterior?.trim()
+    ) {
+      setValue("institucionEducativaAnterior", "N/A");
+    }
+  }, [
+    formData.ultimoGradoCursado,
+    formData.institucionEducativaAnterior,
+    setValue,
+  ]);
+
   const handleAutocompleteChange =
     (fieldName: AutocompleteFields) =>
     (_: React.SyntheticEvent, value: OpcionSelect | null) => {
@@ -108,31 +147,34 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               const pension = response.data[0];
               setPensionValue(pension.valor.toString());
               setValue("pensionId", pension.id);
-              setValue("pensionValor", pension.valor); // Guarda también el valor en el formulario
-            } else {
-              setPensionValue("");
-              setValue("pensionId", "");
-              setValue("pensionValor", "");
+              setValue("pensionValor", pension.valor);
             }
           })
-          .catch((error) => {
+          .catch((error: Error) => {
             console.error("Error al cargar pensión:", error);
             enqueueSnackbar("Error al cargar el valor de la pensión", {
               variant: "error",
             });
-            setPensionValue("");
-            setValue("pensionId", "");
-            setValue("pensionValor", "");
           })
           .finally(() => setLoadingPension(false));
       }
 
       if (fieldName === "paisNacimiento") {
-        cargarDepartamentos(newValue);
+        setLoadingDepartamentos(true);
+        cargarDepartamentos(newValue)
+          .catch((error: Error) =>
+            console.error("Error cargando departamentos:", error)
+          )
+          .finally(() => setLoadingDepartamentos(false));
         setValue("departamentoNacimiento", "");
         setValue("municipioNacimiento", "");
       } else if (fieldName === "departamentoNacimiento") {
-        cargarCiudades(newValue);
+        setLoadingCiudades(true);
+        cargarCiudades(newValue)
+          .catch((error: Error) =>
+            console.error("Error cargando ciudades:", error)
+          )
+          .finally(() => setLoadingCiudades(false));
         setValue("municipioNacimiento", "");
       }
     };
@@ -274,6 +316,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               getOptionLabel={(option: OpcionSelect) => option.nombre}
               getOptionValue={(option) => option.id}
               disabled={!formData.paisNacimiento}
+              loading={loadingDepartamentos}
               rules={{ required: "Este campo es obligatorio" }}
             />
           </Grid>
@@ -288,6 +331,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
               getOptionLabel={(option: OpcionSelect) => option.nombre}
               getOptionValue={(option) => option.id}
               disabled={!formData.departamentoNacimiento}
+              loading={loadingCiudades}
               rules={{ required: "Este campo es obligatorio" }}
             />
           </Grid>
@@ -378,7 +422,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({
             <CustomAutocomplete<FormDataType, OpcionSelect>
               label="Último Grado Cursado"
               name="ultimoGradoCursado"
-              options={grados}
+              options={gradosFiltrados}
               control={control}
               onChange={handleAutocompleteChange("ultimoGradoCursado")}
               getOptionLabel={(option: OpcionSelect) => option.nombre}
