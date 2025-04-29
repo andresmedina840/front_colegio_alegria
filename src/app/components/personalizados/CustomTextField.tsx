@@ -1,7 +1,8 @@
 // src/app/components/personalizados/CustomTextField.tsx
 "use client";
 
-import { TextField, TextFieldProps } from "@mui/material";
+import TextField, { TextFieldProps } from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
 import {
   Controller,
   useFormContext,
@@ -60,10 +61,7 @@ function CustomTextField<T extends FieldValues>({
           onChange(newValue);
         };
 
-        const charCountText =
-          showCharCount && maxLength
-            ? `${String(value ?? "").length} / ${maxLength} caracteres`
-            : helperText;
+        const currentLength = String(value ?? "").length;
 
         return (
           <TextField
@@ -76,18 +74,34 @@ function CustomTextField<T extends FieldValues>({
             disabled={disabled}
             fullWidth
             variant="outlined"
-            error={error ? true : undefined}
-            helperText={error?.message || charCountText}
-            inputProps={{
-              ...props.inputProps,
-              maxLength,
-              style: uppercase ? { textTransform: "uppercase" } : undefined,
-              spellCheck: false,
-              "data-ms-editor": "false",
+            error={!!error}
+            helperText={error?.message || helperText}
+            InputProps={{
+              ...props.InputProps,
+              endAdornment: showCharCount && maxLength ? (
+                <InputAdornment position="end" sx={{ fontSize: "0.75rem", color: "text.secondary", mr: 0.5 }}>
+                  {`${currentLength}/${maxLength}`}
+                </InputAdornment>
+              ) : (
+                props.InputProps?.endAdornment || null
+              ),
+              inputProps: {
+                ...(props.InputProps?.inputProps || {}),
+                maxLength,
+                spellCheck: false,
+                "data-ms-editor": "false",
+                style: {
+                  ...(uppercase ? { textTransform: "uppercase" } : {}),
+                  ...(props.InputProps?.inputProps?.style || {}),
+                },
+              },
             }}
-            InputLabelProps={{
-              shrink: true,
-              ...props.InputLabelProps,
+            slotProps={{
+              inputLabel: {
+                shrink: true,
+                ...props.slotProps?.inputLabel,
+              },
+              ...props.slotProps,
             }}
           />
         );

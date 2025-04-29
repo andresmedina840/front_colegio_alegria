@@ -375,7 +375,7 @@ const CreateStudentForm = () => {
   useEffect(() => {
     const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (stored) methods.reset(JSON.parse(stored));
-  }, []);
+  }, [methods]);
 
   // --- Scroll automático en cambio de paso ---
   useEffect(() => {

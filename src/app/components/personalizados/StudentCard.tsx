@@ -1,6 +1,14 @@
 "use client";
 
-import { Paper, Typography, Grid, useTheme, Select, MenuItem } from "@mui/material";
+import {
+  Paper,
+  Typography,
+  Grid,
+  useTheme,
+  useMediaQuery,
+  Select,
+  MenuItem,
+} from "@mui/material";
 
 interface StudentCardProps {
   nombre: string;
@@ -22,28 +30,41 @@ const StudentCard = ({
   onPeriodoChange,
 }: StudentCardProps) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <Paper
       elevation={3}
       sx={{
-        p: 3,
+        p: { xs: 2, sm: 3 },
         mb: 4,
         borderTop: `4px solid ${theme.palette.primary.main}`,
-        borderRadius: "8px",
+        borderRadius: "12px",
+        backgroundColor: theme.palette.grey[50],
       }}
     >
-      <Grid container spacing={2} sx={{ border: 1, borderColor: "black" }}>
-        <Grid size={{ xs: 6, md: 6 }} sx={{ borderRight: 1, borderBottom: 1, p: 1 }}>
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          border: isMobile ? "none" : 1,
+          borderColor: "grey.300",
+          borderRadius: "8px",
+          overflow: "hidden",
+        }}
+      > 
+        <Grid size={{ xs: 3, md: 3 }} sx={{ borderRight: isMobile ? "none" : 1, borderBottom: 1, p: 2, borderColor: "grey.300" }}>
           <Typography variant="subtitle1" fontWeight="bold">Estudiante:</Typography>
           <Typography variant="body1">{nombre}</Typography>
         </Grid>
-        <Grid size={{ xs: 3, md: 3 }} sx={{ borderRight: 1, borderBottom: 1, p: 1 }}>
+
+        <Grid size={{ xs: 2, md: 2 }} sx={{ borderRight: isMobile ? "none" : 1, borderBottom: 1, p: 2, borderColor: "grey.300" }}>
           <Typography variant="subtitle1" fontWeight="bold">Periodo</Typography>
           <Select
             value={periodo}
             onChange={(e) => onPeriodoChange(e.target.value)}
             fullWidth
+            size="small"
             sx={{ mt: 1 }}
           >
             {periodos.map((p) => (
@@ -51,16 +72,18 @@ const StudentCard = ({
             ))}
           </Select>
         </Grid>
-        <Grid size={{ xs: 3, md: 3 }} sx={{ borderBottom: 1, p: 1 }}>
+
+        <Grid size={{ xs: 2, md: 2 }} sx={{ borderBottom: 1, p: 2, borderColor: "grey.300" }}>
           <Typography variant="subtitle1" fontWeight="bold">Fecha de reporte:</Typography>
           <Typography variant="body1">{fechaReporte}</Typography>
         </Grid>
 
-        <Grid size={{ xs: 6, md: 6 }} sx={{ borderRight: 1, p: 1 }}>
+        <Grid size={{ xs: 2, md: 2 }} sx={{ borderRight: isMobile ? "none" : 1, p: 2, borderColor: "grey.300" }}>
           <Typography variant="subtitle1" fontWeight="bold">Grado:</Typography>
           <Typography variant="body1">{grado}</Typography>
         </Grid>
-        <Grid size={{ xs: 6, md: 6 }} sx={{ p: 1 }}>
+
+        <Grid size={{ xs: 2, md: 2 }} sx={{ p: 2 }}>
           <Typography variant="subtitle1" fontWeight="bold">Directora de grupo:</Typography>
           <Typography variant="body1">{directorGrupo}</Typography>
         </Grid>

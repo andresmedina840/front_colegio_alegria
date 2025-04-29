@@ -31,6 +31,7 @@ interface Estudiante {
   gradoNombre: string;
   gradoId: number;
   acudientes: string[];
+  numeroMatricula: number;
 }
 
 interface EstadoBusqueda {
@@ -177,7 +178,8 @@ const BuscarEstudiantes = () => {
                     <TableCell sx={{ color: "primary.contrastText", fontWeight: 700 }}>Documento</TableCell>
                     <TableCell sx={{ color: "primary.contrastText", fontWeight: 700 }}>Grado</TableCell>
                     <TableCell sx={{ color: "primary.contrastText", fontWeight: 700 }}>Acudientes</TableCell>
-                    <TableCell sx={{ color: "primary.contrastText", fontWeight: 700 }}>Acciones</TableCell>
+                    <TableCell sx={{ color: "primary.contrastText", fontWeight: 700 }}># Matricula</TableCell>
+                    <TableCell sx={{ color: "primary.contrastText", fontWeight: 700 }} align="center">Acciones</TableCell>
                   </TableRow>
                 </TableHead>
 
@@ -187,11 +189,16 @@ const BuscarEstudiantes = () => {
                       <TableRow key={estudiante.id} hover>
                         <TableCell>{`${estudiante.nombre} ${estudiante.apellido}`}</TableCell>
                         <TableCell>{estudiante.numeroIdentificacionEstudiante || "-"}</TableCell>
-                        <TableCell>{estudiante.gradoNombre || "-"}</TableCell>
+                        <TableCell>{estudiante.gradoNombre || "-"}</TableCell>                     
                         <TableCell>{(estudiante.acudientes || []).join(", ")}</TableCell>
+                        <TableCell align="center">{estudiante.numeroMatricula || "-"}</TableCell>
                         <TableCell>
                           <Button variant="contained" color="primary" onClick={() => generarBoletin(estudiante)}>
                             Generar Boletín
+                          </Button>
+
+                          <Button variant="contained" color="secondary" onClick={() => generarBoletin(estudiante)}>
+                            Consultar y/o Editar
                           </Button>
                         </TableCell>
                       </TableRow>

@@ -2,6 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import {
+  SubmitHandler,
+  FormProvider,
+  useForm,
+  useFieldArray,
+} from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import {
   Box,
   Typography,
   Button,
@@ -14,45 +22,73 @@ import {
   Paper,
   CircularProgress,
   Alert,
-  TextField,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import FusionTemplateColegio from "../../components/TemplateColegio";
 import api from "../../axios/axiosClient";
 import { useParams } from "next/navigation";
-import StudentCard from "@/app/components/personalizados/StudentCard";
 import { useSnackbar } from "notistack";
+import FusionTemplateColegio from "../../components/TemplateColegio";
+import StudentCard from "@/app/components/personalizados/StudentCard";
+import CustomTextField from "@/app/components/personalizados/CustomTextField";
 import { AxiosError } from "axios";
-
-interface MateriaAPI {
-  nombre: string;
-  intensidadHoraria?: number;
-}
 
 interface Materia {
   nombre: string;
-  fortalezas: string;
-  debilidades: string;
+  estandar?: string | null;
+  debilidades?: string | null;
+  recomendaciones?: string | null;
   intensidadHoraria: number;
   fallas: number;
-  valoracion: string;
-  recomendaciones: string;
+  valoracion: number;
 }
 
-interface Estudiante {
-  id: number;
-  nombre: string;
-  gradoId: number;
-  grado: string;
-  directorGrupo: string;
-  periodo: string;
-  fechaReporte: string;
-}
-
-interface BoletinData {
-  estudiante: Estudiante;
+interface FormValues {
+  estudiante: {
+    id: number;
+    nombre: string;
+    gradoId: number;
+    grado: string;
+    directorGrupo: string;
+    periodo: string;
+    fechaReporte: string;
+  };
   materias: Materia[];
-  observaciones: string;
+  observaciones: string | null;
 }
+
+const schema: yup.ObjectSchema<FormValues> = yup.object({
+  estudiante: yup
+    .object({
+      id: yup.number().required(),
+      nombre: yup.string().required(),
+      gradoId: yup.number().required(),
+      grado: yup.string().required(),
+      directorGrupo: yup.string().required(),
+      periodo: yup.string().required(),
+      fechaReporte: yup.string().required(),
+    })
+    .required(),
+
+  materias: yup
+    .array()
+    .of(
+      yup
+        .object({
+          nombre: yup.string().required(),
+          estandar: yup.string().nullable().defined(),
+          debilidades: yup.string().nullable().defined(),
+          recomendaciones: yup.string().nullable().defined(),
+          intensidadHoraria: yup.number().min(0).max(99).required(),
+          fallas: yup.number().min(0).max(99).required(),
+          valoracion: yup.number().min(0).max(5).required(),
+        })
+        .defined()
+    )
+    .required(),
+
+  observaciones: yup.string().nullable().defined(),
+});
 
 const PaginaBoletin = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -60,38 +96,59 @@ const PaginaBoletin = () => {
   const id = params?.id as string;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [formData, setFormData] = useState<BoletinData>({
-    estudiante: {
-      id: 0,
-      nombre: "",
-      gradoId: 0,
-      grado: "",
-      directorGrupo: "",
-      periodo: "I",
-      fechaReporte: new Date().toLocaleDateString(),
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const methods = useForm<FormValues>({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      estudiante: {
+        id: 0,
+        nombre: "",
+        gradoId: 0,
+        grado: "",
+        directorGrupo: "",
+        periodo: "I",
+        fechaReporte: new Date().toLocaleDateString(),
+      },
+      materias: [],
+      observaciones: null,
     },
-    materias: [],
-    observaciones: "",
   });
 
-  // Calcular totales
-  const { totalHoras, totalFallas, promedio } = formData.materias.reduce(
-    (acc, materia) => ({
-      totalHoras: acc.totalHoras + materia.intensidadHoraria,
-      totalFallas: acc.totalFallas + materia.fallas,
-      promedio: acc.promedio + parseFloat(materia.valoracion || "0"),
-    }),
-    { totalHoras: 0, totalFallas: 0, promedio: 0 }
-  );
+  const { control, setValue, reset, watch, handleSubmit } = methods;
+  const { fields } = useFieldArray({ control, name: "materias" });
 
-  const promedioFinal =
-    formData.materias.length > 0 ? promedio / formData.materias.length : 0;
+  const formData = watch();
 
-  const determinarNivel = (valoracion: number) => {
-    if (valoracion >= 4.6) return "SUPERIOR";
-    if (valoracion >= 4.0) return "ALTO";
-    if (valoracion >= 2.9) return "BÁSICO";
-    return "BAJO";
+  const calcularTotales = (materias: Materia[]) => {
+    let totalHoras = 0;
+    let totalFallas = 0;
+    let sumaValoraciones = 0;
+    let materiasConNota = 0;
+
+    materias.forEach((materia) => {
+      const intensidad = Number(materia.intensidadHoraria) || 0;
+      const fallas = Number(materia.fallas) || 0;
+      const valoracion = Number(materia.valoracion) || 0;
+
+      totalHoras += intensidad;
+      totalFallas += fallas;
+
+      if (valoracion > 0) {
+        sumaValoraciones += valoracion;
+        materiasConNota++;
+      }
+    });
+
+    const promedioFinal =
+      materiasConNota > 0 ? sumaValoraciones / materiasConNota : 0;
+
+    return {
+      totalHoras,
+      totalFallas,
+      promedioFinal: parseFloat(promedioFinal.toFixed(2)),
+    };
   };
 
   useEffect(() => {
@@ -100,7 +157,6 @@ const PaginaBoletin = () => {
     const cargarDatos = async () => {
       try {
         setLoading(true);
-
         const alumnoResponse = await api.get(`/alumnos/${id}`);
         const alumnoData = alumnoResponse.data?.data;
         const gradoId = alumnoData?.gradoId;
@@ -113,7 +169,7 @@ const PaginaBoletin = () => {
           api.get(`/grados/${gradoId}/directora`),
         ]);
 
-        setFormData({
+        reset({
           estudiante: {
             id: alumnoData.id,
             nombre: `${alumnoData.nombre} ${alumnoData.apellido}`.trim(),
@@ -123,16 +179,16 @@ const PaginaBoletin = () => {
             periodo: "I",
             fechaReporte: new Date().toLocaleDateString(),
           },
-          materias: materiasResponse.data.map((materia: MateriaAPI) => ({
+          materias: materiasResponse.data.map((materia: Materia) => ({
             nombre: materia.nombre,
-            fortalezas: "",
+            estandar: "",
             debilidades: "",
             recomendaciones: "",
-            valoracion: 0,
             intensidadHoraria: materia.intensidadHoraria || 0,
             fallas: 0,
+            valoracion: 0,
           })),
-          observaciones: "",
+          observaciones: null,
         });
       } catch (err) {
         const errorMessage =
@@ -145,47 +201,13 @@ const PaginaBoletin = () => {
     };
 
     cargarDatos();
-  }, [id, enqueueSnackbar]);
+  }, [id, enqueueSnackbar, reset]);
 
-  const handleChangeMateria = (
-    index: number,
-    campo: keyof Materia,
-    valor: string | number
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      materias: prev.materias.map((m, i) =>
-        i === index ? { ...m, [campo]: valor } : m
-      ),
-    }));
-  };
-
-  const handleValoracionChange = (index: number, value: string) => {
-    // Solo permitir valores numéricos con máximo 2 decimales
-    if (!/^\d*\.?\d{0,2}$/.test(value)) return;
-
-    if (value === "") {
-      handleChangeMateria(index, "valoracion", 0);
-      return;
-    }
-
-    const numericValue = parseFloat(value);
-    if (!isNaN(numericValue)) {
-      handleChangeMateria(
-        index,
-        "valoracion",
-        Math.min(5, Math.max(0, numericValue))
-      );
-    }
-  };
-
-  const guardarBoletin = async () => {
+  const guardarBoletin: SubmitHandler<FormValues> = async (data) => {
     try {
       setLoading(true);
-      const {
-        data: { message },
-      } = await api.post("/boletines/crearBoletin", formData);
-      enqueueSnackbar(message, { variant: "success" });
+      const response = await api.post("/boletines/crearBoletin", data);
+      enqueueSnackbar(response.data.message, { variant: "success" });
     } catch (err) {
       const errorMessage =
         err instanceof AxiosError
@@ -198,6 +220,10 @@ const PaginaBoletin = () => {
     }
   };
 
+  const { totalHoras, totalFallas, promedioFinal } = calcularTotales(
+    formData.materias
+  );
+
   if (loading && !formData.estudiante.nombre) {
     return (
       <FusionTemplateColegio>
@@ -208,9 +234,11 @@ const PaginaBoletin = () => {
     );
   }
 
+  //console.log("boeltines carlos",   formData);
+
   return (
     <FusionTemplateColegio>
-      <Box p={4}>
+      <Box p={{ xs: 1, sm: 3, md: 4 }}>
         <Typography variant="h4" gutterBottom>
           Boletín de Notas
         </Typography>
@@ -222,10 +250,7 @@ const PaginaBoletin = () => {
           fechaReporte={formData.estudiante.fechaReporte}
           directorGrupo={formData.estudiante.directorGrupo}
           onPeriodoChange={(nuevoPeriodo) =>
-            setFormData((prev) => ({
-              ...prev,
-              estudiante: { ...prev.estudiante, periodo: nuevoPeriodo },
-            }))
+            setValue("estudiante.periodo", nuevoPeriodo)
           }
         />
 
@@ -235,246 +260,179 @@ const PaginaBoletin = () => {
           </Alert>
         )}
 
-        <TableContainer
-          component={Paper}
-          sx={{ mb: 3, boxShadow: 3, borderRadius: 2 }}
-        >
-          <Table sx={{ minWidth: 300 }}>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: "#1976d2" }}>
-                <TableCell
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(guardarBoletin)}>
+            <TableContainer
+              component={Paper}
+              sx={{ mb: 3, boxShadow: 3, borderRadius: 2, overflowX: "auto" }}
+            >
+              <Table size={isMobile ? "small" : "medium"}>
+                <TableHead>
+                  <TableRow sx={{ backgroundColor: "#1976d2" }}>
+                    {[
+                      "Materia",
+                      "Estándar",
+                      "Debilidades",
+                      "IH",
+                      "Fallas",
+                      "Valoración",
+                      "Nivel",
+                    ].map((head) => (
+                      <TableCell
+                        key={head}
+                        sx={{
+                          fontWeight: "bold",
+                          textAlign: "center",
+                          color: "white",
+                        }}
+                      >
+                        {head}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  {fields.map((field, index) => (
+                    <TableRow key={field.id}>
+                      <TableCell>{field.nombre}</TableCell>
+
+                      <TableCell>
+                        <CustomTextField<FormValues>
+                          name={`materias.${index}.estandar`}
+                          label="Estándar"
+                          maxLength={250}
+                          showCharCount
+                        />
+                      </TableCell>
+
+                      <TableCell>
+                        <CustomTextField<FormValues>
+                          name={`materias.${index}.debilidades`}
+                          label="Debilidades"
+                          maxLength={250}
+                          showCharCount
+                        />
+                      </TableCell>
+
+                      {/* IH */}
+                      <TableCell align="center">
+                        <CustomTextField<FormValues>
+                          name={`materias.${index}.intensidadHoraria`}
+                          label="IH"
+                          type="text"
+                          maxLength={2}
+                          InputProps={{
+                            inputProps: {
+                              inputMode: "numeric",
+                              pattern: "[0-9]*",
+                            },
+                          }}
+                        />
+                      </TableCell>
+
+                      {/* Fallas */}
+                      <TableCell align="center">
+                        <CustomTextField<FormValues>
+                          name={`materias.${index}.fallas`}
+                          label="Fallas"
+                          type="text"
+                          maxLength={2}
+                          InputProps={{
+                            inputProps: {
+                              inputMode: "numeric",
+                              pattern: "[0-9]*",
+                            },
+                          }}
+                        />
+                      </TableCell>
+
+                      {/* Valoración */}
+                      <TableCell align="center">
+                        <CustomTextField<FormValues>
+                          name={`materias.${index}.valoracion`}
+                          label="Valoración"
+                          type="text"
+                          maxLength={3}
+                          InputProps={{
+                            inputProps: {
+                              inputMode: "decimal",
+                              pattern: "^\\d*(\\.\\d{0,1})?$",
+                            },
+                          }}
+                          onInput={(e) => {
+                            const input = e.target as HTMLInputElement;
+                            input.value = input.value.replace(",", "."); // Cambia coma por punto
+                          }}
+                        />
+                      </TableCell>
+
+                      <TableCell align="center">
+                        {determinarNivel(formData.materias[index]?.valoracion)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            {formData.materias.length > 0 && (
+              <Paper
+                elevation={3}
+                sx={{
+                  p: 2,
+                  mb: 3,
+                  borderRadius: 2,
+                  backgroundColor: "grey.50",
+                }}
+              >
+                <Box
                   sx={{
-                    fontWeight: "bold",
-                    textAlign: "center",
-                    color: "white",
+                    display: "flex",
+                    flexDirection: { xs: "column", sm: "row" },
+                    justifyContent: "space-around",
+                    alignItems: "center",
                   }}
                 >
-                  Materia
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    textAlign: "center",
-                    color: "white",
-                  }}
-                >
-                  Fortalezas
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    textAlign: "center",
-                    color: "white",
-                  }}
-                >
-                  Debilidades
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    textAlign: "center",
-                    color: "white",
-                    width: 80,
-                  }}
-                >
-                  IH
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    textAlign: "center",
-                    color: "white",
-                    width: 80,
-                  }}
-                >
-                  Fallas
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    textAlign: "center",
-                    color: "white",
-                    width: 100,
-                  }}
-                >
-                  Valoración
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    textAlign: "center",
-                    color: "white",
-                    width: 100,
-                  }}
-                >
-                  Nivel
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {formData.materias.map((materia, index) => (
-                <TableRow
-                  key={index}
-                  sx={index % 2 ? { backgroundColor: "#f9f9f9" } : {}}
-                >
-                  <TableCell>{materia.nombre}</TableCell>
+                  <Typography variant="subtitle1">
+                    <strong>Total Horas:</strong> {totalHoras}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    <strong>Total Fallas:</strong> {totalFallas}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    <strong>Promedio Final:</strong> {promedioFinal.toFixed(2)}
+                  </Typography>
+                </Box>
+              </Paper>
+            )}
 
-                  <TableCell>
-                    <TextField
-                      fullWidth
-                      multiline
-                      value={materia.fortalezas}
-                      onChange={(e) =>
-                        handleChangeMateria(index, "fortalezas", e.target.value)
-                      }
-                      sx={{ backgroundColor: "white", borderRadius: 1 }}
-                    />
-                  </TableCell>
+            <CustomTextField<FormValues>
+              name="observaciones"
+              label="Observaciones"
+              multiline
+              rows={4}
+              maxLength={250}
+              showCharCount
+            />
 
-                  <TableCell>
-                    <TextField
-                      fullWidth
-                      multiline
-                      value={materia.debilidades}
-                      onChange={(e) =>
-                        handleChangeMateria(
-                          index,
-                          "debilidades",
-                          e.target.value
-                        )
-                      }
-                      sx={{ backgroundColor: "white", borderRadius: 1 }}
-                    />
-                  </TableCell>
-
-                  <TableCell sx={{ textAlign: "center" }}>
-                    <TextField
-                      type="number"
-                      value={materia.intensidadHoraria}
-                      onChange={(e) =>
-                        handleChangeMateria(
-                          index,
-                          "intensidadHoraria",
-                          Math.max(0, Number(e.target.value))
-                        )
-                      }
-                      sx={{
-                        width: 60,
-                        textAlign: "center",
-                        borderRadius: 1,
-                        "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
-                          {
-                            display: "none",
-                          },
-                        "& input[type=number]": {
-                          MozAppearance: "textfield",
-                        },
-                      }}
-                      inputProps={{ min: 0 }}
-                    />
-                  </TableCell>
-
-                  <TableCell sx={{ textAlign: "center" }}>
-                    <TextField
-                      type="number"
-                      value={materia.fallas}
-                      onChange={(e) =>
-                        handleChangeMateria(
-                          index,
-                          "fallas",
-                          Math.max(0, Number(e.target.value))
-                        )
-                      }
-                      sx={{
-                        width: 60,
-                        textAlign: "center",
-                        borderRadius: 1,
-                        "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
-                          {
-                            display: "none",
-                          },
-                        "& input[type=number]": {
-                          MozAppearance: "textfield",
-                        },
-                      }}
-                      inputProps={{ min: 0 }}
-                    />
-                  </TableCell>
-
-                  <TableCell sx={{ textAlign: "center" }}>
-                    <TextField
-                      type="text"
-                      value={materia.valoracion}
-                      onChange={(e) =>
-                        handleValoracionChange(index, e.target.value)
-                      }
-                      inputProps={{
-                        inputMode: "decimal",
-                        pattern: "\\d*\\.?\\d*",
-                      }}
-                      sx={{
-                        width: 80,
-                        textAlign: "center",
-                        borderRadius: 1,
-                      }}
-                    />
-                  </TableCell>
-
-                  <TableCell sx={{ textAlign: "center" }}>
-                    {determinarNivel(parseFloat(materia.valoracion))}
-                  </TableCell>
-                </TableRow>
-              ))}
-
-              <TableRow sx={{ backgroundColor: "#f0f0f0" }}>
-                <TableCell
-                  colSpan={3}
-                  sx={{ textAlign: "right", fontWeight: "bold" }}
-                >
-                  TOTALES
-                </TableCell>
-                <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
-                  {totalHoras}
-                </TableCell>
-                <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
-                  {totalFallas}
-                </TableCell>
-                <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
-                  {promedioFinal.toFixed(1)}
-                </TableCell>
-                <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
-                  {determinarNivel(promedioFinal)}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        <TextField
-          fullWidth
-          label="Observaciones"
-          multiline
-          rows={4}
-          value={formData.observaciones}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, observaciones: e.target.value }))
-          }
-          sx={{ mb: 3 }}
-        />
-
-        <Box display="flex" gap={2} justifyContent="flex-end">
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={guardarBoletin}
-            disabled={loading}
-          >
-            {loading ? <CircularProgress size={24} /> : "Guardar Boletín"}
-          </Button>
-        </Box>
+            <Box display="flex" justifyContent="flex-end" gap={2} mt={4}>
+              <Button variant="contained" type="submit" disabled={loading}>
+                {loading ? <CircularProgress size={24} /> : "Guardar Boletín"}
+              </Button>
+            </Box>
+          </form>
+        </FormProvider>
       </Box>
     </FusionTemplateColegio>
   );
+};
+
+const determinarNivel = (valoracion: number) => {
+  if (valoracion >= 4.6) return "SUPERIOR";
+  if (valoracion >= 4.0) return "ALTO";
+  if (valoracion >= 2.9) return "BÁSICO";
+  return "BAJO";
 };
 
 export default PaginaBoletin;
