@@ -1,14 +1,13 @@
-// src/app/components/boletin/TablaMaterias.tsx
-
 'use client';
 
 import React from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { FormValues } from '@/app/types/formTypes';
 import CustomTextField from '../personalizados/CustomTextField';
 
 const determinarNivel = (valoracion?: number | null): string => {
-  if (valoracion === null || valoracion === undefined || valoracion === 0) return '';
+  if (!valoracion) return '';
   if (valoracion >= 4.6) return 'SUPERIOR';
   if (valoracion >= 4.0) return 'ALTO';
   if (valoracion >= 2.9) return 'BÁSICO';
@@ -21,53 +20,35 @@ const TablaMaterias = () => {
   const materias = watch('materias');
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full border border-gray-300">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="p-2 border">Materia</th>
-            <th className="p-2 border">Estándar</th>
-            <th className="p-2 border">Desempeño</th>
-            <th className="p-2 border">IH</th>
-            <th className="p-2 border">Fallas</th>
-            <th className="p-2 border">Valoración</th>
-            <th className="p-2 border">Nivel</th>
-          </tr>
-        </thead>
-        <tbody>
+    <TableContainer component={Paper} sx={{ boxShadow: 3, borderRadius: 2, mb: 3 }}>
+      <Table>
+        <TableHead>
+          <TableRow sx={{ backgroundColor: '#1976d2' }}>
+            {['Materia', 'Estándar', 'Desempeño', 'IH', 'Fallas', 'Valoración', 'Nivel'].map((col) => (
+              <TableCell key={col} sx={{ fontWeight: 'bold', color: 'white', textAlign: 'center' }}>
+                {col}
+              </TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {fields.map((field, index) => (
-            <tr key={field.id}>
-              <td className="p-2 border">{field.nombre}</td>
-              <td className="p-2 border">
-                <CustomTextField<FormValues>
-                  name={`materias.${index}.estandar`}
-                  label=""
-                  maxLength={250}
-                />
-              </td>
-              <td className="p-2 border">
-                <CustomTextField<FormValues>
-                  name={`materias.${index}.desempeno`}
-                  label=""
-                  maxLength={250}
-                />
-              </td>
-              <td className="p-2 border">
-                <CustomTextField<FormValues>
-                  name={`materias.${index}.intensidadHoraria`}
-                  label=""
-                  type="number"
-                />
-              </td>
-              <td className="p-2 border">
-                <CustomTextField<FormValues>
-                  name={`materias.${index}.fallas`}
-                  label=""
-                  type="number"
-                />
-              </td>
-              <td className="p-2 border">
-                <CustomTextField<FormValues>
+            <TableRow key={field.id} sx={index % 2 ? { backgroundColor: '#f9f9f9' } : {}}>
+              <TableCell>{field.nombre}</TableCell>
+              <TableCell>
+                <CustomTextField name={`materias.${index}.estandar`} label="" />
+              </TableCell>
+              <TableCell>
+                <CustomTextField name={`materias.${index}.desempeno`} label="" />
+              </TableCell>
+              <TableCell>
+                <CustomTextField name={`materias.${index}.intensidadHoraria`} label="" type="number" />
+              </TableCell>
+              <TableCell>
+                <CustomTextField name={`materias.${index}.fallas`} label="" type="number" />
+              </TableCell>
+              <TableCell>
+                <CustomTextField
                   name={`materias.${index}.valoracion`}
                   label=""
                   type="number"
@@ -80,15 +61,15 @@ const TablaMaterias = () => {
                     },
                   }}
                 />
-              </td>
-              <td className="p-2 border text-center">
+              </TableCell>
+              <TableCell align="center">
                 {determinarNivel(materias?.[index]?.valoracion)}
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 

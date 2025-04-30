@@ -1,10 +1,9 @@
-// src/app/components/boletin/ObservacionesInput.tsx
-
 'use client';
 
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { FormValues } from '../../types/formTypes';
+import { FormValues } from '@/app/types/formTypes';
+import { TextField, Paper } from '@mui/material';
 
 const ObservacionesInput = () => {
   const {
@@ -13,21 +12,17 @@ const ObservacionesInput = () => {
   } = useFormContext<FormValues>();
 
   return (
-    <div className="my-4">
-      <label htmlFor="observaciones" className="block font-semibold mb-1">
-        Observaciones
-      </label>
-      <textarea
-        id="observaciones"
-        {...register('observaciones')}
+    <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
+      <TextField
+        label="Observaciones"
+        multiline
         rows={4}
-        className="w-full border px-2 py-1 rounded"
-        placeholder="Escribe observaciones generales del boletín"
+        fullWidth
+        {...register('observaciones')}
+        error={!!errors.observaciones}
+        helperText={errors.observaciones?.message}
       />
-      {errors.observaciones && (
-        <p className="text-red-600 text-sm mt-1">{errors.observaciones.message}</p>
-      )}
-    </div>
+    </Paper>
   );
 };
 
