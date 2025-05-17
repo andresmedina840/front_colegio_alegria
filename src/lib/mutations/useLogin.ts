@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { api } from '@/axios/axiosClient';
+import axiosClient from "@/axios/axiosClient";
 import { LoginFormData } from '@/lib/schemas/validation';
 
 type LoginResponse = {
@@ -15,7 +15,7 @@ type LoginResponse = {
 export function useLogin() {
   return useMutation({
     mutationFn: async (data: LoginFormData) => {
-      const res = await api.post<{ data: LoginResponse; message: string }>(
+      const res = await axiosClient.post<{ data: LoginResponse; message: string }>(
         "/v1/api/auth/login",
         data
       );

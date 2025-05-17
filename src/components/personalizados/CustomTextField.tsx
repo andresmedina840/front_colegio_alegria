@@ -28,9 +28,12 @@ type CustomTextFieldProps<T extends FieldValues> = {
   uppercase?: boolean;
   showCharCount?: boolean;
   type?: string;
-  InputProps?: TextFieldProps['InputProps'];
-  slotProps?: TextFieldProps['slotProps'];
-} & Omit<TextFieldProps, "name" | "label" | "value" | "onChange" | "error" | "helperText">;
+  InputProps?: TextFieldProps["InputProps"];
+  slotProps?: TextFieldProps["slotProps"];
+} & Omit<
+  TextFieldProps,
+  "name" | "label" | "value" | "onChange" | "error" | "helperText"
+>;
 
 function CustomTextField<T extends FieldValues>({
   name,
@@ -43,7 +46,7 @@ function CustomTextField<T extends FieldValues>({
   maxLength,
   uppercase = false,
   showCharCount = false,
-  type = 'text',
+  type = "text",
   InputProps,
   slotProps,
   ...props
@@ -86,14 +89,23 @@ function CustomTextField<T extends FieldValues>({
             error={!!error}
             helperText={(error as FieldError)?.message || helperText}
             InputProps={{
+              readOnly: true,
               ...InputProps,
-              endAdornment: showCharCount && maxLength ? (
-                <InputAdornment position="end" sx={{ fontSize: "0.75rem", color: "text.secondary", mr: 0.5 }}>
-                  {`${currentLength}/${maxLength}`}
-                </InputAdornment>
-              ) : (
-                InputProps?.endAdornment || null
-              ),
+              endAdornment:
+                showCharCount && maxLength ? (
+                  <InputAdornment
+                    position="end"
+                    sx={{
+                      fontSize: "0.75rem",
+                      color: "text.secondary",
+                      mr: 0.5,
+                    }}
+                  >
+                    {`${currentLength}/${maxLength}`}
+                  </InputAdornment>
+                ) : (
+                  InputProps?.endAdornment || null
+                ),
               inputProps: {
                 ...(InputProps?.inputProps || {}),
                 maxLength,

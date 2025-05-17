@@ -17,19 +17,14 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Image from "next/image";
-import Cookies from "js-cookie";
-
-import { api } from "@/axios/axiosClient";
+import axiosClient from "@/axios/axiosClient";
 import { useUIStore } from "@/store/uiStore";
+import { useAuthStore } from "@/store/authStore";
 import CustomTextField from "@/components/personalizados/CustomTextField";
 import { loginSchema, LoginFormData } from "@/lib/schemas/validation";
 
 export default function LoginForm() {
-  const {
-    handleSubmit,
-    control,
-    formState: {},
-  } = useForm<LoginFormData>({
+  const { handleSubmit, control } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
 
@@ -37,8 +32,8 @@ export default function LoginForm() {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const setIsLoading = useUIStore((state) => state.setIsLoading);
+  const login = useAuthStore((state) => state.login);
 
-  // ✅ useEffect corregido sin useSearchParams
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -54,52 +49,57 @@ export default function LoginForm() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: LoginFormData) => {
-      const response = await api.post<{ token: string }>(
-        "/v1/api/auth/login",
-        data
+      console.debug("[Login] Enviando datos de login:", data);
+
+      await axiosClient.post("/v1/api/auth/login", data);
+
+      console.debug(
+        "[Login] Login exitoso. Solicitando información del usuario..."
       );
+
+      const response = await axiosClient.get<{
+        id: number;
+        username: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+        role: string; // ← debe ser 'role', no 'roles'
+        token: string;
+      }>("/v1/api/auth/me");
+
+      console.debug("[Login] Respuesta del endpoint /me:", response.data);
+
       return response.data;
     },
     onMutate: () => {
+      console.debug("[Login] Estado: Loading");
       setIsLoading(true, "Iniciando sesión...");
     },
-    onSuccess: (response) => {
-      const { token } = response;
-      if (!token) {
-        throw new Error("Token no recibido del servidor");
-      }
+    onSuccess: (user) => {
+      console.debug("[Login] Usuario autenticado:", user);
 
-      Cookies.set("token", token, {
-        secure: true,
-        sameSite: "strict",
-        path: "/",
-      });
+      login(user); // ✅ Guarda el usuario y token en authStore
 
-      try {
-        const payloadBase64 = token.split(".")[1];
-        const decodedPayload = JSON.parse(atob(payloadBase64));
-        const roles: string[] = Array.isArray(decodedPayload.roles)
-          ? decodedPayload.roles
-          : [];
+      const role = user.role?.toUpperCase();
+      console.debug("[Login] Rol detectado:", role);
 
-        const role = roles[0]?.toUpperCase();
-        const redirectMap: Record<string, string> = {
-          ADMIN: "/dashboard/admin",
-          PADRE: "/dashboard/padres",
-          PROFESOR: "/dashboard/profesor",
-        };
+      const redirectMap: Record<string, string> = {
+        ADMIN: "/dashboard/admin",
+        PADRE: "/dashboard/padres",
+        PROFESOR: "/dashboard/profesor",
+      };
 
-        if (role && redirectMap[role]) {
-          router.push(redirectMap[role]);
-        } else {
-          enqueueSnackbar("Rol no autorizado", { variant: "error" });
-        }
-      } catch (err) {
-        enqueueSnackbar("Error al procesar el token", { variant: "error" });
-        console.error("Error decodificando token:", err);
+      if (role && redirectMap[role]) {
+        console.debug(`[Login] Redirigiendo a ${redirectMap[role]}`);
+        router.push(redirectMap[role]);
+      } else {
+        console.warn("[Login] Rol no autorizado o no encontrado:", role);
+        enqueueSnackbar("Rol no autorizado", { variant: "error" });
       }
     },
     onError: (error: unknown) => {
+      console.error("[Login] Error durante el login:", error);
+
       let errorMessage = "Error al iniciar sesión";
 
       if (
@@ -138,11 +138,13 @@ export default function LoginForm() {
       });
     },
     onSettled: () => {
+      console.debug("[Login] Finalizando carga");
       setIsLoading(false);
     },
   });
 
   const onSubmit = (data: LoginFormData) => {
+    console.debug("[Login] Enviando datos de login:", data);
     loginMutation.mutate(data);
   };
 
@@ -168,7 +170,10 @@ export default function LoginForm() {
       <Box
         component="form"
         onKeyDown={handleKeyPress}
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit(onSubmit)();
+        }}
         sx={{
           width: { xs: "90%", sm: 400 },
           padding: 3,
