@@ -5,7 +5,7 @@ const PUBLIC_FILE = /\.(.*)$/;
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  const token = req.cookies.get('token')?.value;
+  const token = req.cookies.get('access_token')?.value; // <- debe coincidir con tu backend
   const role = req.cookies.get('role')?.value;
 
   // Permitir archivos públicos y rutas internas de Next
@@ -17,13 +17,13 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Redirigir a dashboard si ya está autenticado
+  // Si ya está autenticado y entra a login o raíz, redirigir al dashboard
   if ((pathname === '/' || pathname === '/login') && token && role) {
-    const roleLower = role.toLowerCase();
+    const roleLower = role.trim().toLowerCase();
     return NextResponse.redirect(new URL(`/dashboard/${roleLower}`, req.url));
   }
 
-  // Redirigir al login si intenta acceder a dashboard sin token
+  // Si intenta acceder a dashboard sin token, redirigir a login
   if (pathname.startsWith('/dashboard') && !token) {
     return NextResponse.redirect(new URL('/login', req.url));
   }

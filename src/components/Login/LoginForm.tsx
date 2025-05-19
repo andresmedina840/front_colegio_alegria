@@ -78,25 +78,27 @@ export default function LoginForm() {
     onSuccess: (user) => {
       console.debug("[Login] Usuario autenticado:", user);
 
-      login(user); // ✅ Guarda el usuario y token en authStore
+      login(user); // Guarda el usuario y token en Zustand
 
-      const role = user.role?.toUpperCase();
+      const role = user.role?.trim().toUpperCase();
       console.debug("[Login] Rol detectado:", role);
 
       const redirectMap: Record<string, string> = {
         ADMIN: "/dashboard/admin",
-        PADRE: "/dashboard/padres",
+        PADRE: "/dashboard/padre",
         PROFESOR: "/dashboard/profesor",
       };
 
       if (role && redirectMap[role]) {
         console.debug(`[Login] Redirigiendo a ${redirectMap[role]}`);
-        router.push(redirectMap[role]);
+        // Forzar navegación completa para que el middleware actúe correctamente
+        window.location.href = redirectMap[role];
       } else {
         console.warn("[Login] Rol no autorizado o no encontrado:", role);
         enqueueSnackbar("Rol no autorizado", { variant: "error" });
       }
     },
+
     onError: (error: unknown) => {
       console.error("[Login] Error durante el login:", error);
 

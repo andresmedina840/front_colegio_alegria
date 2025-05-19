@@ -15,6 +15,7 @@ const axiosClient: AxiosInstance = axios.create({
     ? `${process.env.NEXT_PUBLIC_BACKEND}/v1/api` 
     : "http://localhost:8080/v1/api",
   timeout: 10000,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
