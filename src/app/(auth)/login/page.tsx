@@ -13,7 +13,7 @@ export default function LoginPage() {
   }, []);
 
   if (!isMounted) {
-    return null; // O un loader/skeleton
+    return null; 
   }
 
   return (

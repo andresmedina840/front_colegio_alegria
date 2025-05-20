@@ -20,7 +20,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Image from "next/image";
 import axiosClient from "@/axios/axiosClient";
 import { useUIStore } from "@/store/uiStore";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore, User } from "@/store/authStore";
 import CustomTextField from "@/components/personalizados/CustomTextField";
 import { loginSchema, LoginFormData } from "@/lib/schemas/validation";
 
@@ -48,33 +48,46 @@ export default function LoginForm() {
   }, [enqueueSnackbar, router]);
 
   const loginMutation = useMutation({
-    mutationFn: async (data: LoginFormData) => {
-      console.debug("[Login] Enviando credenciales:", data);
+    mutationFn: async (data: LoginFormData): Promise<User> => {
+      console.debug("[Login] ✉️ Enviando datos:", data);
 
-      await axiosClient.post("/v1/api/auth/login", data);
-      console.debug("[Login] Login correcto. Obteniendo datos de usuario...");
+      await axiosClient.post("/v1/api/auth/login", data, {
+        withCredentials: true,
+      });
 
-      const response = await axiosClient.get("/v1/api/auth/me");
-      const user = response.data.data; // ✔⃝ acceso correcto a `data`
+      console.debug("[Login] ✅ Login exitoso. Obteniendo usuario...");
 
-      console.debug("[Login] Usuario obtenido:", user);
+      const response = await axiosClient.get("/v1/api/auth/me", {
+        withCredentials: true,
+      });
 
-      if (!user || !user.rol) {
-        throw new Error("El usuario no tiene un rol asignado");
-      }
+      const raw = response.data?.data;
+
+      console.debug("[Login] 🔍 Respuesta de /me:", raw);
+
+      const token = useAuthStore.getState().token ?? "";
+
+      const user: User = {
+        id: raw.id,
+        username: raw.username,
+        firstName: raw.nombreCompleto?.split(" ")[1] ?? "",
+        lastName: raw.nombreCompleto?.split(" ")[2] ?? "",
+        email: raw.email,
+        role: raw.rol,
+        token,
+      };
 
       return user;
     },
     onMutate: () => {
-      console.debug("[Login] Cargando...");
+      console.debug("[Login] ⌛ Cargando...");
       setIsLoading(true, "Iniciando sesión...");
     },
-    onSuccess: (user) => {
+    onSuccess: (user: User) => {
+      console.debug("[Login] ✔️ Usuario autenticado:", user);
       login(user);
 
-      const role = user.rol.trim().toUpperCase();
-      console.debug("[Login] Rol recibido:", role);
-
+      const role = user.role?.trim().toUpperCase();
       const redirectMap: Record<string, string> = {
         ADMIN: "/dashboard/admin",
         PADRE: "/dashboard/padre",
@@ -83,25 +96,44 @@ export default function LoginForm() {
 
       const target = redirectMap[role];
       if (!target) {
-        enqueueSnackbar(`Rol no autorizado: ${role}`, { variant: "error" });
+        enqueueSnackbar("Rol no autorizado", { variant: "error" });
         return;
       }
 
+      console.debug("[Login] 🧭 Redirigiendo a:", target);
       router.push(target);
     },
-    onError: (error) => {
-      console.error("[Login] Error en login:", error);
-      enqueueSnackbar(error instanceof Error ? error.message : "Error al iniciar sesión", {
-        variant: "error",
-      });
+    onError: (error: unknown) => {
+      console.error("[Login] ❌ Error:", error);
+      let errorMessage = "Error al iniciar sesión";
+
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof error.message === "string"
+      ) {
+        if (error.message.includes("Bad credentials")) {
+          errorMessage = "Usuario o contraseña incorrectos";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      enqueueSnackbar(errorMessage, { variant: "error" });
     },
     onSettled: () => {
+      console.debug("[Login] 🌟 Finalizando carga");
       setIsLoading(false);
     },
   });
 
   const onSubmit = (data: LoginFormData) => {
     loginMutation.mutate(data);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSubmit(onSubmit)();
   };
 
   return (
@@ -119,6 +151,7 @@ export default function LoginForm() {
     >
       <Box
         component="form"
+        onKeyDown={handleKeyPress}
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit(onSubmit)();
@@ -199,16 +232,14 @@ export default function LoginForm() {
           sx={{ mt: 3, py: 1.5 }}
           disabled={loginMutation.isPending}
           startIcon={
-            loginMutation.isPending && (
-              <CircularProgress size={20} color="inherit" />
-            )
+            loginMutation.isPending && <CircularProgress size={20} color="inherit" />
           }
         >
           {loginMutation.isPending ? "Iniciando sesión..." : "Iniciar Sesión"}
         </Button>
 
         <Typography variant="body2" sx={{ mt: 2 }}>
-          ¿No tienes una cuenta?{' '}
+          ¿No tienes una cuenta?{" "}
           <Link href="/register" color="primary" underline="hover">
             Regístrate aquí
           </Link>

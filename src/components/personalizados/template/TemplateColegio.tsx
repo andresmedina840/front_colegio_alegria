@@ -1,3 +1,4 @@
+// src/components/personalizados/template/TemplateColegio.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -21,22 +22,27 @@ import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useRouter } from "next/navigation";
 
-import { MENU_ITEMS } from "./config";
-import { MenuItem } from "./types";
-
-interface TemplateColegioProps {
-  children: React.ReactNode;
-}
+import { useAuthStore } from "@/store/authStore";
+import { MENU_ITEMS } from "@/app/config/navigation";
+import { ICON_COMPONENTS } from "@/app/config/iconMap";
+import type { UserRole, IconName } from "@/types";
 
 const drawerWidth = 240;
 
-const TemplateColegio: React.FC<TemplateColegioProps> = ({ children }) => {
+export default function TemplateColegio({ children }: { children: React.ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const router = useRouter();
   const theme = useTheme();
+  const router = useRouter();
 
-  // ⚠️ Reemplaza esto por tu lógica de autenticación real
-  const currentUserRole = "ADMIN";
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+  const role = user?.role;
+
+  // ✅ Verificamos que el rol sea válido
+  const isValidRole = role === "ADMIN" || role === "PROFESOR" || role === "PADRE";
+  if (!isValidRole) return null;
+
+  const currentRole = role as UserRole;
 
   const handleDrawerToggle = () => setDrawerOpen(!drawerOpen);
 
@@ -46,37 +52,40 @@ const TemplateColegio: React.FC<TemplateColegioProps> = ({ children }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    router.push("/login");
+    logout();
+    router.push("/login?sessionExpired=true");
   };
 
-  const filteredMenuItems = MENU_ITEMS.filter((item: MenuItem) =>
-    item.roles.includes(currentUserRole)
+  const filteredMenu = MENU_ITEMS.filter((item) =>
+    item.roles.includes(currentRole)
   );
 
-  const renderDrawerContent = (
+  const drawerContent = (
     <Box sx={{ overflow: "auto" }}>
       <Toolbar />
       <List>
-        {filteredMenuItems.map((item) => (
-          <ListItem key={item.label} disablePadding>
-            <ListItemButton onClick={() => handleNavigate(item.route)}>
-              <ListItemIcon>
-                <item.icon />
-              </ListItemIcon>
-              <ListItemText primary={item.label} />
-            </ListItemButton>
-          </ListItem>
-        ))}
+        {filteredMenu.map((item) => {
+          const Icon = ICON_COMPONENTS[item.icon as IconName];
+          return (
+            <ListItem key={item.text} disablePadding>
+              <ListItemButton onClick={() => handleNavigate(item.route)}>
+                <ListItemIcon sx={{ color: "#1976d2", minWidth: 40 }}>
+                  <Icon />
+                </ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
       </List>
     </Box>
   );
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+    <Box sx={{ display: "flex" }}>
       <CssBaseline />
 
-      {/* AppBar */}
+      {/* AppBar superior */}
       <AppBar position="fixed" sx={{ zIndex: theme.zIndex.drawer + 1 }}>
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <IconButton
@@ -93,7 +102,12 @@ const TemplateColegio: React.FC<TemplateColegioProps> = ({ children }) => {
           </Typography>
 
           <Box display="flex" alignItems="center">
-            <Avatar alt="Usuario" src="/user-avatar.png" sx={{ mr: 2 }} />
+            <Typography variant="body1" sx={{ mr: 2 }}>
+              {user?.username ?? "Usuario"}
+            </Typography>
+            <Avatar sx={{ bgcolor: "#1976d2", mr: 1 }}>
+              {user?.username?.charAt(0).toUpperCase() ?? "U"}
+            </Avatar>
             <IconButton color="inherit" onClick={handleLogout}>
               <LogoutIcon />
             </IconButton>
@@ -101,7 +115,7 @@ const TemplateColegio: React.FC<TemplateColegioProps> = ({ children }) => {
         </Toolbar>
       </AppBar>
 
-      {/* Drawer (temporal en móviles) */}
+      {/* Drawer temporal para móviles */}
       <Drawer
         variant="temporary"
         open={drawerOpen}
@@ -109,22 +123,28 @@ const TemplateColegio: React.FC<TemplateColegioProps> = ({ children }) => {
         ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: "block", sm: "none" },
-          "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
+          "& .MuiDrawer-paper": {
+            width: drawerWidth,
+            boxSizing: "border-box",
+          },
         }}
       >
-        {renderDrawerContent}
+        {drawerContent}
       </Drawer>
 
-      {/* Drawer permanente en escritorio */}
+      {/* Drawer permanente para escritorio */}
       <Drawer
         variant="permanent"
         sx={{
           display: { xs: "none", sm: "block" },
-          "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
+          "& .MuiDrawer-paper": {
+            width: drawerWidth,
+            boxSizing: "border-box",
+          },
         }}
         open
       >
-        {renderDrawerContent}
+        {drawerContent}
       </Drawer>
 
       {/* Contenido principal */}
@@ -141,6 +161,4 @@ const TemplateColegio: React.FC<TemplateColegioProps> = ({ children }) => {
       </Box>
     </Box>
   );
-};
-
-export default TemplateColegio;
+}

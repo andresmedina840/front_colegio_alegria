@@ -1,6 +1,7 @@
 // src/store/authStore.ts
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { UserRole } from "@/types";
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 export interface User {
   id: number;
@@ -8,7 +9,7 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
-  role: string;
+  role: UserRole;
   token: string;
 }
 
@@ -28,7 +29,7 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       login: (userData: User) => {
         if (!userData || !userData.token || !userData.role) {
-          console.error('[AuthStore] Datos inválidos en login:', userData);
+          console.error("[AuthStore] Datos inválidos en login:", userData);
           return;
         }
         set({ user: userData, token: userData.token });
@@ -38,7 +39,7 @@ export const useAuthStore = create<AuthState>()(
       },
       loadFromStorage: () => {
         try {
-          const stored = localStorage.getItem('auth-storage');
+          const stored = localStorage.getItem("auth-storage");
           if (!stored) return;
 
           const parsed = JSON.parse(stored)?.state as AuthState;
@@ -46,7 +47,7 @@ export const useAuthStore = create<AuthState>()(
             set({ user: parsed.user, token: parsed.token });
           }
         } catch (err) {
-          console.error('[AuthStore] Error cargando auth desde storage:', err);
+          console.error("[AuthStore] Error cargando auth desde storage:", err);
         }
       },
       isAuthenticated: () => {
@@ -55,7 +56,7 @@ export const useAuthStore = create<AuthState>()(
       },
     }),
     {
-      name: 'auth-storage',
+      name: "auth-storage",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ user: state.user, token: state.token }),
     }
