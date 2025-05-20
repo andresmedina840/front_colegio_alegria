@@ -1,5 +1,5 @@
 // src/types/typesApiLogueo.ts
-import { UserRole } from "./index"; 
+import { UserRole } from "./index";
 
 /**
  * Estructura esperada del usuario desde /auth/me
@@ -15,6 +15,8 @@ export interface RawUser {
  * Respuesta del endpoint /auth/me
  */
 export interface AuthMeResponse {
+  code: number;
+  message: string;
   data: RawUser;
 }
 
