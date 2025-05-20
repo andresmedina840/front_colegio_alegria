@@ -1,19 +1,17 @@
-import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosError, AxiosResponse, AxiosHeaders } from "axios";
-
-interface UserData {
-  token: string;
-  id?: number;
-  username?: string;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  role?: string;
-}
+// src/axios/axiosClient.ts
+import axios, {
+  AxiosInstance,
+  InternalAxiosRequestConfig,
+  AxiosError,
+  AxiosResponse,
+  AxiosHeaders,
+} from "axios";
+import { useAuthStore } from "@/store/authStore";
 
 const axiosClient: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND 
-    ? `${process.env.NEXT_PUBLIC_BACKEND}/v1/api` 
-    : "http://localhost:8080/v1/api",
+  baseURL: process.env.NEXT_PUBLIC_BACKEND
+    ? `${process.env.NEXT_PUBLIC_BACKEND}`
+    : "http://localhost:8080",
   timeout: 10000,
   withCredentials: true,
   headers: {
@@ -21,31 +19,21 @@ const axiosClient: AxiosInstance = axios.create({
   },
 });
 
-// Request interceptor
+// Interceptor de solicitud con Zustand
 axiosClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     if (typeof window !== "undefined") {
-      const userData = sessionStorage.getItem("userData");
-      
-      if (userData) {
-        try {
-          const parsedData: UserData = JSON.parse(userData);
-          if (parsedData.token) {
-            // Solución 1: Usar AxiosHeaders
-            const headers = new AxiosHeaders();
-            headers.set("Authorization", `Bearer ${parsedData.token}`);
-            config.headers = headers;
-            
-            // Solución alternativa (menos tipo-safe pero funciona):
-            // config.headers = {
-            //   ...config.headers,
-            //   Authorization: `Bearer ${parsedData.token}`,
-            // } as AxiosHeaders;
-          }
-        } catch (error) {
-          console.error("Error parsing user data:", error);
-          sessionStorage.removeItem("userData");
-        }
+      const token = useAuthStore.getState().token;
+      if (token) {
+        // Solución para el problema de tipos con los headers
+        const headers = new AxiosHeaders();
+        headers.set("Content-Type", "application/json");
+        headers.set("Authorization", `Bearer ${token}`);
+        
+        return {
+          ...config,
+          headers
+        };
       }
     }
     return config;
@@ -53,25 +41,31 @@ axiosClient.interceptors.request.use(
   (error: AxiosError) => Promise.reject(error)
 );
 
-// Response interceptor
+// Interceptor de respuesta con control global de errores
 axiosClient.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: AxiosError) => {
     if (typeof window !== "undefined") {
-      if (error.response?.status === 401) {
-        sessionStorage.removeItem("userData");
+      const status = error.response?.status;
+
+      if (status === 401) {
+        console.warn("[axios] ⚠️ Sesión expirada");
+        useAuthStore.getState().logout();
         window.location.href = "/login?sessionExpired=true";
       }
-      
-      if (error.response?.status === 403) {
+
+      if (status === 403) {
+        console.warn("[axios] 🚫 Acceso prohibido");
         window.location.href = "/unauthorized";
       }
     }
 
-    const errorData = error.response?.data as { message?: string };
-    const errorMessage = errorData?.message || error.message || "Error de conexión";
-    
-    return Promise.reject(new Error(errorMessage));
+    const message =
+      (error.response?.data as { message?: string })?.message ||
+      error.message ||
+      "Error desconocido";
+
+    return Promise.reject(new Error(message));
   }
 );
 

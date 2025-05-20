@@ -1,4 +1,5 @@
 "use client";
+
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
@@ -39,49 +40,40 @@ export default function LoginForm() {
 
     const params = new URLSearchParams(window.location.search);
     if (params.get("sessionExpired") === "true") {
-      enqueueSnackbar(
-        "Tu sesión ha expirado, por favor inicia sesión nuevamente",
-        { variant: "warning" }
-      );
+      enqueueSnackbar("Tu sesión ha expirado, por favor inicia sesión nuevamente", {
+        variant: "warning",
+      });
       router.replace("/login");
     }
   }, [enqueueSnackbar, router]);
 
   const loginMutation = useMutation({
     mutationFn: async (data: LoginFormData) => {
-      console.debug("[Login] Enviando datos de login:", data);
+      console.debug("[Login] Enviando credenciales:", data);
 
       await axiosClient.post("/v1/api/auth/login", data);
+      console.debug("[Login] Login correcto. Obteniendo datos de usuario...");
 
-      console.debug(
-        "[Login] Login exitoso. Solicitando información del usuario..."
-      );
+      const response = await axiosClient.get("/v1/api/auth/me");
+      const user = response.data.data; // ✔⃝ acceso correcto a `data`
 
-      const response = await axiosClient.get<{
-        id: number;
-        username: string;
-        firstName: string;
-        lastName: string;
-        email: string;
-        role: string; // ← debe ser 'role', no 'roles'
-        token: string;
-      }>("/v1/api/auth/me");
+      console.debug("[Login] Usuario obtenido:", user);
 
-      console.debug("[Login] Respuesta del endpoint /me:", response.data);
+      if (!user || !user.rol) {
+        throw new Error("El usuario no tiene un rol asignado");
+      }
 
-      return response.data;
+      return user;
     },
     onMutate: () => {
-      console.debug("[Login] Estado: Loading");
+      console.debug("[Login] Cargando...");
       setIsLoading(true, "Iniciando sesión...");
     },
     onSuccess: (user) => {
-      console.debug("[Login] Usuario autenticado:", user);
+      login(user);
 
-      login(user); // Guarda el usuario y token en Zustand
-
-      const role = user.role?.trim().toUpperCase();
-      console.debug("[Login] Rol detectado:", role);
+      const role = user.rol.trim().toUpperCase();
+      console.debug("[Login] Rol recibido:", role);
 
       const redirectMap: Record<string, string> = {
         ADMIN: "/dashboard/admin",
@@ -89,71 +81,27 @@ export default function LoginForm() {
         PROFESOR: "/dashboard/profesor",
       };
 
-      if (role && redirectMap[role]) {
-        console.debug(`[Login] Redirigiendo a ${redirectMap[role]}`);
-        // Forzar navegación completa para que el middleware actúe correctamente
-        window.location.href = redirectMap[role];
-      } else {
-        console.warn("[Login] Rol no autorizado o no encontrado:", role);
-        enqueueSnackbar("Rol no autorizado", { variant: "error" });
+      const target = redirectMap[role];
+      if (!target) {
+        enqueueSnackbar(`Rol no autorizado: ${role}`, { variant: "error" });
+        return;
       }
+
+      router.push(target);
     },
-
-    onError: (error: unknown) => {
-      console.error("[Login] Error durante el login:", error);
-
-      let errorMessage = "Error al iniciar sesión";
-
-      if (
-        typeof error === "object" &&
-        error !== null &&
-        "response" in error &&
-        typeof error.response === "object"
-      ) {
-        const err = error as {
-          response?: {
-            data?: {
-              message?: string;
-            };
-          };
-          message?: string;
-        };
-
-        switch (err.response?.data?.message) {
-          case "Bad credentials":
-            errorMessage = "Usuario o contraseña incorrectos";
-            break;
-          case "User not found":
-            errorMessage = "Usuario no encontrado";
-            break;
-          case "Account disabled":
-            errorMessage = "Cuenta deshabilitada";
-            break;
-          default:
-            errorMessage =
-              err.response?.data?.message || err.message || errorMessage;
-        }
-      }
-
-      enqueueSnackbar(errorMessage, {
+    onError: (error) => {
+      console.error("[Login] Error en login:", error);
+      enqueueSnackbar(error instanceof Error ? error.message : "Error al iniciar sesión", {
         variant: "error",
       });
     },
     onSettled: () => {
-      console.debug("[Login] Finalizando carga");
       setIsLoading(false);
     },
   });
 
   const onSubmit = (data: LoginFormData) => {
-    console.debug("[Login] Enviando datos de login:", data);
     loginMutation.mutate(data);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSubmit(onSubmit)();
-    }
   };
 
   return (
@@ -171,15 +119,14 @@ export default function LoginForm() {
     >
       <Box
         component="form"
-        onKeyDown={handleKeyPress}
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit(onSubmit)();
         }}
         sx={{
           width: { xs: "90%", sm: 400 },
-          padding: 3,
-          backgroundColor: "background.paper",
+          p: 3,
+          bgcolor: "background.paper",
           borderRadius: 2,
           boxShadow: 3,
           textAlign: "center",
@@ -214,11 +161,10 @@ export default function LoginForm() {
               fullWidth
               showCharCount
               maxLength={30}
-              InputProps={{
-                inputProps: { maxLength: 30 },
-              }}
+              InputProps={{ inputProps: { maxLength: 30 } }}
             />
           </Grid>
+
           <Grid size={{ xs: 12 }}>
             <CustomTextField
               name="password"
@@ -262,7 +208,7 @@ export default function LoginForm() {
         </Button>
 
         <Typography variant="body2" sx={{ mt: 2 }}>
-          ¿No tienes una cuenta?{" "}
+          ¿No tienes una cuenta?{' '}
           <Link href="/register" color="primary" underline="hover">
             Regístrate aquí
           </Link>

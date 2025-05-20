@@ -1,32 +1,53 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 const PUBLIC_FILE = /\.(.*)$/;
 
+const roleRedirectMap: Record<string, string> = {
+  admin: "/dashboard/admin",
+  padre: "/dashboard/padre",
+  profesor: "/dashboard/profesor",
+};
+
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  const token = req.cookies.get("access_token")?.value;
+  const role = req.cookies.get("role")?.value?.toLowerCase();
 
-  const token = req.cookies.get('access_token')?.value; // <- debe coincidir con tu backend
-  const role = req.cookies.get('role')?.value;
+  const isPublicFile =
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    PUBLIC_FILE.test(pathname);
 
-  // Permitir archivos públicos y rutas internas de Next
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api') ||
-    PUBLIC_FILE.test(pathname)
-  ) {
-    return NextResponse.next();
+  // 🎯 Permitir archivos públicos y APIs
+  if (isPublicFile) return NextResponse.next();
+
+  // 🔁 Redirigir desde raíz o login si ya está autenticado
+  if ((pathname === "/" || pathname === "/login") && token && role) {
+    const destination = roleRedirectMap[role];
+    if (destination) {
+      return NextResponse.redirect(new URL(destination, req.url));
+    }
   }
 
-  // Si ya está autenticado y entra a login o raíz, redirigir al dashboard
-  if ((pathname === '/' || pathname === '/login') && token && role) {
-    const roleLower = role.trim().toLowerCase();
-    return NextResponse.redirect(new URL(`/dashboard/${roleLower}`, req.url));
+  // 🔐 Bloquear acceso a /dashboard si no hay token
+  if (pathname.startsWith("/dashboard") && !token) {
+    return NextResponse.redirect(
+      new URL("/login?sessionExpired=true", req.url)
+    );
   }
 
-  // Si intenta acceder a dashboard sin token, redirigir a login
-  if (pathname.startsWith('/dashboard') && !token) {
-    return NextResponse.redirect(new URL('/login', req.url));
+  // 🛑 Rol válido pero está en ruta equivocada → forzar redirección
+  if (pathname.startsWith("/dashboard") && token && role) {
+    const expectedPath = roleRedirectMap[role];
+    if (expectedPath && !pathname.startsWith(expectedPath)) {
+      return NextResponse.redirect(new URL(expectedPath, req.url));
+    }
   }
 
   return NextResponse.next();
 }
+
+// 💡 Matcher: aplicar solo a rutas visibles, no a APIs ni assets
+export const config = {
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+};
