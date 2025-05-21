@@ -25,6 +25,7 @@ import { useAuthStore } from "@/store/authStore";
 import CustomTextField from "@/components/personalizados/CustomTextField";
 import { loginSchema, LoginFormData } from "@/lib/schemas/validation";
 import { User } from "@/types";
+import Cookies from "js-cookie";
 
 export default function LoginForm() {
   const { handleSubmit, control } = useForm<LoginFormData>({
@@ -42,37 +43,48 @@ export default function LoginForm() {
 
     const params = new URLSearchParams(window.location.search);
     if (params.get("sessionExpired") === "true") {
-      enqueueSnackbar("Tu sesión ha expirado, por favor inicia sesión nuevamente", {
-        variant: "warning",
-      });
+      enqueueSnackbar(
+        "Tu sesión ha expirado, por favor inicia sesión nuevamente",
+        {
+          variant: "warning",
+        }
+      );
       router.replace("/login");
     }
   }, [enqueueSnackbar, router]);
 
   const loginMutation = useMutation({
-    mutationFn: async (data: LoginFormData): Promise<Omit<User, "token">> => {
-      await axiosClient.post("/v1/api/auth/login", data, {
+    mutationFn: async (
+      data: LoginFormData
+    ): Promise<{ userData: Omit<User, "token">; token: string }> => {
+      const response = await axiosClient.post("/v1/api/auth/login", data, {
         withCredentials: true,
       });
 
-      const response = await axiosClient.get("/v1/api/auth/me", {
+      // Obtener el token de la respuesta o de las cookies
+      const token = response.data?.token || Cookies.get("access_token");
+
+      const userResponse = await axiosClient.get("/v1/api/auth/me", {
         withCredentials: true,
       });
-      const raw = response.data?.data;
+      const raw = userResponse.data?.data;
 
       return {
-        id: raw.id,
-        username: raw.username,
-        nombreCompleto: raw.nombreCompleto,
-        email: raw.email ?? "",
-        rol: raw.rol,
-      } satisfies Omit<User, "token">;
+        userData: {
+          id: raw.id,
+          username: raw.username,
+          nombreCompleto: raw.nombreCompleto,
+          email: raw.email ?? "",
+          rol: raw.rol,
+        },
+        token: token,
+      };
     },
     onMutate: () => {
       setIsLoading(true, "Iniciando sesión...");
     },
-    onSuccess: (userData) => {
-      login(userData); // token se obtiene desde cookie internamente
+    onSuccess: ({ userData, token }) => {
+      login(userData, token); // Ahora pasamos ambos argumentos
       const target =
         {
           ADMIN: "/dashboard/admin",

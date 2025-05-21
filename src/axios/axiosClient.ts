@@ -1,17 +1,13 @@
-// src/axios/axiosClient.ts
 import axios, {
   AxiosInstance,
   InternalAxiosRequestConfig,
   AxiosError,
   AxiosResponse,
-  AxiosHeaders,
 } from "axios";
 import { useAuthStore } from "@/store/authStore";
 
 const axiosClient: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND
-    ? `${process.env.NEXT_PUBLIC_BACKEND}`
-    : "http://localhost:8080",
+  baseURL: process.env.NEXT_PUBLIC_BACKEND || "http://localhost:8080",
   timeout: 10000,
   withCredentials: true,
   headers: {
@@ -19,21 +15,13 @@ const axiosClient: AxiosInstance = axios.create({
   },
 });
 
-// Interceptor de solicitud con Zustand
 axiosClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     if (typeof window !== "undefined") {
-      const token = useAuthStore.getState().token;
+      const token = useAuthStore.getState().token; // Ahora token existe en el estado
       if (token) {
-        // Solución para el problema de tipos con los headers
-        const headers = new AxiosHeaders();
-        headers.set("Content-Type", "application/json");
-        headers.set("Authorization", `Bearer ${token}`);
-        
-        return {
-          ...config,
-          headers
-        };
+        config.headers = config.headers || {};
+        config.headers["Authorization"] = `Bearer ${token}`;
       }
     }
     return config;
@@ -41,7 +29,6 @@ axiosClient.interceptors.request.use(
   (error: AxiosError) => Promise.reject(error)
 );
 
-// Interceptor de respuesta con control global de errores
 axiosClient.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: AxiosError) => {

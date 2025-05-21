@@ -18,7 +18,7 @@ export interface User {
   nombreCompleto: string;
   email?: string;
   rol: UserRole;
-  token: string;
+  token?: string;
 }
 
 /**
