@@ -1,22 +1,13 @@
-// src/store/authStore.ts
-import { UserRole } from "@/types";
+// ✅ src/store/authStore.ts
+import { User } from "@/types";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-
-export interface User {
-  id: number;
-  username: string;
-  firstName: string;
-  lastName: string;
-  email?: string;
-  role: UserRole;
-  token: string;
-}
+import Cookies from "js-cookie";
 
 interface AuthState {
   user: User | null;
   token: string | null;
-  login: (userData: User) => void;
+  login: (userData: Omit<User, "token">) => void;
   logout: () => void;
   loadFromStorage: () => void;
   isAuthenticated: () => boolean;
@@ -27,33 +18,32 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       token: null,
-      login: (userData: User) => {
-        if (!userData || !userData.token || !userData.role) {
-          console.error("[AuthStore] Datos inválidos en login:", userData);
+      login: (userData) => {
+        const token = Cookies.get("access_token") ?? "";
+
+        if (!token || !userData.rol) {
+          console.error("[AuthStore] Datos inválidos:", userData);
           return;
         }
-        set({ user: userData, token: userData.token });
+
+        set({
+          user: { ...userData, token },
+          token,
+        });
       },
-      logout: () => {
-        set({ user: null, token: null });
-      },
+      logout: () => set({ user: null, token: null }),
       loadFromStorage: () => {
         try {
           const stored = localStorage.getItem("auth-storage");
-          if (!stored) return;
-
-          const parsed = JSON.parse(stored)?.state as AuthState;
-          if (parsed?.user && parsed?.token) {
-            set({ user: parsed.user, token: parsed.token });
+          if (stored) {
+            const { user, token } = JSON.parse(stored).state as AuthState;
+            if (user && token) set({ user, token });
           }
-        } catch (err) {
-          console.error("[AuthStore] Error cargando auth desde storage:", err);
+        } catch (error) {
+          console.error("[AuthStore] Error al cargar:", error);
         }
       },
-      isAuthenticated: () => {
-        const { user, token } = get();
-        return !!user && !!token;
-      },
+      isAuthenticated: () => !!get().user && !!get().token,
     }),
     {
       name: "auth-storage",

@@ -14,7 +14,7 @@ export default function AdminDashboard() {
       setTimeout(() => {
         if (!isAuthenticated()) {
           router.replace('/login');
-        } else if (user?.role !== 'ADMIN') {
+        } else if (user?.rol !== 'ADMIN') {
           router.replace('/');
         } else {
           setChecking(false);

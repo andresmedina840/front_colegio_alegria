@@ -10,12 +10,12 @@ export default function PadreDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!user || user.role.toUpperCase() !== 'PADRE') {
+    if (!user || user.rol.toUpperCase() !== 'PADRE') {
       router.replace('/');
     }
   }, [user, router]);
 
-  if (!user || user.role.toUpperCase() !== 'PADRE') return null;
+  if (!user || user.rol.toUpperCase() !== 'PADRE') return null;
 
   return (
     <Grid container spacing={3}>

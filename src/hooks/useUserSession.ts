@@ -1,11 +1,13 @@
+// ✅ src/hooks/useUserSession.ts
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
 import { fetchUserSession } from "@/hooks/fetchUserSession";
-import { useAuthStore, type User } from "@/store/authStore";
+import { useAuthStore } from "@/store/authStore";
 import React from "react";
+import { User } from "@/types";
 
 export const useUserSession = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -24,13 +26,12 @@ export const useUserSession = () => {
     if (query.isError) {
       const message = query.error?.message || "Error de sesión";
       enqueueSnackbar(message, { variant: "error" });
-      
-      // Limpiar cache y hacer logout
+
       queryClient.removeQueries({ queryKey: ["user-session"] });
       logout();
       router.push("/login?sessionExpired=true");
     }
-  }, [query.isError, query.error, enqueueSnackbar, logout, router, queryClient]);
+  }, [query.isError, query.error]);
 
   return query;
 };

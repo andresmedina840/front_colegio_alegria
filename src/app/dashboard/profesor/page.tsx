@@ -10,12 +10,12 @@ export default function ProfesorDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!user || user.role.toUpperCase() !== 'PROFESOR') {
+    if (!user || user.rol.toUpperCase() !== 'PROFESOR') {
       router.replace('/');
     }
   }, [user, router]);
 
-  if (!user || user.role.toUpperCase() !== 'PROFESOR') return null;
+  if (!user || user.rol.toUpperCase() !== 'PROFESOR') return null;
 
   return (
     <Grid container spacing={3}>

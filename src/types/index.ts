@@ -1,7 +1,40 @@
-// src/types/index.ts
+// ✅ src/types/index.ts
 export type UserRole = "ADMIN" | "PROFESOR" | "PADRE";
 
-export type IconName = "Dashboard" | "People" | "Assignment" | "Book" | "School" | "Search";
+export type IconName =
+  | "Dashboard"
+  | "People"
+  | "Assignment"
+  | "Book"
+  | "School"
+  | "Search";
+
+/**
+ * Estructura completa del usuario en el sistema
+ */
+export interface User {
+  id: number;
+  username: string;
+  nombreCompleto: string;
+  email?: string;
+  rol: UserRole;
+  token: string;
+}
+
+/**
+ * Respuesta de la API para endpoints de autenticación
+ */
+export interface AuthResponse {
+  code: number;
+  message: string;
+  data: {
+    id: number;
+    username: string;
+    nombreCompleto: string;
+    rol: string; // El backend puede enviarlo en minúsculas
+    email?: string;
+  };
+}
 
 export interface GradoAcademico {
   id: number;

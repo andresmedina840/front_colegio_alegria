@@ -1,35 +1,28 @@
-// src/hooks/fetchUserSession.ts
-import { User } from "@/store/authStore";
-import { AuthMeResponse } from "@/types/ApiLogueoTypes";
-import { UserRole } from "@/types";
+// ✅ src/hooks/fetchUserSession.ts
+import { AuthResponse, User, UserRole } from "@/types";
 import axiosClient from "@/axios/axiosClient";
 import { useAuthStore } from "@/store/authStore";
 
 export const fetchUserSession = async (): Promise<User> => {
-  const response = await axiosClient.get<AuthMeResponse>("/auth/me");
-  const raw = response.data.data;
+  const res = await axiosClient.get<AuthResponse>("/auth/me", {
+    withCredentials: true,
+  });
 
-  const [firstName, ...rest] = raw.nombreCompleto.trim().split(" ");
-  const lastName = rest.join(" ");
+  const raw = res.data.data;
   const token = useAuthStore.getState().token ?? "";
 
   const role = raw.rol.toUpperCase() as UserRole;
   const VALID_ROLES: UserRole[] = ["ADMIN", "PROFESOR", "PADRE"];
-
   if (!VALID_ROLES.includes(role)) {
     throw new Error(`Rol inválido: ${raw.rol}`);
   }
 
-  const user: User = {
+  return {
     id: raw.id,
     username: raw.username,
-    firstName,
-    lastName,
-    email: "",
-    role,
+    nombreCompleto: raw.nombreCompleto,
+    email: raw.email ?? "",
+    rol: role,
     token,
   };
-
-  useAuthStore.getState().login(user);
-  return user;
 };

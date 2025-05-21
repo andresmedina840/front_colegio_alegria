@@ -22,7 +22,7 @@ import Link from "next/link";
 const drawerWidth = 240;
 
 export default function Sidebar() {
-  const role = useAuthStore((state) => state.user?.role) as UserRole | undefined;
+  const role = useAuthStore((state) => state.user?.rol) as UserRole | undefined;
 
   if (!role || !["ADMIN", "PROFESOR", "PADRE"].includes(role)) return null;
 

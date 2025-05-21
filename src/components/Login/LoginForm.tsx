@@ -1,3 +1,4 @@
+// src/components/Login/LoginForm.tsx
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -20,9 +21,10 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Image from "next/image";
 import axiosClient from "@/axios/axiosClient";
 import { useUIStore } from "@/store/uiStore";
-import { useAuthStore, User } from "@/store/authStore";
+import { useAuthStore } from "@/store/authStore";
 import CustomTextField from "@/components/personalizados/CustomTextField";
 import { loginSchema, LoginFormData } from "@/lib/schemas/validation";
+import { User } from "@/types";
 
 export default function LoginForm() {
   const { handleSubmit, control } = useForm<LoginFormData>({
@@ -48,82 +50,44 @@ export default function LoginForm() {
   }, [enqueueSnackbar, router]);
 
   const loginMutation = useMutation({
-    mutationFn: async (data: LoginFormData): Promise<User> => {
-      console.debug("[Login] ✉️ Enviando datos:", data);
-
+    mutationFn: async (data: LoginFormData): Promise<Omit<User, "token">> => {
       await axiosClient.post("/v1/api/auth/login", data, {
         withCredentials: true,
       });
 
-      console.debug("[Login] ✅ Login exitoso. Obteniendo usuario...");
-
       const response = await axiosClient.get("/v1/api/auth/me", {
         withCredentials: true,
       });
-
       const raw = response.data?.data;
 
-      console.debug("[Login] 🔍 Respuesta de /me:", raw);
-
-      const token = useAuthStore.getState().token ?? "";
-
-      const user: User = {
+      return {
         id: raw.id,
         username: raw.username,
-        firstName: raw.nombreCompleto?.split(" ")[1] ?? "",
-        lastName: raw.nombreCompleto?.split(" ")[2] ?? "",
-        email: raw.email,
-        role: raw.rol,
-        token,
-      };
-
-      return user;
+        nombreCompleto: raw.nombreCompleto,
+        email: raw.email ?? "",
+        rol: raw.rol,
+      } satisfies Omit<User, "token">;
     },
     onMutate: () => {
-      console.debug("[Login] ⌛ Cargando...");
       setIsLoading(true, "Iniciando sesión...");
     },
-    onSuccess: (user: User) => {
-      console.debug("[Login] ✔️ Usuario autenticado:", user);
-      login(user);
+    onSuccess: (userData) => {
+      login(userData); // token se obtiene desde cookie internamente
+      const target =
+        {
+          ADMIN: "/dashboard/admin",
+          PADRE: "/dashboard/padre",
+          PROFESOR: "/dashboard/profesor",
+        }[userData.rol.toUpperCase()] ?? "/login";
 
-      const role = user.role?.trim().toUpperCase();
-      const redirectMap: Record<string, string> = {
-        ADMIN: "/dashboard/admin",
-        PADRE: "/dashboard/padre",
-        PROFESOR: "/dashboard/profesor",
-      };
-
-      const target = redirectMap[role];
-      if (!target) {
-        enqueueSnackbar("Rol no autorizado", { variant: "error" });
-        return;
-      }
-
-      console.debug("[Login] 🧭 Redirigiendo a:", target);
       router.push(target);
     },
-    onError: (error: unknown) => {
-      console.error("[Login] ❌ Error:", error);
-      let errorMessage = "Error al iniciar sesión";
-
-      if (
-        typeof error === "object" &&
-        error !== null &&
-        "message" in error &&
-        typeof error.message === "string"
-      ) {
-        if (error.message.includes("Bad credentials")) {
-          errorMessage = "Usuario o contraseña incorrectos";
-        } else {
-          errorMessage = error.message;
-        }
-      }
-
-      enqueueSnackbar(errorMessage, { variant: "error" });
+    onError: (error) => {
+      const msg =
+        error instanceof Error ? error.message : "Error al iniciar sesión";
+      enqueueSnackbar(msg, { variant: "error" });
     },
     onSettled: () => {
-      console.debug("[Login] 🌟 Finalizando carga");
       setIsLoading(false);
     },
   });
@@ -232,7 +196,9 @@ export default function LoginForm() {
           sx={{ mt: 3, py: 1.5 }}
           disabled={loginMutation.isPending}
           startIcon={
-            loginMutation.isPending && <CircularProgress size={20} color="inherit" />
+            loginMutation.isPending && (
+              <CircularProgress size={20} color="inherit" />
+            )
           }
         >
           {loginMutation.isPending ? "Iniciando sesión..." : "Iniciar Sesión"}

@@ -36,7 +36,7 @@ export default function TemplateColegio({ children }: { children: React.ReactNod
 
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
-  const role = user?.role;
+  const role = user?.rol;
 
   // ✅ Verificamos que el rol sea válido
   const isValidRole = role === "ADMIN" || role === "PROFESOR" || role === "PADRE";
