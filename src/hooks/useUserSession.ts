@@ -12,8 +12,10 @@ import { User } from "@/types";
 export const useUserSession = () => {
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
-  const logout = useAuthStore.getState().logout;
   const queryClient = useQueryClient();
+
+  // Mejor práctica: usar selector para extraer la función del store y mantener la reactividad
+  const logout = useAuthStore((state) => state.logout);
 
   const query = useQuery<User, Error>({
     queryKey: ["user-session"],
@@ -31,7 +33,14 @@ export const useUserSession = () => {
       logout();
       router.push("/login?sessionExpired=true");
     }
-  }, [query.isError, query.error]);
+  }, [
+    query.isError,
+    query.error,
+    enqueueSnackbar,
+    queryClient,
+    logout,
+    router,
+  ]);
 
   return query;
 };

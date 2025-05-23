@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import {
   Controller,
   Control,
@@ -7,18 +8,21 @@ import {
   Path,
   RegisterOptions,
 } from "react-hook-form";
-import { Autocomplete, TextField, AutocompleteProps } from "@mui/material";
-import React from "react";
+import {
+  Autocomplete,
+  TextField,
+  AutocompleteProps,
+} from "@mui/material";
 
 type CustomAutocompleteProps<
-  T extends FieldValues,
+  TFormValues extends FieldValues,
   TOption extends object,
   TValue = string
 > = {
-  name: Path<T>;
+  name: Path<TFormValues>;
   label: string;
   options: TOption[];
-  control: Control<T>;
+  control: Control<TFormValues>;
   getOptionLabel: (option: TOption) => string;
   getOptionValue?: (option: TOption) => TValue;
   onChange?: (event: React.SyntheticEvent, value: TOption | null) => void;
@@ -26,7 +30,7 @@ type CustomAutocompleteProps<
   required?: boolean;
   helperText?: string;
   rules?: Omit<
-    RegisterOptions<T, Path<T>>,
+    RegisterOptions<TFormValues, Path<TFormValues>>,
     "disabled" | "valueAsNumber" | "valueAsDate" | "setValueAs"
   >;
   loading?: boolean;
@@ -36,7 +40,7 @@ type CustomAutocompleteProps<
 >;
 
 function CustomAutocomplete<
-  T extends FieldValues,
+  TFormValues extends FieldValues,
   TOption extends object,
   TValue = string
 >({
@@ -51,20 +55,21 @@ function CustomAutocomplete<
   required = false,
   helperText,
   rules,
-  loading,
+  loading = false,
   ...props
-}: CustomAutocompleteProps<T, TOption, TValue>) {
+}: CustomAutocompleteProps<TFormValues, TOption, TValue>) {
   return (
     <Controller
-      control={control}
       name={name}
+      control={control}
       rules={rules}
       render={({
         field: { onChange: onFieldChange, value, ref },
         fieldState: { error },
       }) => {
-        // Función para obtener el valor de comparación seguro para tipos
-        const getSafeValue = (item: TOption | TValue | null): TValue | null => {
+        const getSafeValue = (
+          item: TOption | TValue | null
+        ): TValue | null => {
           if (!item) return null;
           if (typeof item === "object" && "id" in item) {
             return getOptionValue
@@ -74,7 +79,6 @@ function CustomAutocomplete<
           return item as TValue;
         };
 
-        // Encontrar la opción seleccionada de manera segura
         const findSelectedOption = (
           currentValue: TValue | null
         ): TOption | null => {
@@ -96,10 +100,7 @@ function CustomAutocomplete<
           <Autocomplete
             {...props}
             options={options}
-            getOptionLabel={(option) => {
-              const label = getOptionLabel(option);
-              return label ?? "";
-            }}
+            value={selectedOption}
             onChange={(event, newValue) => {
               const valueToStore = newValue
                 ? getOptionValue
@@ -109,9 +110,9 @@ function CustomAutocomplete<
               onFieldChange(valueToStore);
               onChange?.(event, newValue);
             }}
-            value={selectedOption}
-            disabled={disabled}
-            loading={loading}
+            getOptionLabel={(option) =>
+              getOptionLabel(option) ?? ""
+            }
             isOptionEqualToValue={(option, val) => {
               const optionValue = getOptionValue
                 ? getOptionValue(option)
@@ -119,6 +120,8 @@ function CustomAutocomplete<
               const valValue = getSafeValue(val);
               return optionValue === valValue;
             }}
+            disabled={disabled}
+            loading={loading}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -128,9 +131,7 @@ function CustomAutocomplete<
                 helperText={error?.message || helperText}
                 inputRef={ref}
                 autoComplete="new-password"
-                InputLabelProps={{
-                  shrink: true,
-                }}
+                InputLabelProps={{ shrink: true }}
               />
             )}
           />
