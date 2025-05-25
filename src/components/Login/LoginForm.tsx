@@ -84,7 +84,7 @@ export default function LoginForm() {
       setIsLoading(true, "Iniciando sesión...");
     },
     onSuccess: ({ userData, token }) => {
-      login(userData, token); // Ahora pasamos ambos argumentos
+      login(userData, token); 
       const target =
         {
           ADMIN: "/dashboard/admin",

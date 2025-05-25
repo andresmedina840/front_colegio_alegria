@@ -1,3 +1,5 @@
+// ✅ COMPONENTE CustomDatePicker.tsx COMPLETO
+
 "use client";
 
 import { DatePicker } from "@mui/x-date-pickers";
@@ -46,24 +48,19 @@ export const CustomDatePicker = <T extends FieldValues>({
 }: Props<T>) => {
   const parseDate = (dateValue: unknown): Dayjs | null => {
     if (!dateValue) return null;
-    
-    try {
-      // Manejar formato ISO (backend) y DD/MM/YYYY (frontend)
-      if (typeof dateValue === "string") {
-        if (dateValue.includes("T") || dateValue.includes("-")) {
-          return dayjs(dateValue);
-        }
-        return dayjs(dateValue, "DD/MM/YYYY", true);
+
+    if (typeof dateValue === "string") {
+      if (dateValue.includes("T") || dateValue.includes("-")) {
+        return dayjs(dateValue);
       }
-      return dayjs(dateValue as Dayjs);
-    } catch {
-      return null;
+      return dayjs(dateValue, "DD/MM/YYYY", true);
     }
+    return dayjs(dateValue as Dayjs);
   };
 
   const formatDateForStorage = (date: Dayjs | null): string | null => {
     if (!date?.isValid()) return null;
-    return date.format("DD/MM/YYYY"); // Guardamos en formato DD/MM/YYYY
+    return date.format("DD/MM/YYYY");
   };
 
   return (

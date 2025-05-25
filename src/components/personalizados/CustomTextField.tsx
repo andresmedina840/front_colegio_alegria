@@ -33,10 +33,7 @@ type CustomTextFieldProps<T extends FieldValues> = {
   InputProps?: TextFieldProps["InputProps"];
   slotProps?: TextFieldProps["slotProps"];
   inputComponent?: ElementType<InputBaseComponentProps>;
-} & Omit<
-  TextFieldProps,
-  "name" | "label" | "value" | "onChange" | "error" | "helperText"
->;
+} & Omit<TextFieldProps, "name" | "label" | "value" | "onChange">;
 
 function CustomTextField<T extends FieldValues>({
   name,
@@ -57,6 +54,8 @@ function CustomTextField<T extends FieldValues>({
   inputComponent,
   ...props
 }: CustomTextFieldProps<T>) {
+  const isCustomInput = !!inputComponent;
+
   if (control) {
     return (
       <Controller
@@ -64,14 +63,8 @@ function CustomTextField<T extends FieldValues>({
         control={control}
         rules={rules}
         render={({ field: { onChange, value, ref }, fieldState: { error } }) => {
-          const isCustomInput = !!inputComponent;
-
           const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            if (isCustomInput) {
-              // No procesamos el cambio, dejamos que el componente personalizado lo maneje
-              onChange(e);
-              return;
-            }
+            if (isCustomInput) return onChange(e);
 
             let newValue = e.target.value;
 
@@ -151,6 +144,7 @@ function CustomTextField<T extends FieldValues>({
     );
   }
 
+  // Si no se provee control (modo no-controlado)
   return (
     <TextField
       {...props}

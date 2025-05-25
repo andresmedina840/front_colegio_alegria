@@ -14,7 +14,7 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: ["ADMIN", "PROFESOR"],
     icon: "People" 
   },
-  { 
+  /*{ 
     text: "Boletines", 
     route: "/boletines", 
     roles: ["ADMIN", "PROFESOR"],
@@ -37,5 +37,5 @@ export const MENU_ITEMS: MenuItem[] = [
     route: "/buscar-estudiantes", 
     roles: ["ADMIN", "PROFESOR"],
     icon: "Search" 
-  }
+  }*/
 ];

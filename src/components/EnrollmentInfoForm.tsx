@@ -2,19 +2,22 @@
 "use client";
 
 import { Card, CardContent, Grid } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
-import { Controller, Control } from "react-hook-form";
+import { Control, FieldErrors, UseFormTrigger } from "react-hook-form";
 import CustomTextField from "./personalizados/CustomTextField";
-import { getCurrentDateISO, formatDateToISO } from "../utils/dateUtils";
+import { getCurrentDateISO } from "../utils/dateUtils";
 import { StudentInfoFormValues } from "@/schemas/studentInfoSchema";
+import { CustomDatePicker } from "./personalizados/CustomDatePicker";
+import dayjs from "dayjs";
 
-type EnrollmentInfoFormProps = {
+type Props = {
   control: Control<StudentInfoFormValues>;
+  errors: FieldErrors<StudentInfoFormValues>;
+  trigger: UseFormTrigger<StudentInfoFormValues>;
 };
 
-const EnrollmentInfoForm = ({ control }: EnrollmentInfoFormProps) => {
+const EnrollmentInfoForm = ({ control, errors, trigger }: Props) => {
   const [maxDate, setMaxDate] = useState<Dayjs | null>(null);
 
   useEffect(() => {
@@ -35,37 +38,17 @@ const EnrollmentInfoForm = ({ control }: EnrollmentInfoFormProps) => {
             />
           </Grid>
 
-          {maxDate && (
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Controller
-                name="fechaMatricula"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <DatePicker
-                    label="Fecha de matrícula"
-                    value={value && dayjs(value).isValid() ? dayjs(value) : null}
-                    onChange={(newValue) =>
-                      onChange(newValue ? formatDateToISO(newValue.toDate()) : "")
-                    }
-                    maxDate={maxDate}
-                    format="DD/MM/YYYY"
-                    timezone="UTC"
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        InputLabelProps: { shrink: true },
-                        inputProps: {
-                          suppressHydrationWarning: true,
-                          spellCheck: false,
-                          "data-ms-editor": "false",
-                        } as React.InputHTMLAttributes<HTMLInputElement>,
-                      },
-                    }}
-                  />
-                )}
-              />
-            </Grid>
-          )}
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <CustomDatePicker
+              name="fechaMatricula"
+              label="Fecha de matrícula"
+              control={control}
+              errors={errors}
+              required
+              maxDate={maxDate || undefined}
+              trigger={trigger}
+            />
+          </Grid>
         </Grid>
       </CardContent>
     </Card>
